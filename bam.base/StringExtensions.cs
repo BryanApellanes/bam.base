@@ -1012,5 +1012,165 @@ namespace Bam.Net
 
             return startInfo.Run(output, error, timeout);//return Run(startInfo, output, error, timeout);
         }
+
+        /// <summary>
+        /// Attempts to return the plural version of the supplied word (assumed to be a noun)
+        /// using basic rules.
+        /// </summary>
+        /// <param name="stringToPluralize"></param>
+        /// <returns></returns>
+        public static string Pluralize(this string stringToPluralize)
+        {
+            string checkValue = stringToPluralize.ToLowerInvariant();
+            if (checkValue.EndsWith("ies"))
+            {
+                return stringToPluralize;
+            }
+            else if (checkValue.EndsWith("us"))
+            {
+                return stringToPluralize.Substring(0, stringToPluralize.Length - 2) + "i";
+            }
+            else if (checkValue.EndsWith("s") ||
+                     checkValue.EndsWith("sh"))
+            {
+                return stringToPluralize + "es";
+            }
+            else if (checkValue.EndsWith("ay") ||
+                     checkValue.EndsWith("ey") ||
+                     checkValue.EndsWith("iy") ||
+                     checkValue.EndsWith("oy") ||
+                     checkValue.EndsWith("uy"))
+            {
+                return stringToPluralize + "s";
+            }
+            else if (checkValue.EndsWith("y"))
+            {
+                return stringToPluralize.Substring(0, stringToPluralize.Length - 1) + "ies";
+            }
+            else
+            {
+                return stringToPluralize + "s";
+            }
+        }
+
+        /// <summary>
+        /// Returns true if the string equals "true", "t", "yes", "y" or "1" using a case
+        /// insensitive comparison.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static bool IsAffirmative(this string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return false;
+            }
+
+            return value.Equals("true", StringComparison.InvariantCultureIgnoreCase) ||
+                   value.Equals("yes", StringComparison.InvariantCultureIgnoreCase) ||
+                   value.Equals("t", StringComparison.InvariantCultureIgnoreCase) ||
+                   value.Equals("y", StringComparison.InvariantCultureIgnoreCase) ||
+                   value.Equals("1");
+        }
+
+        public static string MixCase(string retTemp)
+        {
+            return MixCase(retTemp, 5);
+        }
+
+        private static string MixCase(string retTemp, int tryCount)
+        {
+            if (tryCount <= 0)
+                return retTemp;
+
+            if (retTemp.Length < 2)
+                return retTemp;
+
+            string upperIzed = string.Empty;
+            bool didUpper = false;
+            bool keptLower = false;
+            foreach (char c in retTemp)
+            {
+                string upper = string.Empty;
+                if (Extensions.RandomBool())
+                {
+                    upper = c.ToString().ToUpper();
+                    didUpper = true;
+                }
+                else
+                {
+                    upper = c.ToString();
+                    keptLower = true;
+                }
+
+                upperIzed += upper;
+            }
+
+            if (didUpper && keptLower)
+                return upperIzed;
+            else
+                return MixCase(upperIzed, --tryCount);
+        }
+        public static string TrimNonLetters(this string targetString)
+        {
+            return targetString.DropLeadingNonLetters().DropTrailingNonLetters();
+        }
+
+
+
+        public static string DropLeadingNonLetters(this string targetString)
+        {
+            StringBuilder result = new StringBuilder();
+            bool foundLetter = false;
+            for (int i = 0; i < targetString.Length; i++)
+            {
+                char c = targetString[i];
+                if (c.IsLetter())
+                {
+                    foundLetter = true;
+                }
+
+                if (foundLetter)
+                {
+                    result.Append(c);
+                }
+            }
+
+            return result.ToString();
+        }
+
+        static string[] letters = new string[]
+        {
+                    "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u",
+                    "v", "w", "x", "y", "z"
+        };
+
+        /// <summary>
+        /// Returns a random lowercase letter from a-z."
+        /// </summary>
+        /// <returns>String</returns>
+        public static string RandomLetter()
+        {
+            return letters[RandomHelper.Next(0, 26)];
+        }
+
+        /// <summary>
+        /// Append the specified number of characters
+        /// to the end of the string
+        /// </summary>
+        /// <param name="val"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        public static string RandomLetters(this string val, int count)
+        {
+            StringBuilder txt = new StringBuilder();
+            txt.Append(val);
+            for (int i = 0; i < count; i++)
+            {
+                txt.Append(RandomLetter());
+            }
+
+            return txt.ToString();
+        }
     }
 }

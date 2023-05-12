@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Bam.Net.ServiceProxy;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-//using Bam.Net.ServiceProxy;
 
 namespace Bam.Net.Data.Repositories
 {
@@ -38,7 +38,7 @@ namespace Bam.Net.Data.Repositories
             }
         }
           
-/*        public static DaoInfo FromContext(IHttpContext context)
+        public static DaoInfo FromContext(IHttpContext context)
         {
             return FromRequest(context.Request);
         }
@@ -46,7 +46,7 @@ namespace Bam.Net.Data.Repositories
         public static DaoInfo FromRequest(IRequest request)
         {
             return FromUri(request.Url);
-        }*/
+        }
 
         public static DaoInfo FromUri(Uri uri)
         {

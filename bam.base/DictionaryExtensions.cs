@@ -28,5 +28,23 @@ namespace Bam.Net
 
             return false;
         }
+
+
+        /// <summary>
+        /// Set the value for the specified key in the dictionary in a way that won't 
+        /// throw an exception if the key isn't already there
+        /// </summary>
+        /// <typeparam name="TKey"></typeparam>
+        /// <typeparam name="TValue"></typeparam>
+        /// <param name="dictionary"></param>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        public static void Set<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TKey key, TValue value)
+        {
+            if (!AddMissing(dictionary, key, value))
+            {
+                dictionary[key] = value;
+            }
+        }
     }
 }

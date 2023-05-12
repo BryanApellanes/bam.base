@@ -38,6 +38,6 @@ namespace Bam.Net.Data.Repositories
 
         bool TryHydrate(IRepoData data);
 
-        T LoadByKey<T>(ulong key) where T : IKeyedAuditRepoData, new();
+        T LoadByKey<T>(ulong key) where T : class, new();
     }
 }

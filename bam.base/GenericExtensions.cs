@@ -17,5 +17,17 @@ namespace Bam.Net
         {
             return new List<T>(options).Contains(obj);
         }
+
+        public static T Largest<T>(this T[] values)
+        {
+            if (values.Length == 0)
+            {
+                return default(T);
+            }
+
+            T result = values[0];
+            values.Each(s => result = s.ToString().CompareTo(result.ToString()) == 1 ? s : result);
+            return result;
+        }
     }
 }

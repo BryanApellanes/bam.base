@@ -5,7 +5,7 @@ using System;
 
 namespace Bam.Net.Data
 {
-    public interface IQuerySet
+    public interface IQuerySet: ISqlStringBuilder
     {
         IDatabase Database { get; set; }
         IQuerySetResults Results { get; }

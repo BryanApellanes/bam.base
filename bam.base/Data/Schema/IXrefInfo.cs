@@ -9,7 +9,7 @@ namespace Bam.Net.Data.Schema
         string ParentTableName { get; set; }
         string XrefTableName { get; set; }
 
-        string RenderAddToChildDaoCollection();
-        string RenderXrefProperty();
+/*        string RenderAddToChildDaoCollection();
+        string RenderXrefProperty();*/
     }
 }

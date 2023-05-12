@@ -581,5 +581,56 @@ namespace Bam.Net
             return result;
         }
 
+        /// <summary>
+        /// Copy the current source instance as the specified type
+        /// copying all properties that match in name and type.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static object CopyAs(this object source, Type type, params object[] ctorParams)
+        {
+            if (source == null)
+            {
+                return source;
+            }
+
+            object result = type.Construct(ctorParams);
+            result.CopyProperties(source);
+            return result;
+        }
+
+        public static string ToJson(this object value, bool pretty,
+            NullValueHandling nullValueHandling = NullValueHandling.Ignore)
+        {
+            Newtonsoft.Json.Formatting formatting =
+                pretty ? Newtonsoft.Json.Formatting.Indented : Newtonsoft.Json.Formatting.None;
+            JsonSerializerSettings settings = new JsonSerializerSettings
+            {
+                Formatting = formatting,
+                NullValueHandling = nullValueHandling
+            };
+            return value.ToJson(settings);
+        }
+
+        public static string ToJson(this object value, JsonSerializerSettings settings)
+        {
+            return JsonConvert.SerializeObject(value, settings);
+        }
+
+        public static bool IsNumber(this object value)
+        {
+            return value is sbyte
+                   || value is byte
+                   || value is short
+                   || value is ushort
+                   || value is int
+                   || value is uint
+                   || value is long
+                   || value is ulong
+                   || value is float
+                   || value is double
+                   || value is decimal;
+        }
     }
 }

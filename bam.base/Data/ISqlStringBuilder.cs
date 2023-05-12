@@ -8,10 +8,10 @@ using System.Data.Common;
 
 namespace Bam.Net.Data
 {
-    public interface ISqlStringBuilder
+    public interface ISqlStringBuilder: IHasFilters
     {
         Func<string, string> ColumnNameFormatter { get; set; }
-        IEnumerable<IFilterToken> Filters { get; }
+        //IEnumerable<IFilterToken> Filters { get; }
         string GoText { get; set; }
         int? NextNumber { get; set; }
         IParameterInfo[] Parameters { get; set; }

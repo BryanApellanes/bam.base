@@ -13,6 +13,7 @@ namespace Bam.Net.Data
 {
     public interface IDatabase
     {
+        Func<ColumnAttribute, string> ColumnNameProvider { get; set; }
         ColumnNameListProvider ColumnNameListProvider { get; }
         IDbConnectionManager ConnectionManager { get; set; }
         string ConnectionName { get; set; }

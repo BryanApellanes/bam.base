@@ -12,6 +12,6 @@ namespace Bam.Net.Data.Repositories
         DateTime? Modified { get; set; }
         string ModifiedBy { get; set; }
 
-        T EnsureSingle<T>(IRepository repo, string modifiedBy, params string[] propertyNames) where T : IAuditRepoData, new();
+        T EnsureSingle<T>(IRepository repo, string modifiedBy, params string[] propertyNames) where T : class, new();
     }
 }

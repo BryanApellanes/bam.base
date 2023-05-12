@@ -12,6 +12,7 @@ namespace Bam.Net.Data
     {
         bool AutoDeleteChildren { get; set; }
         bool AutoHydrateChildrenOnDelete { get; set; }
+        void HydrateChildren(IDatabase database = null);
         string[] Columns { get; }
         IDatabase Database { get; set; }
         DataRow DataRow { get; set; }
@@ -24,6 +25,7 @@ namespace Bam.Net.Data
         string KeyColumnName { get; }
         object PrimaryKey { get; set; }
         Incubator ServiceProvider { get; }
+        bool HasNewValues { get; }
         Func<IDao, IQueryFilter> UniqueFilterProvider { get; set; }
 
         event ICommittableDelegate AfterCommit;
@@ -51,6 +53,7 @@ namespace Bam.Net.Data
         Type[] GetSchemaTypes();
         TypeCode GetTypeCode(DataTypes dataTypes);
         IQueryFilter GetUniqueFilter();
+        AssignValue[] GetNewAssignValues();
         void Hydrate(IDatabase database = null);
         void Insert(IDatabase db = null);
         void OnInitialize();
@@ -61,6 +64,8 @@ namespace Bam.Net.Data
         Task SaveAsync(IDatabase db = null);
         void SetId(object value);
         void SetId(ulong? id);
+        void SetUuid();
+        void SetValue(string columnName, object value);
         string TableName();
         ulong? TryGetId(Action<Exception> exceptionHandler = null);
         void Undelete(IDatabase db = null);
