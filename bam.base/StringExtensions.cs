@@ -1172,5 +1172,17 @@ namespace Bam.Net
 
             return txt.ToString();
         }
+
+        public static object DecodeFromFile(this string filePath)
+        {
+            byte[] data = File.ReadAllBytes(filePath);
+            return data.Decode();
+        }
+        
+        public static T DecodeFromFile<T>(this string filePath)
+        {
+            byte[] data = File.ReadAllBytes(filePath);
+            return data.Decode<T>();
+        }
     }
 }

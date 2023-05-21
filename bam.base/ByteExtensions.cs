@@ -29,5 +29,23 @@ namespace Bam.Net
         {
             return Convert.ToBase64String(data);
         }
+
+        public static IObjectDecoder ObjectDecoder
+        {
+            get;
+            set;
+        }
+
+        public static object Decode(this byte[] data)
+        {
+            Args.ThrowIfNull(ObjectDecoder, $"{nameof(ByteExtensions)}.{nameof(ObjectDecoder)}");
+            return ObjectDecoder.Decode(data);
+        }
+
+        public static T Decode<T>(this byte[] data)
+        {
+            Args.ThrowIfNull(ObjectDecoder, $"{nameof(ByteExtensions)}.{nameof(ObjectDecoder)}");
+            return ObjectDecoder.Decode<T>(data);
+        }
     }
 }

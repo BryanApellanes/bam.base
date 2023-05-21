@@ -6,13 +6,14 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 using YamlDotNet.Serialization;
 
 namespace Bam.Net    
 {
-    public static class OjectExtensions
+    public static class ObjectExtensions
     {
         /// <summary>
         /// Double null check the specified toInit locking on the current
@@ -631,6 +632,24 @@ namespace Bam.Net
                    || value is float
                    || value is double
                    || value is decimal;
+        }
+
+        public static IObjectEncoder ObjectEncoder
+        {
+            get;
+            set;
+        }
+
+        public static IObjectEncoding Encode(this object value)
+        {
+            Args.ThrowIfNull(ObjectEncoder, "OjbectExtensions.ObjectEncoder");
+            return ObjectEncoder.Encode(value);
+        }
+
+        public static void EncodeToFile(this object value, string filePath)
+        {
+            IObjectEncoding encoding = value.Encode();
+            File.WriteAllBytes(filePath, encoding.Bytes);
         }
     }
 }

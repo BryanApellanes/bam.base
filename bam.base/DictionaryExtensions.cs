@@ -18,7 +18,7 @@ namespace Bam.Net
         /// <param name="key"></param>
         /// <param name="value"></param>
         /// <returns>true if the value was added because no value existed, false if a value with the same key is already in the dictionary.</returns>
-        public static bool AddMissing<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TKey key, TValue value)
+        public static bool AddMissing<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TKey key, TValue value) where TKey : notnull
         {
             if (!dictionary.ContainsKey(key))
             {
@@ -45,6 +45,21 @@ namespace Bam.Net
             {
                 dictionary[key] = value;
             }
+        }
+        public static object ToInstance(this Dictionary<object, object> dictionary, Type type, params object[] ctorParams)
+        {
+            return CopyAs(dictionary, type, ctorParams);
+        }
+
+        public static object CopyAs(this Dictionary<object, object> dictionary, Type type, params object[] ctorParams)
+        {
+            object result = type.Construct(ctorParams);
+            foreach (object key in dictionary.Keys)
+            {
+                result.Property(key.ToString(), dictionary[key]);
+            }
+
+            return result;
         }
     }
 }

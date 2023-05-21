@@ -11,7 +11,7 @@ namespace Bam.Net.Data
         where T: IDao, new()
     {
         Func<ColumnAttribute, string> ColumnNameProvider { get; set; }
-
+        IDatabase Database { get; set; }
         DataTable GetDataTable();
         DataTable GetDataTable(IDatabase database);
         ISqlStringBuilder ToSqlStringBuilder(IDatabase db);
