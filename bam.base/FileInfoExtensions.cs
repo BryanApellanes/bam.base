@@ -58,5 +58,15 @@ namespace Bam.Net
         {
             return new FileInfo(file.FullName.GetNextFileName());
         }
+
+        public static object DecodeFromFile(this FileInfo file, Type type)
+        {
+            return file.FullName.DecodeFromFile(type);
+        }
+
+        public static T DecodeFromFile<T>(this FileInfo file)
+        {
+            return file.FullName.DecodeFromFile<T>();
+        }
     }
 }

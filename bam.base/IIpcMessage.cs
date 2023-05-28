@@ -1,11 +1,12 @@
 ﻿/*
 	Copyright © Bryan Apellanes 2015  
 */
+using Bam.Net.Logging;
 using System;
 
 namespace Bam.Net
 {
-    public interface IIpcMessage
+    public interface IIpcMessage : ILoggable
     {
         int AcquireLockRetryInterval { get; set; }
         string CurrentLockerId { get; set; }

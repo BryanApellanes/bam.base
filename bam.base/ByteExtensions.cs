@@ -36,10 +36,10 @@ namespace Bam.Net
             set;
         }
 
-        public static object Decode(this byte[] data)
+        public static object Decode(this byte[] data, Type type)
         {
             Args.ThrowIfNull(ObjectDecoder, $"{nameof(ByteExtensions)}.{nameof(ObjectDecoder)}");
-            return ObjectDecoder.Decode(data);
+            return ObjectDecoder.Decode(data, type);
         }
 
         public static T Decode<T>(this byte[] data)

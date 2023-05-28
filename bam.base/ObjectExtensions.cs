@@ -642,7 +642,7 @@ namespace Bam.Net
 
         public static IObjectEncoding Encode(this object value)
         {
-            Args.ThrowIfNull(ObjectEncoder, "OjbectExtensions.ObjectEncoder");
+            Args.ThrowIfNull(ObjectEncoder, $"{nameof(ObjectExtensions)}.{nameof(ObjectEncoder)}");
             return ObjectEncoder.Encode(value);
         }
 
@@ -650,6 +650,15 @@ namespace Bam.Net
         {
             IObjectEncoding encoding = value.Encode();
             File.WriteAllBytes(filePath, encoding.Bytes);
+        }
+
+        /// <summary>
+        /// Clears the locks created for writing and appending
+        /// to files
+        /// </summary>
+        public static void ClearFileAccessLocks(this object any)
+        {
+            FileLock.ClearLocks();
         }
     }
 }
