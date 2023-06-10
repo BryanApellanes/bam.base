@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using YamlDotNet.Serialization;
 using Bam.Net;
+using System.Data;
 
 namespace Bam.Net
 {
@@ -67,6 +68,111 @@ namespace Bam.Net
         public static T DecodeFromFile<T>(this FileInfo file)
         {
             return file.FullName.DecodeFromFile<T>();
+        }
+
+        static Dictionary<string, SerializationFormat> _serializationFormats;
+        static object _serializationFormatsLock = new object();
+
+        public static Dictionary<string, SerializationFormat> SerializationFormats
+        {
+            get
+            {
+                return _serializationFormatsLock.DoubleCheckLock(ref _serializationFormats, () =>
+                    new Dictionary<string, SerializationFormat>
+                    {
+                        {".yaml", SerializationFormat.Yaml},
+                        {".yml", SerializationFormat.Yaml},
+                        {".json", SerializationFormat.Json},
+                        {".xml", SerializationFormat.Xml},
+             /*           {".dat", SerializationFormat.Binary},
+                        {".bin", SerializationFormat.Binary}*/
+                    });
+            }
+        }
+
+        static Dictionary<SerializationFormat, Func<Stream, Type, object>> _deserializers;
+        static object _deserializersLock = new object();
+
+        public static Dictionary<SerializationFormat, Func<Stream, Type, object>> Deserializers
+        {
+            get
+            {
+                return _deserializersLock.DoubleCheckLock(ref _deserializers, () =>
+                    new Dictionary<SerializationFormat, Func<Stream, Type, object>>
+                    {
+                        {
+                            SerializationFormat.Invalid, (stream, type) =>
+                            {
+                                Args.Throw<InvalidOperationException>("Invalid SerializationFormat specified");
+                                return null;
+                            }
+                        },
+                        {SerializationFormat.Xml, (stream, type) => stream.FromXmlStream(type)},
+                        {
+                            SerializationFormat.Json, (stream, type) => stream.FromJsonStream(type)
+                        }, // this might not work; should be tested
+                        {
+                            SerializationFormat.Yaml, (stream, type) => stream.FromYamlStream(type)
+                        }, // this might not work; should be tested
+/*                        {
+                            SerializationFormat.Binary, (stream, type) => stream.FromBinaryStream()
+                        } // this might not work; should be tested*/
+                    });
+            }
+        }
+
+        static Dictionary<SerializationFormat, Action<Stream, object>> _serializeActions;
+        static object _serializeActionsLock = new object();
+
+        public static Dictionary<SerializationFormat, Action<Stream, object>> SerializeActions
+        {
+            get
+            {
+                return _serializeActionsLock.DoubleCheckLock(ref _serializeActions, () =>
+                    new Dictionary<SerializationFormat, Action<Stream, object>>
+                    {
+                        {
+                            SerializationFormat.Invalid,
+                            (stream, obj) =>
+                                Args.Throw<InvalidOperationException>("Invalid SerializationFormat specified")
+                        },
+                        {SerializationFormat.Xml, (stream, obj) => obj.ToXmlStream(stream)},
+                        {SerializationFormat.Json, (stream, obj) => obj.ToJsonStream(stream)},
+                        {SerializationFormat.Yaml, (stream, obj) => obj.ToYamlStream(stream)},
+                        //{SerializationFormat.Binary, (stream, obj) => obj.ToBinaryStream(stream)}
+                    });
+            }
+        }
+
+        /// <summary>
+        /// Deserialize the specified file using the file extension to determine the format.
+        /// </summary>
+        /// <param name="file"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static T FromFile<T>(this FileInfo file)
+        {
+            return Deserialize<T>(file);
+        }
+
+        public static T Deserialize<T>(this FileInfo file)
+        {
+            return (T)Deserialize(file, typeof(T));
+        }
+
+        public static object Deserialize(this FileInfo file, Type type)
+        {
+            string fileExtension = file.Extension;
+            if (!SerializationFormats.ContainsKey(fileExtension))
+            {
+                throw new ArgumentException(
+                    $"File extension ({fileExtension}) not supported for deserialization, use one of ({string.Join(",", SerializationFormats.Keys.ToArray())})");
+            }
+
+            using (FileStream fs = file.OpenRead())
+            {
+                return Deserializers[SerializationFormats[fileExtension]](fs, type);
+            }
         }
     }
 }

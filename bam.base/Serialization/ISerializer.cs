@@ -6,12 +6,8 @@ using System.Threading.Tasks;
 
 namespace Bam.Net
 {
-    public enum SerializationFormat
+    public interface ISerializer
     {
-        Invalid,
-        Xml,
-        Json,
-        Yaml,
-        Binary
+        byte[] Serialize(object data);
     }
 }

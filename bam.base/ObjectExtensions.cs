@@ -9,6 +9,8 @@ using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
+using System.Xml.Serialization;
 using YamlDotNet.Serialization;
 
 namespace Bam.Net    
@@ -659,6 +661,142 @@ namespace Bam.Net
         public static void ClearFileAccessLocks(this object any)
         {
             FileLock.ClearLocks();
+        }
+
+        /// <summary>
+        /// Serialize the object to the specified filePath.  The same as
+        /// ToXmlFile().
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="filePath"></param>
+        public static void XmlSerialize(this object target, string filePath)
+        {
+            ToXmlFile(target, filePath);
+        }
+
+        /// <summary>
+        /// Serialize the object to the specified filePath.  The same as XmlSerialzie()
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="filePath"></param>
+        public static void ToXmlFile(this object target, string filePath)
+        {
+            ToXmlFile(target, filePath, true);
+        }
+
+        static object lockObj = new object();
+        public static void ToXmlFile(this object target, string filePath, bool throwIfNotSerializable)
+        {
+            Type t = target.GetType();
+            if (throwIfNotSerializable)
+            {
+                bool isSerializable = IsSerializable(t);
+                if (!isSerializable)
+                {
+                    ThrowInvalidOperationException(t);
+                }
+            }
+
+            XmlSerializer ser = new XmlSerializer(t);
+            lock (lockObj)
+            {
+                using (StreamWriter sw = new StreamWriter(filePath))
+                {
+                    ser.Serialize(sw, target);
+                }
+            }
+        }
+
+        public static string ToXml(this object target)
+        {
+            MemoryStream stream = new MemoryStream();
+            ToXmlStream(target, stream);
+            stream.Seek(0, SeekOrigin.Begin);
+            using (StreamReader reader = new StreamReader(stream))
+            {
+                return reader.ReadToEnd();
+            }
+        }
+
+        public static string ToXml(this object target, bool includeXmlDeclaration)
+        {
+            return ToXml(target, new XmlWriterSettings { OmitXmlDeclaration = !includeXmlDeclaration, Indent = true });
+        }
+
+        public static string ToXml(this object target, XmlWriterSettings settings)
+        {
+            MemoryStream stream = new MemoryStream();
+            ToXmlStream(target, stream, settings);
+            stream.Seek(0, SeekOrigin.Begin);
+            using (StreamReader reader = new StreamReader(stream))
+            {
+                return reader.ReadToEnd();
+            }
+        }
+
+        public static void ToXmlStream(this object target, Stream stream)
+        {
+            ToXmlStream(target, stream, new XmlWriterSettings { Indent = true });
+        }
+
+        public static void ToXmlStream(this object target, Stream stream, XmlWriterSettings settings)
+        {
+            XmlSerializer ser = new XmlSerializer(target.GetType());
+            using (XmlWriter writer = XmlWriter.Create(stream, settings))
+            {
+                ser.Serialize(writer, target);
+            }
+        }
+
+        /// <summary>
+        /// Return a Stream containing the current
+        /// object as json
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static Stream ToJsonStream(this object value)
+        {
+            MemoryStream stream = new MemoryStream();
+            ToJsonStream(value, stream);
+            return stream;
+        }
+
+        /// <summary>
+        /// Write the specified value to the specified stream as json
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="stream"></param>
+        public static void ToJsonStream(this object value, Stream stream)
+        {
+            StreamWriter writer = new StreamWriter(stream);
+            writer.Write(value.ToJson());
+            writer.Flush();
+            stream.Seek(0, SeekOrigin.Begin);
+        }
+        public static Stream ToYamlStream(this object value)
+        {
+            MemoryStream stream = new MemoryStream();
+            ToYamlStream(value, stream);
+            return stream;
+        }
+
+        public static void ToYamlStream(this object value, Stream stream)
+        {
+            StreamWriter writer = new StreamWriter(stream);
+            writer.Write(value.ToYaml());
+            writer.Flush();
+            stream.Seek(0, SeekOrigin.Begin);
+        }
+
+        private static void ThrowInvalidOperationException(Type t)
+        {
+            throw new InvalidOperationException("The target object specified is of type " + t.Name + " which is not serializable.  If this is a user defined type add the [Serializable] attribute to the class definition");
+        }
+
+        private static bool IsSerializable(Type t)
+        {
+            bool isSerializable = t.GetCustomAttributes(typeof(SerializableAttribute), false).Length > 0;
+            return isSerializable;
         }
     }
 }

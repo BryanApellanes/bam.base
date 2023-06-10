@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace Bam.Net
 {
@@ -681,6 +682,67 @@ namespace Bam.Net
         public static object FromJsonFile(this string filePath, Type type)
         {
             return filePath.SafeReadFile().FromJson(type);
+        }
+
+
+        /// <summary>
+        /// Deserialize the xml file as the specified generic type
+        /// </summary>
+        /// <typeparam name="T">The type of the return value</typeparam>
+        /// <param name="filePath">The path to the xml file</param>
+        /// <returns>instance of T</returns>
+        public static T FromXmlFile<T>(this string filePath)
+        {
+            return (T)FromXmlFile(filePath, typeof(T));
+        }
+
+        /// <summary>
+        /// Deserialize the xml file as the speicified type
+        /// </summary>
+        /// <param name="filePath">The path to the xml file</param>
+        /// <param name="type">The type of the return value</param>
+        /// <returns>instance of specified type deserialized from the specified file</returns>
+        public static object FromXmlFile(this string filePath, Type type)
+        {
+            using (StreamReader sr = new StreamReader(filePath))
+            {
+                return new XmlSerializer(type).Deserialize(sr);
+            }
+        }
+
+
+        /// <summary>
+        /// Deserialize the specified xmlString as the specified 
+        /// generic type
+        /// </summary>
+        /// <typeparam name="T">The type of return value</typeparam>
+        /// <param name="xmlString">The string to deserialize</param>
+        /// <returns>instance of T</returns>
+        public static T FromXml<T>(this string xmlString)
+        {
+            return FromXml<T>(xmlString, Encoding.Default);
+        }
+
+        /// <summary>
+        /// Deserialize the specified xml as the specified generic type using the specified encoding.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="xmlString"></param>
+        /// <returns></returns>
+        public static T FromXml<T>(this string xmlString, Encoding encoding)
+        {
+            XmlSerializer ser = new XmlSerializer(typeof(T));
+            byte[] xmlBytes = encoding.GetBytes(xmlString);
+            MemoryStream ms = new MemoryStream(xmlBytes);
+            return (T)ser.Deserialize(ms);
+        }
+
+        public static object FromXml(this string xml, Type type, Encoding encoding = null)
+        {
+            XmlSerializer ser = new XmlSerializer(type);
+            byte[] xmlBytes = encoding.GetBytes(xml);
+            MemoryStream ms = new MemoryStream(xmlBytes);
+            return ser.Deserialize(ms);
         }
 
         public static Task<ProcessOutput> RunAsync(this string command, int timeout = 600000)

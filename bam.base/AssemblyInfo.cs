@@ -29,3 +29,4 @@ using System.Runtime.InteropServices;
 [assembly: InternalsVisibleTo("bam.data.schema")]
 [assembly: InternalsVisibleTo("bam.data.repositories")]
 [assembly: InternalsVisibleTo("bam.data.backup")]
+[assembly: InternalsVisibleTo("bam.caching")]
