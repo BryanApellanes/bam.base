@@ -1246,5 +1246,25 @@ namespace Bam.Net
             byte[] data = File.ReadAllBytes(filePath);
             return data.Decode<T>();
         }
+
+        /// <summary>
+        /// Returns true if the string equals "false", "f", "no", "n" or 0 using a case
+        /// insensitive comparison
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static bool IsNegative(this string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return true;
+            }
+
+            return value.Equals("false", StringComparison.InvariantCultureIgnoreCase) ||
+                   value.Equals("no", StringComparison.InvariantCultureIgnoreCase) ||
+                   value.Equals("f", StringComparison.InvariantCultureIgnoreCase) ||
+                   value.Equals("n", StringComparison.InvariantCultureIgnoreCase) ||
+                   value.Equals("0");
+        }
     }
 }
