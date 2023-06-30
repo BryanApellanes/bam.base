@@ -1266,5 +1266,17 @@ namespace Bam.Net
                    value.Equals("n", StringComparison.InvariantCultureIgnoreCase) ||
                    value.Equals("0");
         }
+
+        public static void WriteToStream(this string text, Stream writeTo, bool dispose = true)
+        {
+            StreamWriter sw = new StreamWriter(writeTo);
+            sw.Write(text);
+            sw.Flush();
+
+            if (dispose)
+            {
+                sw.Dispose();
+            }
+        }
     }
 }
