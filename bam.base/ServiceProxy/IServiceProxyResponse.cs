@@ -9,6 +9,6 @@ namespace Bam.Net.ServiceProxy
         string Message { get; set; }
         bool Success { get; set; }
 
-        T DataTo<T>();
+        T? DataTo<T>();
     }
 }
