@@ -88,9 +88,20 @@ namespace Bam.Net
 
         public static string DataPath => System.IO.Path.Combine(DataSegments);
 
-        public static string[] DataSegments => new List<string>(PathSegments) {"data"}.ToArray();
-        
+        public static string[] DataSegments => new List<string>(PathSegments) {"data"}.ToArray();        
+
         public static string RecipesPath => System.IO.Path.Combine(RecipeSegments);
+
         public static string[] RecipeSegments => new List<string>(PathSegments) {"recipes"}.ToArray();
+
+        public static string GetAppDataPath()
+        {
+            return GetAppDataPath(ProcessApplicationNameProvider.Current);
+        }
+
+        public static string GetAppDataPath(IApplicationNameProvider applicationNameProvider)
+        {
+            return System.IO.Path.Combine(DataPath, applicationNameProvider.GetApplicationName());
+        }
     }
 }

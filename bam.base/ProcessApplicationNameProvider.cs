@@ -6,9 +6,7 @@ namespace Bam.Net
 {
     /// <summary>
     /// Gets the Application name from the environment variable BAM_APPLICATION_NAME
-    /// or the name of the entry assembly if it is not set.  Will set the environment variable BAM_APPLICATION_NAME (note the difference in the variable name)
-    /// to the name of the entry assembly if BAM_ApplicationName is not set or set to
-    /// a value prefixed by "UNKNOWN".
+    /// or the name of the entry assembly if the environment variable is not set.  Sets the environment variable BAM_APPLICATION_NAME if it is not set or set to a value prefixed by "UNKNOWN".
     /// </summary>
     public class ProcessApplicationNameProvider: IApplicationNameProvider
     {

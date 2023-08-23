@@ -1,4 +1,5 @@
 using System;
+using Bam.CommandLine;
 using Bam.Net.Analytics;
 using Bam.Net.Logging;
 
