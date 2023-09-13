@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using YamlDotNet.Serialization;
-using Bam.Net;
 using System.Data;
 
 namespace Bam.Net

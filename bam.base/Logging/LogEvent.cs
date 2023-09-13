@@ -71,7 +71,7 @@ namespace Bam.Net.Logging
 
         public string MessageSignature { get; set; }
 
-        public string[] MessageVariableValues { get; set; }
+        public string?[] MessageVariableValues { get; set; }
 
         public string StackTrace { get; set; }
     }

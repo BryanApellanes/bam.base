@@ -1,4 +1,5 @@
-﻿using Bam.Net.Data.Repositories;
+﻿using Bam.Net;
+using Bam.Net.Data.Repositories;
 using Newtonsoft.Json;
 using System;
 using System.Collections;
@@ -13,7 +14,7 @@ using System.Xml;
 using System.Xml.Serialization;
 using YamlDotNet.Serialization;
 
-namespace Bam.Net    
+namespace Bam
 {
     public static class ObjectExtensions
     {
@@ -64,7 +65,7 @@ namespace Bam.Net
 
             Type type = obj.GetType();
             PropertyInfo[] properties = type.GetProperties();
-            return PropertiesToString(obj, properties, separator);
+            return obj.PropertiesToString(properties, separator);
         }
 
         /// <summary>
@@ -75,7 +76,7 @@ namespace Bam.Net
         /// <returns></returns>
         public static string PropertiesToLine(this object obj)
         {
-            return PropertiesToString(obj, "~");
+            return obj.PropertiesToString("~");
         }
 
         public static Dictionary<string, object> PropertiesToDictionary(this object obj, PropertyInfo[] properties)
@@ -89,7 +90,7 @@ namespace Bam.Net
                     {
                         if (property.PropertyType == typeof(string[]))
                         {
-                            string[] values = ((string[])property.GetValue(obj, null)) ?? new string[] { };
+                            string[] values = (string[])property.GetValue(obj, null) ?? new string[] { };
                             result.Add(property.Name, string.Join(", ", values));
                         }
 #if NET472
@@ -204,7 +205,7 @@ namespace Bam.Net
                     {
                         if (property.PropertyType == typeof(string[]))
                         {
-                            string[] values = ((string[])property.GetValue(obj, null)) ?? new string[] { };
+                            string[] values = (string[])property.GetValue(obj, null) ?? new string[] { };
                             returnValue.AppendFormat("{0}: {1}{2}", property.Name, string.Join(", ", values),
                                 separator);
                         }
@@ -317,7 +318,7 @@ namespace Bam.Net
         /// <param name="path"></param>
         public static void ToJsonFile(this object value, string path)
         {
-            ToJsonFile(value, new FileInfo(path));
+            value.ToJsonFile(new FileInfo(path));
         }
 
         /// <summary>
@@ -333,7 +334,7 @@ namespace Bam.Net
                 file.Directory.Create();
             }
 
-            ToJson(value, Newtonsoft.Json.Formatting.Indented).SafeWriteToFile(file.FullName, true);
+            value.ToJson(Newtonsoft.Json.Formatting.Indented).SafeWriteToFile(file.FullName, true);
         }
         public static string ToJson(this object value, Newtonsoft.Json.Formatting formatting)
         {
@@ -349,7 +350,7 @@ namespace Bam.Net
                 {
                     if (property != null)
                     {
-                        hash = (hash * 16777619) ^ property.GetHashCode();
+                        hash = hash * 16777619 ^ property.GetHashCode();
                     }
                 }
 
@@ -366,7 +367,7 @@ namespace Bam.Net
         /// <returns></returns>
         public static object CopyEventHandlers(this object destination, object source)
         {
-            GetEventSubscriptions(source).Each(es => { es.EventInfo.AddEventHandler(destination, es.Delegate); });
+            source.GetEventSubscriptions().Each(es => { es.EventInfo.AddEventHandler(destination, es.Delegate); });
             return destination;
         }
 
@@ -378,7 +379,7 @@ namespace Bam.Net
         /// <returns></returns>
         public static IEnumerable<IEventSubscription> GetEventSubscriptions(this object instance, string eventName)
         {
-            return GetEventSubscriptions(instance).Where(es => es.EventInfo.Name.Equals(eventName));
+            return instance.GetEventSubscriptions().Where(es => es.EventInfo.Name.Equals(eventName));
         }
 
         /// <summary>
@@ -397,19 +398,19 @@ namespace Bam.Net
 
             // ** yuck **
             IEnumerable<IEventSubscription> results = from eventInfo in type.GetEvents()
-                                                     let eventFieldInfo = ei2fi(eventInfo)
-                                                     let eventFieldValue =
-                                                         (System.Delegate)eventFieldInfo?.GetValue(instance)
-                                                     from subscribedDelegate in eventFieldValue == null
-                                                         ? new Delegate[] { }
-                                                         : eventFieldValue.GetInvocationList()
-                                                     select new EventSubscription
-                                                     {
-                                                         EventName = eventFieldInfo.Name,
-                                                         Delegate = subscribedDelegate,
-                                                         FieldInfo = eventFieldInfo,
-                                                         EventInfo = eventInfo
-                                                     };
+                                                      let eventFieldInfo = ei2fi(eventInfo)
+                                                      let eventFieldValue =
+                                                          (Delegate)eventFieldInfo?.GetValue(instance)
+                                                      from subscribedDelegate in eventFieldValue == null
+                                                          ? new Delegate[] { }
+                                                          : eventFieldValue.GetInvocationList()
+                                                      select new EventSubscription
+                                                      {
+                                                          EventName = eventFieldInfo.Name,
+                                                          Delegate = subscribedDelegate,
+                                                          FieldInfo = eventFieldInfo,
+                                                          EventInfo = eventInfo
+                                                      };
             // ** /yuck **
             return results;
         }
@@ -515,7 +516,7 @@ namespace Bam.Net
 
         public static void ToYamlFile(this object val, string path)
         {
-            ToYamlFile(val, new FileInfo(path));
+            val.ToYamlFile(new FileInfo(path));
         }
 
         public static void ToYamlFile(this object val, FileInfo file)
@@ -545,7 +546,7 @@ namespace Bam.Net
         {
             try
             {
-                return CopyAs<T>(source);
+                return source.CopyAs<T>();
             }
             catch
             {
@@ -671,7 +672,7 @@ namespace Bam.Net
         /// <param name="filePath"></param>
         public static void XmlSerialize(this object target, string filePath)
         {
-            ToXmlFile(target, filePath);
+            target.ToXmlFile(filePath);
         }
 
         /// <summary>
@@ -681,7 +682,7 @@ namespace Bam.Net
         /// <param name="filePath"></param>
         public static void ToXmlFile(this object target, string filePath)
         {
-            ToXmlFile(target, filePath, true);
+            target.ToXmlFile(filePath, true);
         }
 
         static object lockObj = new object();
@@ -710,7 +711,7 @@ namespace Bam.Net
         public static string ToXml(this object target)
         {
             MemoryStream stream = new MemoryStream();
-            ToXmlStream(target, stream);
+            target.ToXmlStream(stream);
             stream.Seek(0, SeekOrigin.Begin);
             using (StreamReader reader = new StreamReader(stream))
             {
@@ -720,13 +721,13 @@ namespace Bam.Net
 
         public static string ToXml(this object target, bool includeXmlDeclaration)
         {
-            return ToXml(target, new XmlWriterSettings { OmitXmlDeclaration = !includeXmlDeclaration, Indent = true });
+            return target.ToXml(new XmlWriterSettings { OmitXmlDeclaration = !includeXmlDeclaration, Indent = true });
         }
 
         public static string ToXml(this object target, XmlWriterSettings settings)
         {
             MemoryStream stream = new MemoryStream();
-            ToXmlStream(target, stream, settings);
+            target.ToXmlStream(stream, settings);
             stream.Seek(0, SeekOrigin.Begin);
             using (StreamReader reader = new StreamReader(stream))
             {
@@ -736,7 +737,7 @@ namespace Bam.Net
 
         public static void ToXmlStream(this object target, Stream stream)
         {
-            ToXmlStream(target, stream, new XmlWriterSettings { Indent = true });
+            target.ToXmlStream(stream, new XmlWriterSettings { Indent = true });
         }
 
         public static void ToXmlStream(this object target, Stream stream, XmlWriterSettings settings)
@@ -757,7 +758,7 @@ namespace Bam.Net
         public static Stream ToJsonStream(this object value)
         {
             MemoryStream stream = new MemoryStream();
-            ToJsonStream(value, stream);
+            value.ToJsonStream(stream);
             return stream;
         }
 
@@ -776,7 +777,7 @@ namespace Bam.Net
         public static Stream ToYamlStream(this object value)
         {
             MemoryStream stream = new MemoryStream();
-            ToYamlStream(value, stream);
+            value.ToYamlStream(stream);
             return stream;
         }
 

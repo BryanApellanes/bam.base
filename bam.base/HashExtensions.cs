@@ -1,5 +1,4 @@
-﻿using Bam.Net;
-using Bam.Net.Configuration;
+﻿using Bam.Net.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Data;

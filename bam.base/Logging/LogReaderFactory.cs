@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Bam.Net.Logging
 {
-	public class LogReaderFactory
+    public class LogReaderFactory
 	{
 		public LogReaderFactory() { }
 

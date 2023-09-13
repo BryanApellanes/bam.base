@@ -261,7 +261,7 @@ namespace Bam.Net.Logging
             AddEntry(messageSignature, UserUtil.GetCurrentUser(true), verbosity, variableMessageValues);
         }
 
-        public virtual void AddEntry(string messageSignature, Exception ex, params string[] variableMessageValues)
+        public virtual void AddEntry(string messageSignature, Exception ex, params string?[] variableMessageValues)
         {
             AddEntry(messageSignature, UserUtil.GetCurrentUser(true), ex, variableMessageValues);
         }
@@ -271,7 +271,7 @@ namespace Bam.Net.Logging
             AddEntry(messageSignature, user, (int)LogEventType.Information, variableMessageValues);
         }
 
-        private void AddEntry(string messageSignature, string user, int verbosity, params string[] variableMessageValues)
+        private void AddEntry(string messageSignature, string user, int verbosity, params string?[] variableMessageValues)
         {
             if ((LogEventType)verbosity == LogEventType.Error)
             {
@@ -283,7 +283,7 @@ namespace Bam.Net.Logging
             }
         }
 
-        private void AddEntry(string messageSignature, string user, Exception ex, params string[] variableMessageValues)
+        private void AddEntry(string messageSignature, string user, Exception ex, params string?[] variableMessageValues)
         {
             if (ex == null)
             {
@@ -300,7 +300,7 @@ namespace Bam.Net.Logging
             AddEntry(messageSignature, user, category, (int)LogEventType.Information, variableMessageValues);
         }
 
-        private void AddEntry(string messageSignature, string user, string category, int verbosity, params string[] variableMessageValues)
+        private void AddEntry(string messageSignature, string user, string category, int verbosity, params string?[] variableMessageValues)
         {
             Exception ex = null;
             if ((LogEventType)verbosity == LogEventType.Error)
@@ -397,7 +397,7 @@ namespace Bam.Net.Logging
             return CreateLogEvent(messageSignature, UserUtil.GetCurrentUser(true), "Application", LogEventType.Error, ex, messageVariableValues);
         }
 
-        protected internal virtual LogEvent CreateLogEvent(string messageSignature, string user, string category, LogEventType type, Exception ex, params string[] messageVariableValues)
+        protected internal virtual LogEvent CreateLogEvent(string messageSignature, string user, string category, LogEventType type, Exception ex, params string?[] messageVariableValues)
         {
             LogEvent ev = new LogEvent
             {
@@ -518,6 +518,12 @@ namespace Bam.Net.Logging
         {
             Args.ThrowIfNull(args);
             AddEntry(messageSignature, LogEventType.Error, args.Each(a => a.ToString()).ToArray());
+        }
+
+        public void Error(string messageSignature, Exception ex, params object[] args)
+        {
+            Args.ThrowIfNull(args);
+            AddEntry(messageSignature, ex, args.Each(a => a.ToString()).ToArray());
         }
 
         #endregion

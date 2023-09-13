@@ -11,7 +11,7 @@ using System.Xml.Serialization;
 
 namespace Bam.Net.Analytics
 {
-    
+
     [Serializable]
     public class DiffReport : IDiffReport
     {

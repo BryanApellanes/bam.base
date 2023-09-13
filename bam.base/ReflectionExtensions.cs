@@ -437,7 +437,7 @@ namespace Bam.Net
         }
 
         /// <summary>
-        /// If instance is null return the specified alternative other return the instance.
+        /// If instance is null return the specified alternative otherwise return the instance.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="instance">The instance.</param>

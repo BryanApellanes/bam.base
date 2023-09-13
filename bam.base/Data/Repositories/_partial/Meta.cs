@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Reflection;
 using System.IO;
-using Bam.Net;
 using Bam.Net.Logging;
 using NCuid;
 using Bam.Net.CoreServices;
