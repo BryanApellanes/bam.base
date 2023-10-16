@@ -25,9 +25,9 @@ namespace Bam.Net.CoreServices
 
         public ServiceRegistry Returns(object instance)
         {
-            ServiceRegistry inc = ServiceRegistry ?? new ServiceRegistry();
-            inc.Set(typeof(I), () => instance);
-            return inc;
+            ServiceRegistry svcRegistry = ServiceRegistry ?? new ServiceRegistry();
+            svcRegistry.Set(typeof(I), () => instance);
+            return svcRegistry;
         }
 
         public ServiceRegistry Use<T>()
@@ -43,9 +43,21 @@ namespace Bam.Net.CoreServices
         /// <returns></returns>
         public ServiceRegistry Returns<T>()
         {
-            ServiceRegistry inc = ServiceRegistry ?? new ServiceRegistry();
-            inc.Set(typeof(I), () => inc.Construct(typeof(T)));
-            return inc;
+            ServiceRegistry svcRegistry = ServiceRegistry ?? new ServiceRegistry();
+            svcRegistry.Set(typeof(I), () => svcRegistry.Construct(typeof(T)));
+            return svcRegistry;
+        }
+
+        public ServiceRegistry UseSingleton<T>()
+        {
+            ServiceRegistry svcRegistry = ServiceRegistry ?? new ServiceRegistry();
+            svcRegistry.Set(typeof(I), svcRegistry.Construct(typeof(T)));
+            return svcRegistry;
+        }
+
+        public ServiceRegistry UseTransient<T>()
+        {
+            return Returns<T>();
         }
 
         public ServiceRegistry Use<T>(Func<T> instanciator)

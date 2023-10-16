@@ -91,5 +91,10 @@ namespace Bam.Net
                 appName = value;
             }
         }
+
+        public override string ToString()
+        {
+            return NamedMessageFormat.NamedFormat(this);
+        }
     }
 }

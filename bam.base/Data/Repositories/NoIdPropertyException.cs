@@ -16,7 +16,7 @@ namespace Bam.Net.Data.Repositories
 			: base(string.Format("The specified type {0} doesn't have an Id property and no property addorned with the Key attribute", type.FullName))
 		{ }
 		public NoIdPropertyException(IEnumerable<string> classNames)
-			: base("The specified types don't have Id properties: \r\n\t{0}"._Format(classNames.ToArray().ToDelimited(s => s, "\r\n\t")))
+			: base("The specified types don't have Id properties: \r\n\t{0}".Format(classNames.ToArray().ToDelimited(s => s, "\r\n\t")))
 		{ }
 	}
 }

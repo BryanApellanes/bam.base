@@ -32,6 +32,7 @@ namespace Bam.Net.Logging
             };
             Verbosity = VerbosityLevel.Information;
             EventIdProvider = new HashingEventIdProvider();
+            CommitCycleDelay = 30;
             StartLoggingThread();
         }
 
@@ -62,6 +63,7 @@ namespace Bam.Net.Logging
                 lock (_threadLock)
                 {
                     _keepLogging = false;
+                    _loggingThreadStarted = false;
                     _waitForEnqueueLogEvent.Set();
                     int wait = 3000;
                     int waited = 0;

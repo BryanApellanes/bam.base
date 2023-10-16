@@ -461,7 +461,7 @@ namespace Bam.Net
         /// <param name="propertyName">Name of the property.</param>
         /// <param name="ifPropertyNotFound">If property not found.</param>
         /// <param name="value">The value.</param>
-        public static void TryGetPropertyValue<T>(this object instance, string propertyName, T ifPropertyNotFound, out T value)
+        public static bool TryGetPropertyValue<T>(this object instance, string propertyName, T ifPropertyNotFound, out T value)
         {
             Args.ThrowIfNull(instance, "instance");
             Type type = instance.GetType();
@@ -469,10 +469,12 @@ namespace Bam.Net
             if(property == null)
             {
                 value = ifPropertyNotFound;
+                return false;
             }
             else
             {
                 value = (T)property.GetValue(instance);
+                return true;
             }
         }
 
@@ -777,7 +779,7 @@ namespace Bam.Net
             output.Append(type == typeof(int) || type == typeof(long) || type == typeof(uint) || type == typeof(ulong) ? type.Name: type.Name.DropTrailingNonLetters());
             if (type.IsGenericType)
             {
-                output.AppendFormat("<{0}>", type.GetGenericArguments().ToDelimited(t => includeNamespace ? "{0}.{1}"._Format(t.Namespace, t.ToTypeString(false)): t.ToTypeString(false)));
+                output.AppendFormat("<{0}>", type.GetGenericArguments().ToDelimited(t => includeNamespace ? "{0}.{1}".Format(t.Namespace, t.ToTypeString(false)): t.ToTypeString(false)));
             }
             if (type.IsArray)
             {

@@ -188,13 +188,13 @@ namespace Bam.Net
 
         public static bool HasCustomAttributeOfType<T>(this MemberInfo member, bool inherit) where T : Attribute
         {
-            T outT = null;
+            T outT = default;
             return HasCustomAttributeOfType<T>(member, inherit, out outT);
         }
 
         public static T GetCustomAttributeOfType<T>(this MemberInfo memberInfo) where T : Attribute
         {
-            T retVal = null;
+            T retVal = default;
             HasCustomAttributeOfType<T>(memberInfo, out retVal);
             return retVal;
         }
@@ -247,7 +247,7 @@ namespace Bam.Net
             bool concreteAttribute)
             where T : Attribute
         {
-            attribute = null;
+            attribute = default;
             if (concreteAttribute)
             {
                 foreach (object foundAttribute in customAttributes)

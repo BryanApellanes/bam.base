@@ -125,19 +125,17 @@ namespace Bam.Net
             return (E)ctor.Invoke(new object[] { string.Format(msgFormat, values), innerException });
         }
 
-		public static string GetStackTrace()
+		public static string GetStackTrace(this Exception ex)
 		{
 			StringBuilder message = new StringBuilder();
 			StringBuilder stackTrace = new StringBuilder();
-			SetMessageAndStackTrace(null, message, stackTrace);
+			SetMessageAndStackTrace(ex, message, stackTrace);
 			return stackTrace.ToString();
 		}
 
 		public static string GetMessageAndStackTrace(this Exception ex)
 		{
-			StringBuilder message = new StringBuilder();
-			StringBuilder stackTrace = new StringBuilder();
-			PopMessageAndStackTrace(ex, out message, out stackTrace);
+			PopMessageAndStackTrace(ex, out StringBuilder message, out StringBuilder stackTrace);
 			return message.Append(stackTrace.ToString()).ToString();
 		}
 

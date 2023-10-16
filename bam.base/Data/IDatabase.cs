@@ -23,7 +23,7 @@ namespace Bam.Net.Data
         string ParameterPrefix { get; set; }
         string[] SchemaNames { get; }
         bool SelectStar { get; set; }
-        Incubator ServiceProvider { get; set; }
+        DependencyProvider ServiceProvider { get; set; }
 
         event EventHandler CommandException;
         event EventHandler CommandExecuted;

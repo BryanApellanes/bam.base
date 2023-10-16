@@ -7,11 +7,19 @@ using System.Threading.Tasks;
 using Bam.Net.Incubation;
 using Bam.Net.Data.Repositories;
 using YamlDotNet.Serialization;
+using Bam.Services;
 
 namespace Bam.Net.CoreServices
 {
-    public partial class ServiceRegistry: Incubator
+    public partial class ServiceRegistry: DependencyProvider
     {
+        static ServiceRegistry()
+        {
+            Default = new ServiceRegistry { Name = "Default" };
+            //Default.Set<IObjectPersister>(NetCoreObjectPersister.Default);
+            //Default.Set<IRepository>(new DaoRepository()); // TODO: consider ObjectRepository here, review ObjectRepsitory; ensure accepts custom streaming serializers
+        }
+
         public string Name { get; set; }
 
         public FluentCtorContext<I> ForCtor<I>(string parameterName)
@@ -24,9 +32,9 @@ namespace Bam.Net.CoreServices
             return new FluentServiceRegistryContext<I>(this);
         }
 
-        public ServiceRegistry Include(Incubator incubator)
+        public ServiceRegistry Include(DependencyProvider dependencyProvider)
         {
-            CombineWith(incubator, true);
+            CombineWith(dependencyProvider, true);
             return this;
         }
 

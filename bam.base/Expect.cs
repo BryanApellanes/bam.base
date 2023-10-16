@@ -603,7 +603,48 @@ namespace Bam.Net
                 }
             }
         }
-        
+
+        public static void ShouldNotBeEqualTo(this object objectToCheck, object compareTo, string failureMessage = null)
+        {
+            if (objectToCheck.Equals(compareTo))
+            {
+                if (!string.IsNullOrEmpty(failureMessage))
+                {
+                    throw new ExpectationFailedException(failureMessage);
+                }
+                else
+                {
+                    throw new ExpectationFailedException($"Expected {objectToCheck?.ToString()}.Equals({compareTo?.ToString()}) to be false");
+                }
+            }
+        }
+
+        public static void ShouldBeOfType<T>(this object instance, string failureMessage = null)
+        {
+            if (instance == null)
+            {
+                throw new ExpectationFailedException(failureMessage ?? $"instance was null and not of type {typeof(T).Name}");
+            }
+            Type type = instance.GetType();
+            if (type != typeof(T))
+            {
+                throw new ExpectationFailedException(failureMessage ?? $"instance was null and not of type {typeof(T).Name}");
+            }
+        }
+
+        public static void ShouldBeOfType(this object instance, Type shouldBe, string failureMessage = null)
+        {
+            if (instance == null)
+            {
+                throw new ExpectationFailedException(failureMessage ?? $"instance was null and not of type {shouldBe.Name}");
+            }
+            Type type = instance.GetType();
+            if (type != shouldBe)
+            {
+                throw new ExpectationFailedException(failureMessage ?? $"instance was null and not of type {shouldBe.Name}");
+            }
+        }
+
         public static void ShouldEqual(this object objectToCheck, object compareTo, string failureMessage = null)
         {
             if (objectToCheck != compareTo)
@@ -615,6 +656,21 @@ namespace Bam.Net
                 else
                 {
                     throw new ExpectationFailedException($"Expected {objectToCheck?.ToString()} == {compareTo?.ToString()}");
+                }
+            }
+        }
+
+        public static void ShouldNotEqual(this object objectToCheck, object compareTo, string failureMessage = null)
+        {
+            if (objectToCheck == compareTo)
+            {
+                if (!string.IsNullOrEmpty(failureMessage))
+                {
+                    throw new ExpectationFailedException(failureMessage);
+                }
+                else
+                {
+                    throw new ExpectationFailedException($"Expected {objectToCheck?.ToString()} != {compareTo?.ToString()}");
                 }
             }
         }

@@ -12,7 +12,13 @@ namespace Bam.Net.Incubation
     public class ConstructFailedException: Exception
     {
 		public ConstructFailedException(Type type, Type[] ctorTypes)
-			: base($"The constructor wasn't found for the specified type and parameter combination: {type.Name}({(ctorTypes == null || ctorTypes.Length == 0 ? "" : ctorTypes.ToDelimited<Type>(t => t.Name))})")
+			: base(GetMessage(type, ctorTypes))
 		{ }
+
+        private static string GetMessage(Type type, Type[] ctorTypes)
+        {
+            string kind = type.IsInterface ? "interface implementation" : "type";
+            return $"Unable to construct instance of {kind} {type.Name}: {type.Name}({(ctorTypes == null || ctorTypes.Length == 0 ? "" : ctorTypes.ToDelimited<Type>(t => t.Name))})";
+        }
     }
 }

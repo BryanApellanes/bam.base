@@ -24,7 +24,7 @@ namespace Bam.Net.Data
         bool IsNew { get; set; }
         string KeyColumnName { get; }
         object PrimaryKey { get; set; }
-        Incubator ServiceProvider { get; }
+        DependencyProvider ServiceProvider { get; }
         bool HasNewValues { get; }
         Func<IDao, IQueryFilter> UniqueFilterProvider { get; set; }
 

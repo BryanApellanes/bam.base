@@ -8,42 +8,43 @@ using System.Linq;
 using System.Reflection;
 using Bam.Net.Logging;
 using Bam.Net.Services;
+using Bam.Services;
 
 namespace Bam.Net.Incubation
 {
     /// <summary>
     /// A simple dependency injection container.
     /// </summary>
-    public class Incubator: ISetupContext
+    public class DependencyProvider: IDependencyProvider
     {
         readonly object _accessLock = new object();
         readonly Dictionary<Type, object> _typeInstanceDictionary;
         readonly Dictionary<string, Type> _classNameTypeDictionary;
         readonly Dictionary<Type, Dictionary<string, object>> _ctorParams;
 
-        static Incubator()
+        static DependencyProvider()
         {
-            Default = new Incubator();
+            Default = new DependencyProvider();
         }
 
-        public Incubator()
+        public DependencyProvider()
         {
             _typeInstanceDictionary = new Dictionary<Type, object>();
             _classNameTypeDictionary = new Dictionary<string, Type>();
             _ctorParams = new Dictionary<Type, Dictionary<string, object>>();
         }
 
-        public static Incubator Default
+        public static DependencyProvider Default
         {
             get;
             set;
         }
 
-        public Incubator Clone()
+        public DependencyProvider Clone()
         {
             lock (_accessLock)
             {
-                Incubator val = new Incubator();
+                DependencyProvider val = new DependencyProvider();
                 foreach (Type t in _typeInstanceDictionary.Keys)
                 {
                     val._typeInstanceDictionary.Add(t, _typeInstanceDictionary[t]);
@@ -62,58 +63,58 @@ namespace Bam.Net.Incubation
         }
 
         /// <summary>
-        /// Copy the values from the specified incubator to the current; the same as CopyFrom
+        /// Copy the values from the specified dependencyProvider to the current; the same as CopyFrom
         /// </summary>
-        /// <param name="incubator">The incubator to copy from</param>
-        /// <param name="overwrite">If true, values in the current incubator
+        /// <param name="dependencyProvider">The dependencyProvider to copy from</param>
+        /// <param name="overwrite">If true, values in the current dependencyProvider
         /// will be over written by values of the same types from the specified
-        /// incubator otherwise the current value will be kept</param>
-        public void CombineWith(Incubator incubator, bool overwrite = true)
+        /// dependencyProvider otherwise the current value will be kept</param>
+        public void CombineWith(DependencyProvider dependencyProvider, bool overwrite = true)
         {
-            CopyFrom(incubator, overwrite);
+            CopyFrom(dependencyProvider, overwrite);
         }
         
         /// <summary>
-        /// Copy the values from the specified incubator to the current; the same as CombineWith.
+        /// Copy the values from the specified dependencyProvider to the current; the same as CombineWith.
         /// </summary>
-        /// <param name="incubator">The incubator to copy from</param>
-        /// <param name="overwrite">If true, values in the current incubator
+        /// <param name="dependencyProvider">The dependencyProvider to copy from</param>
+        /// <param name="overwrite">If true, values in the current dependencyProvider
         /// are over written by values of the same types from the specified
-        /// incubator otherwise the current value is kept.</param>
-        public void CopyFrom(Incubator incubator, bool overwrite = true)
+        /// dependencyProvider otherwise the current value is kept.</param>
+        public void CopyFrom(DependencyProvider dependencyProvider, bool overwrite = true)
         {
-            if (incubator == null)
+            if (dependencyProvider == null)
             {
                 return;
             }
             lock (_accessLock)
             {
-                foreach (Type t in incubator._typeInstanceDictionary.Keys)
+                foreach (Type t in dependencyProvider._typeInstanceDictionary.Keys)
                 {
                     if (!this._typeInstanceDictionary.ContainsKey(t) || overwrite)
                     {
-                        this._typeInstanceDictionary[t] = incubator._typeInstanceDictionary[t];
+                        this._typeInstanceDictionary[t] = dependencyProvider._typeInstanceDictionary[t];
                     }
                 }
-                foreach (string s in incubator._classNameTypeDictionary.Keys)
+                foreach (string s in dependencyProvider._classNameTypeDictionary.Keys)
                 {
                     if (!this._classNameTypeDictionary.ContainsKey(s) || overwrite)
                     {
-                        this._classNameTypeDictionary[s] = incubator._classNameTypeDictionary[s];
+                        this._classNameTypeDictionary[s] = dependencyProvider._classNameTypeDictionary[s];
                     }
                 }
-                foreach(Type type in incubator._ctorParams.Keys)
+                foreach(Type type in dependencyProvider._ctorParams.Keys)
                 {
-                    CopyCtorParams(type, incubator);
+                    CopyCtorParams(type, dependencyProvider);
                 }
             }
         }
 
-        public void CopyCtorParams(Type type, Incubator incubator)
+        public void CopyCtorParams(Type type, DependencyProvider dependencyProvider)
         {
-            if (incubator._ctorParams.ContainsKey(type))
+            if (dependencyProvider._ctorParams.ContainsKey(type))
             {
-                Dictionary<string, object> ctorArgs = incubator._ctorParams[type];
+                Dictionary<string, object> ctorArgs = dependencyProvider._ctorParams[type];
                 foreach (string parameterName in ctorArgs.Keys)
                 {
                     SetCtorParam(type, parameterName, ctorArgs[parameterName]);
@@ -125,14 +126,14 @@ namespace Bam.Net.Incubation
         /// Copies the specified generic type from the specified source.
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="source">The incubator.</param>
+        /// <param name="source">The dependencyProvider.</param>
         /// <param name="overwrite">if set to <c>true</c> [overwrite].</param>
-        public void CopyTypeFrom<T>(Incubator source, bool overwrite = true)
+        public void CopyTypeFrom<T>(DependencyProvider source, bool overwrite = true)
         {
             CopyTypeFrom(typeof(T), source, overwrite);
         }
 
-        public void CopyTypeFrom(Type type, Incubator source, bool overwrite = true)
+        public void CopyTypeFrom(Type type, DependencyProvider source, bool overwrite = true)
         {
             if (!_typeInstanceDictionary.ContainsKey(type) || overwrite)
             {
@@ -162,7 +163,7 @@ namespace Bam.Net.Incubation
         /// <summary>
         /// Construct an instance of the specified type
         /// injecting constructor params from the current 
-        /// incubator
+        /// dependencyProvider
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
@@ -175,7 +176,7 @@ namespace Bam.Net.Incubation
         
         /// <summary>
         /// Set writable properties of the specified instance to 
-        /// values in the current Incubator.
+        /// values in the current dependencyProvider.
         /// </summary>
         /// <param name="instance"></param>
         public void SetProperties(object instance)
@@ -202,7 +203,7 @@ namespace Bam.Net.Incubation
 
         /// <summary>
         /// Sets writable properties adorned with the Inject attribute of the specified instance to
-        /// values in the current Incubator.
+        /// values in the current dependencyProvider.
         /// </summary>
         /// <param name="instance">The instance.</param>
         public void SetInjectionProperties(object instance) 
@@ -542,6 +543,11 @@ namespace Bam.Net.Incubation
             this[typeof(T)] = instance;
         }
 
+        public void Set<T>(Func<T> instanciator)
+        {
+            Set<T>(instanciator, false);
+        }
+
         public void Set<T>(Func<T> instanciator, bool throwIfSet = false)
         {
             Check<T>(throwIfSet);
@@ -579,7 +585,7 @@ namespace Bam.Net.Incubation
         {
             if (throwIfSet && Contains(t))
             {
-                throw new InvalidOperationException(string.Format("Type of ({0}) already set in this incubator", t.Name));
+                throw new InvalidOperationException(string.Format("Type of ({0}) already set in this {1}", t.Name, nameof(DependencyProvider)));
             }
         }
 
@@ -587,7 +593,7 @@ namespace Bam.Net.Incubation
         {
             if (throwIfSet && Contains<T>())
             {
-                throw new InvalidOperationException(string.Format("Type of <{0}> already set in this incubator", typeof(T).Name));
+                throw new InvalidOperationException(string.Format("Type of <{0}> already set in this dependencyProvider", typeof(T).Name));
             }
         }
 

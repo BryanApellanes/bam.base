@@ -366,12 +366,12 @@ namespace Bam.Net.Data.Repositories
 
         public static string GetIdHash(long id, Type type)
         {
-            return "{0}::{1}"._Format(id, type.FullName).Md5();
+            return "{0}::{1}".Format(id, type.FullName).Md5();
         }
 
         public static string GetIdHash(ulong id, Type type)
         {
-            return "{0}::{1}"._Format(id, type.FullName).Md5();
+            return "{0}::{1}".Format(id, type.FullName).Md5();
         }
 
         protected internal static string GetUuid(object data, bool throwIfUuidPropertyMissing = false)

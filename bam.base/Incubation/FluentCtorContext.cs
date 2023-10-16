@@ -1,26 +1,27 @@
-﻿using System;
+﻿using Bam.Net.Incubation;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Bam.Net.Incubation
+namespace Bam.Services
 {
     public class FluentCtorContext<I>
     {
-        public FluentCtorContext(Incubator inc, string parameterName)
+        public FluentCtorContext(DependencyProvider inc, string parameterName)
         {
             Incubator = inc;
             ParameterName = parameterName;
         }
-        public Incubator Use(object value)
+        public DependencyProvider Use(object value)
         {
-            Incubator inc = Incubator ?? new Incubator();
+            DependencyProvider inc = Incubator ?? new DependencyProvider();
             inc.SetCtorParam(typeof(I), ParameterName, value);
             return inc;
         }
         protected string ParameterName { get; set; }
-        protected Incubator Incubator
+        protected DependencyProvider Incubator
         {
             get;
             set;

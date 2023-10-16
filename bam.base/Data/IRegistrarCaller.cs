@@ -16,6 +16,6 @@ namespace Bam.Net.Data
         void Register(string connectionName);
         void Register(Type daoType);
         void Register<T>() where T : IDao;
-        void Register(Incubator incubator);
+        void Register(DependencyProvider incubator);
     }
 }

@@ -31,3 +31,4 @@ using System.Runtime.InteropServices;
 [assembly: InternalsVisibleTo("bam.data.backup")]
 [assembly: InternalsVisibleTo("bam.caching")]
 [assembly: InternalsVisibleTo("bam.commandline")]
+[assembly: InternalsVisibleTo("bam.console")]

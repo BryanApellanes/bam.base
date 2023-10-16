@@ -16,6 +16,6 @@ namespace Bam.Net.Data
         StringBuilder MinCtors { get; }
         StringBuilder MinProxies { get; }
         StringBuilder Proxies { get; }
-        Incubator ServiceProvider { get; set; }
+        DependencyProvider ServiceProvider { get; set; }
     }
 }

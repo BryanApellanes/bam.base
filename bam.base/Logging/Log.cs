@@ -77,7 +77,7 @@ namespace Bam.Net.Logging
 
         public static void Warn(string messageSignature, params object[] args)
         {
-            Default.AddEntry(messageSignature, LogEventType.Warning, args?.Select(a => a.ToString())?.ToArray());
+            Default.AddEntry(messageSignature, LogEventType.Warning, args?.Select(a => a?.ToString())?.ToArray());
         }
 
         public static void Error(string messageSignature, params object[] args)
@@ -237,13 +237,21 @@ namespace Bam.Net.Logging
         /// <exception cref="InvalidOperationException"></exception>
         public static ILogger CreateLogger(Type loggerType)
         {
-            ConstructorInfo ctor = loggerType.GetConstructor(Type.EmptyTypes);
-            if (ctor == null)
+            try
             {
-                throw new InvalidOperationException(string.Format("The specified logType ({0}) doesn't have a parameterless constructor.", loggerType.FullName));
-            }
+                ConstructorInfo ctor = loggerType.GetConstructor(Type.EmptyTypes);
+                if (ctor == null)
+                {
+                    throw new InvalidOperationException(string.Format("The specified logType ({0}) doesn't have a parameterless constructor.", loggerType.FullName));
+                }
 
-            return ((ILogger)ctor.Invoke(null)).StartLoggingThread();
+                return ((ILogger)ctor.Invoke(null)).StartLoggingThread();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Failed to create logger of type ({0}): ({1})", loggerType.Name, ex.Message);
+                return new ConsoleLogger();
+            }
         }
 
         public static IMultiTargetLogger AddLogger(Type loggerType)

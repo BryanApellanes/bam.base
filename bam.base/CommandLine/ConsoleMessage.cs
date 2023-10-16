@@ -74,6 +74,10 @@ namespace Bam.CommandLine
 
             try
             {
+                if (string.IsNullOrEmpty(MessageSignature))
+                {
+                    return String.Empty;
+                }
                 _text = string.Format(MessageSignature, MessageArgs);
             }
             catch (Exception ex)

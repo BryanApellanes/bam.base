@@ -548,7 +548,7 @@ namespace Bam.Net
         /// <param name="format"></param>
         /// <param name="formatArgs"></param>
         /// <returns></returns>
-        public static string _Format(this string format, params object[] formatArgs)
+        public static string Format(this string format, params object[] formatArgs)
         {
             return string.Format(format, formatArgs);
         }
@@ -1277,6 +1277,16 @@ namespace Bam.Net
             {
                 sw.Dispose();
             }
+        }
+
+        public static string Times(this string text, int repeatCount)
+        {
+            StringBuilder result = new StringBuilder();
+            for(int i = 0; i < repeatCount; i++)
+            {
+                result.Append(text);
+            }
+            return result.ToString();
         }
     }
 }
