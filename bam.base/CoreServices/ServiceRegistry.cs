@@ -16,8 +16,6 @@ namespace Bam.Net.CoreServices
         static ServiceRegistry()
         {
             Default = new ServiceRegistry { Name = "Default" };
-            //Default.Set<IObjectPersister>(NetCoreObjectPersister.Default);
-            //Default.Set<IRepository>(new DaoRepository()); // TODO: consider ObjectRepository here, review ObjectRepsitory; ensure accepts custom streaming serializers
         }
 
         public string Name { get; set; }

@@ -8,6 +8,7 @@ namespace Bam.Net.Data.Repositories
     public interface IAuditRepoData
     {
         string CreatedBy { get; set; }
+        DateTime? Created { get; set; }
         DateTime? Deleted { get; set; }
         DateTime? Modified { get; set; }
         string ModifiedBy { get; set; }

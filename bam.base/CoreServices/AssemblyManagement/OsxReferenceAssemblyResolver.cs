@@ -56,5 +56,9 @@ namespace Bam.Net.CoreServices.AssemblyManagement
         {
             return NugetReferenceAssemblyResolver.ResolveReferencePackage(packageName);
         }
+        public string ResolveSystemRuntimePath()
+        {
+            return NugetReferenceAssemblyResolver.ResolveSystemRuntimePath();
+        }
     }
 }

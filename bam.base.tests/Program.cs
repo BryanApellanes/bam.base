@@ -8,7 +8,7 @@ namespace Bam.Net.Application
     {
         static void Main(string[] args)
         {
-            BamContext.Main(args);
+            BamConsole.Main(args);
         }
     }
 }

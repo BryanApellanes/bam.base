@@ -78,7 +78,7 @@ namespace Bam.Net.Logging
             loggable.Subscribers.Each(Subscribe);
 		}
 
-        public virtual void Subscribe(VerbosityLevel levelToSubscribe, Action<Loggable, LoggableEventArgs> handler)
+        public virtual void Subscribe(VerbosityLevel levelToSubscribe, Action<ILoggable, LoggableEventArgs> handler)
         {
             Type emittingType = this.GetType();
             EventInfo[] eventInfos = emittingType.GetEvents();
@@ -283,7 +283,7 @@ namespace Bam.Net.Logging
         /// </summary>
         /// <param name="eventHandler"></param>
         /// <param name="eventArgs"></param>
-		protected void FireEvent(EventHandler eventHandler, EventArgs eventArgs)
+		protected void FireEvent(EventHandler? eventHandler, EventArgs eventArgs)
         {
             try
             {

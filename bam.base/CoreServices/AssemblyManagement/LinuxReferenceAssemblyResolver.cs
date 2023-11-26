@@ -6,11 +6,11 @@ using Bam.Net.Logging;
 
 namespace Bam.Net.CoreServices.AssemblyManagement
 {
-    public class LinuxReferenceAssemblyResolver: IReferenceAssemblyResolver
+    public class LinuxReferenceAssemblyResolver : IReferenceAssemblyResolver
     {
         private const string _dotnetAssemblyPath = "/usr/share/dotnet/shared/Microsoft.NETCore.App";
         public LinuxReferenceAssemblyResolver()
-        { 
+        {
             NugetReferenceAssemblyResolver = new NugetReferenceAssemblyResolver(_dotnetAssemblyPath);
             RuntimeSettingsConfigReferenceAssemblyResolver = new RuntimeSettingsConfigReferenceAssemblyResolver();
         }
@@ -29,7 +29,7 @@ namespace Bam.Net.CoreServices.AssemblyManagement
             {
                 return assemblyFile.FullName;
             }
-            throw new ReferenceAssemblyNotFoundException(type); 
+            throw new ReferenceAssemblyNotFoundException(type);
         }
 
         public string ResolveReferenceAssemblyPath(string nameSpace, string typeName)
@@ -40,6 +40,11 @@ namespace Bam.Net.CoreServices.AssemblyManagement
         public string ResolveReferenceAssemblyPath(string assemblyName)
         {
             return Path.Combine(RuntimeSettings.GetReferenceAssembliesDirectory(), assemblyName);
+        }
+
+        public string ResolveSystemRuntimePath()
+        {
+            return NugetReferenceAssemblyResolver.ResolveSystemRuntimePath();
         }
     }
 }

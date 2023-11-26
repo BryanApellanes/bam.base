@@ -29,6 +29,8 @@ namespace Bam.Net.Logging
         /// </summary>
         /// <param name="logger"></param>
         void Subscribe(ILogger logger);
+        
+        void Subscribe(VerbosityLevel levelToSubscribe, Action<ILoggable, LoggableEventArgs> handler);
 
         /// <summary>
         /// When implemented in a derived class, 

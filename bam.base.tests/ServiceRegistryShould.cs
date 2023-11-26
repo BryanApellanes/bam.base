@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Bam.Tests
 {
-    [Menu<UnitTest>(nameof(ServiceRegistryShould), Selector = "ut")]
+    [UnitTestMenu("ServiceRegistry Should", Selector = "srs")]
     public class ServiceRegistryShould
     {
         [UnitTest]
@@ -23,7 +23,7 @@ namespace Bam.Tests
             ITestClass refOne = svcRegistry.Get<ITestClass>();
             ITestClass refTwo = svcRegistry.Get<ITestClass>();
 
-            refOne.ShouldEqual(refTwo);
+            refOne.ShouldBe(refTwo);
             refOne.Name.ShouldBeEqualTo(refTwo.Name);
         }
 
@@ -37,7 +37,7 @@ namespace Bam.Tests
             ITestClass refOne = svcRegistry.Get<ITestClass>();
             ITestClass refTwo = svcRegistry.Get<ITestClass>();
 
-            refOne.ShouldNotEqual(refTwo);
+            refOne.ShouldNotBe(refTwo);
             refOne.Name.ShouldNotBeEqualTo(refTwo.Name);
         }
     }

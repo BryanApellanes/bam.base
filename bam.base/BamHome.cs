@@ -56,9 +56,9 @@ namespace Bam.Net
         
         public static string[] CurrentRuntimeToolkitSegments => new List<string>(ToolkitSegments) {OSInfo.CurrentRuntime}.ToArray();
         
-        public static string NugetOutputPath => BamProfile.NugetOutputPath;
+        public static string NugetPackagePath => BamProfile.NugetPackagePath;
         
-        public static string[] NugetOutputSegments => BamProfile.NugetOutputSegments;
+        public static string[] NugetPackageSegments => BamProfile.NugetPackageSegments;
         
         /// <summary>
         /// The path where third party tools are found, including sysinternals and opencover.

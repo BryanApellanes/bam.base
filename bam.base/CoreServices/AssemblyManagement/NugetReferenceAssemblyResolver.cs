@@ -101,27 +101,32 @@ namespace Bam.Net.CoreServices.AssemblyManagement
             {
                 return typeof(object).Assembly.GetFilePath();
             }
-            string netCoreDir = new FileInfo(typeof(object).Assembly.GetFilePath()).Directory.FullName;
-            string systemRuntime = Path.Combine(netCoreDir, "System.Runtime.dll");
-            if (File.Exists(systemRuntime))
+
+            FileInfo assemblyFileInfo = new FileInfo(typeof(object).Assembly.GetFilePath());
+            if(assemblyFileInfo.Directory != null)
             {
-                return systemRuntime;
+                string netCoreDir = assemblyFileInfo.Directory.FullName;
+                string systemRuntime = Path.Combine(netCoreDir, "System.Runtime.dll");
+                if (File.Exists(systemRuntime))
+                {
+                    return systemRuntime;
+                }
+
+                string packageDirectoryRoot = ResolvePackageRootDirectory("System", "Runtime");
+
+                string packageVersion = PackageVersionResolver.ResolveVersion("System", "Runtime");
+
+                string packagePath = GetPackagePath(packageDirectoryRoot, packageVersion, "System", "Runtime");
+
+                if (!File.Exists(packagePath))
+                {
+                    throw new ReferenceAssemblyNotFoundException($"System.Runtime");
+                }
+
+                return packagePath;
             }
-            
-            string packageDirectoryRoot = ResolvePackageRootDirectory("System", "Runtime");
-            
-            string packageVersion = PackageVersionResolver.ResolveVersion("System", "Runtime");
 
-            string versionDirectoryRoot = Path.Combine(packageDirectoryRoot, packageVersion);
-
-            string packagePath = GetPackagePath(packageDirectoryRoot, packageVersion, "System", "Runtime");
-
-            if (!File.Exists(packagePath))
-            {
-                throw new ReferenceAssemblyNotFoundException($"System.Runtime");
-            }
-
-            return packagePath;
+            throw new ReferenceAssemblyNotFoundException($"System.Runtime");
         }
 
         public string ResolveReferenceAssemblyPath(string assemblyName)

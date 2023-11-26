@@ -282,7 +282,14 @@ namespace Bam.Net.Incubation
 
         private static void Throw(Type type, Type[] ctorTypes)
         {
-            throw new ConstructFailedException(type, ctorTypes);
+            if (type.IsInterface)
+            {
+                throw new BindingNotFoundException(type);
+            }
+            else
+            {
+                throw new ConstructFailedException(type, ctorTypes);
+            }
         }
 
         /// <summary>

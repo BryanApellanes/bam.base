@@ -22,7 +22,7 @@ namespace Bam.Net
         /// </summary>
         /// <param name="param"></param>
         /// <param name="paramName"></param>
-        public static void ThrowIfNull(object param, string paramName = "param")
+        public static void ThrowIfNull(object? param, string paramName = "param")
         {
             if (param == null)
             {
@@ -30,7 +30,7 @@ namespace Bam.Net
             }
         }
 
-        public static void ThrowIfNull(object param, string message, string paramName)
+        public static void ThrowIfNull(object? param, string message, string paramName)
         {
             if(param == null)
             {

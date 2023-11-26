@@ -501,7 +501,7 @@ namespace Bam.Net
                 throw new ExpectationFailedException($"{objectToCheck.GetType().Name} doesn't extend {typeof(T).Name}", ShouldHtmlEncodeExceptions);
         }
 
-        public static void ShouldBeGreaterThan(this int valueToCheck, int valueToCompareTo, string message = null)
+        public static void ShouldBeGreaterThan(this int valueToCheck, int valueToCompareTo, string? message = null)
         {
             if (!(valueToCheck > valueToCompareTo))
             {
@@ -517,7 +517,7 @@ namespace Bam.Net
             
         }
         
-        public static void ShouldBeGreaterThan(this uint valueToCheck, uint valueToCompareTo, string message = null)
+        public static void ShouldBeGreaterThan(this uint valueToCheck, uint valueToCompareTo, string? message = null)
         {
             if (!(valueToCheck > valueToCompareTo))
             {
@@ -559,7 +559,8 @@ namespace Bam.Net
                 }
             }
         }
-        public static void ShouldBeGreaterThanOrEqualTo(this uint valueToCheck, uint valueToCompareTo, string message = null)
+
+        public static void ShouldBeGreaterThanOrEqualTo(this uint valueToCheck, uint valueToCompareTo, string? message = null)
         {
             if (!(valueToCheck >= valueToCompareTo))
             {
@@ -589,7 +590,19 @@ namespace Bam.Net
             }
         }
 
-        public static void ShouldBeEqualTo(this object objectToCheck, object compareTo, string failureMessage = null)
+        public static void ShouldEqual(this object objectToCheck, object compareTo, string? failureMessage = null)
+        {
+            ShouldBeEqualTo(objectToCheck, compareTo, failureMessage);
+        }
+
+        /// <summary>
+        /// Does a value equality check.
+        /// </summary>
+        /// <param name="objectToCheck"></param>
+        /// <param name="compareTo"></param>
+        /// <param name="failureMessage"></param>
+        /// <exception cref="ExpectationFailedException"></exception>
+        public static void ShouldBeEqualTo(this object objectToCheck, object compareTo, string? failureMessage = null)
         {
             if (!objectToCheck.Equals(compareTo))
             {
@@ -604,7 +617,12 @@ namespace Bam.Net
             }
         }
 
-        public static void ShouldNotBeEqualTo(this object objectToCheck, object compareTo, string failureMessage = null)
+        public static void ShouldNotEqual(this object objectToCheck,  object compareTo, string? failureMessage = null)
+        {
+            ShouldNotBeEqualTo(objectToCheck, compareTo, failureMessage);
+        }
+
+        public static void ShouldNotBeEqualTo(this object objectToCheck, object compareTo, string? failureMessage = null)
         {
             if (objectToCheck.Equals(compareTo))
             {
@@ -619,7 +637,7 @@ namespace Bam.Net
             }
         }
 
-        public static void ShouldBeOfType<T>(this object instance, string failureMessage = null)
+        public static void ShouldBeOfType<T>(this object instance, string? failureMessage = null)
         {
             if (instance == null)
             {
@@ -632,7 +650,7 @@ namespace Bam.Net
             }
         }
 
-        public static void ShouldBeOfType(this object instance, Type shouldBe, string failureMessage = null)
+        public static void ShouldBeOfType(this object instance, Type shouldBe, string? failureMessage = null)
         {
             if (instance == null)
             {
@@ -645,7 +663,14 @@ namespace Bam.Net
             }
         }
 
-        public static void ShouldEqual(this object objectToCheck, object compareTo, string failureMessage = null)
+        /// <summary>
+        /// Does a reference equality check.
+        /// </summary>
+        /// <param name="objectToCheck"></param>
+        /// <param name="compareTo"></param>
+        /// <param name="failureMessage"></param>
+        /// <exception cref="ExpectationFailedException"></exception>
+        public static void ShouldBe(this object objectToCheck, object compareTo, string? failureMessage = null)
         {
             if (objectToCheck != compareTo)
             {
@@ -660,7 +685,7 @@ namespace Bam.Net
             }
         }
 
-        public static void ShouldNotEqual(this object objectToCheck, object compareTo, string failureMessage = null)
+        public static void ShouldNotBe(this object objectToCheck, object compareTo, string? failureMessage = null)
         {
             if (objectToCheck == compareTo)
             {
@@ -675,12 +700,12 @@ namespace Bam.Net
             }
         }
 
-        public static void ShouldBeTrue(this bool? valueToCheck, string failureMessage = null)
+        public static void ShouldBeTrue(this bool? valueToCheck, string? failureMessage = null)
         {
             IsTrue(valueToCheck, failureMessage);
         }
         
-        public static void IsTrue(this bool? valueToCheck, string failureMessage = null)
+        public static void IsTrue(this bool? valueToCheck, string? failureMessage = null)
         {
             if (valueToCheck != true)
             {
@@ -695,7 +720,7 @@ namespace Bam.Net
             }
         }
         
-        public static void ShouldBeNull(this object objectToCheck, string failureMessage = null)
+        public static void ShouldBeNull(this object objectToCheck, string? failureMessage = null)
         {
             IsNull(objectToCheck, failureMessage);
         }

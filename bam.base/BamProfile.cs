@@ -12,7 +12,7 @@ namespace Bam.Net
         static BamProfile()
         {
             EnsureDirectoryExists(ToolkitPath);
-            EnsureDirectoryExists(NugetOutputPath);
+            EnsureDirectoryExists(NugetPackagePath);
             EnsureDirectoryExists(ConfigPath);
             EnsureDirectoryExists(TestsPath);
             EnsureDirectoryExists(ContentPath);
@@ -59,9 +59,9 @@ namespace Bam.Net
                 
         public static string ToolkitPath => System.IO.Path.Combine(ToolkitSegments);
         public static string[] ToolkitSegments => new string[] {Path, "toolkit"};
-        public static string NugetOutputPath => System.IO.Path.Combine(NugetOutputSegments);
+        public static string NugetPackagePath => System.IO.Path.Combine(NugetPackageSegments);
         
-        public static string[] NugetOutputSegments => new string[] {Path, "nupkg"};
+        public static string[] NugetPackageSegments => new string[] {Path, "nupkg"};
         
         /// <summary>
         /// ~/.bam/config

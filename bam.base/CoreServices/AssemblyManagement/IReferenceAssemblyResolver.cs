@@ -10,5 +10,7 @@ namespace Bam.Net.CoreServices.AssemblyManagement
         string ResolveReferenceAssemblyPath(string nameSpace, string typeName);
         
         string ResolveReferenceAssemblyPath(string assemblyName);
+
+        string ResolveSystemRuntimePath();
     }
 }

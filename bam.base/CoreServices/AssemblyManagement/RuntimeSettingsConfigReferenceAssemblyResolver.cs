@@ -11,6 +11,12 @@ namespace Bam.Net.CoreServices.AssemblyManagement
             return ResolveReferenceAssemblyPath(type.Namespace, type.Name);
         }
 
+        public override string ResolveSystemRuntimePath()
+        {
+            RuntimeConfig runtimeConfig = RuntimeSettings.GetRuntimeConfig();
+            return new NugetReferenceAssemblyResolver(runtimeConfig.NugetPackageRoot).ResolveSystemRuntimePath();
+        }
+
         public override string ResolveReferenceAssemblyPath(string typeNamespace, string typeName)
         {
             string referenceAssembliesDir = RuntimeSettings.GetRuntimeConfig().ReferenceAssemblies;

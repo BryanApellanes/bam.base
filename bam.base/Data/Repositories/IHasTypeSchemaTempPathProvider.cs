@@ -5,6 +5,6 @@ namespace Bam.Net.Data.Repositories
 {
     public interface IHasTypeSchemaTempPathProvider
     {
-        Func<ISchemaDefinition, ITypeSchema, string> TypeSchemaTempPathProvider { get; set; }
+        Func<IDaoSchemaDefinition, ITypeSchema, string> TypeSchemaTempPathProvider { get; set; }
     }
 }

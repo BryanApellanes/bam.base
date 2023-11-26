@@ -11,17 +11,17 @@ using System.Reflection;
 
 namespace Bam.Net.Data.Repositories
 {
-    public interface IDaoRepository
+    public interface IDaoRepository : IRepository
     {
         string BaseNamespace { get; set; }
         Assembly DaoAssembly { get; set; }
         string DaoNamespace { get; set; }
         IDatabase Database { get; set; }
         bool KeepSource { get; set; }
-        ISchemaDefinition SchemaDefinition { get; }
+        IDaoSchemaDefinition SchemaDefinition { get; }
         string SchemaName { get; set; }
         ITypeSchema TypeSchema { get; }
-        Func<ISchemaDefinition, ITypeSchema, string> TypeSchemaTempPathProvider { get; set; }
+        Func<IDaoSchemaDefinition, ITypeSchema, string> TypeSchemaTempPathProvider { get; set; }
         bool WarningsAsErrors { get; set; }
         bool WrapByDefault { get; set; }
 

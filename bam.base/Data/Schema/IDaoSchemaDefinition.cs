@@ -5,7 +5,7 @@ using System;
 
 namespace Bam.Net.Data.Schema
 {
-    public interface ISchemaDefinition
+    public interface IDaoSchemaDefinition
     {
         string DbType { get; set; }
         string File { get; set; }
@@ -18,7 +18,9 @@ namespace Bam.Net.Data.Schema
         ISchemaManagerResult AddForeignKey(IForeignKeyColumn fk);
         ISchemaManagerResult AddTable(ITable table);
         ISchemaManagerResult AddXref(IXrefTable xref);
-        ISchemaDefinition CombineWith(ISchemaDefinition schemaDefinition);
+        ITable GetTable(string tableName);
+        IXrefTable GetXref(string tableName);
+        IDaoSchemaDefinition CombineWith(IDaoSchemaDefinition schemaDefinition);
         IXrefInfo[] LeftXrefsFor(string tableName);
         void RemoveTable(string tableName);
         void RemoveTable(ITable table);

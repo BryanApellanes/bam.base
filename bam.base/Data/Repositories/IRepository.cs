@@ -21,7 +21,8 @@ namespace Bam.Net.Data.Repositories
         void AddNamespace(Assembly assembly, string ns, Func<Type, bool> predicate);
 		void AddTypes(IEnumerable<Type> types);
 		void AddType<T>();
-        object Save(Type type, object toSave);        
+        object Save(Type type, object toSave);
+        
         void BatchRetrieveAll(Type type, int batchSize, Action<IEnumerable<object>> processor);        
 		IEnumerable<object> Query(string propertyName, object propertyValue);
         IEnumerable<T> Query<T>(Dictionary<string, object> queryParams) where T: class, new();

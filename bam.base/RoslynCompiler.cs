@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Xml;
+using Bam.CoreServices.AssemblyManagement;
 using Bam.Net.CoreServices.AssemblyManagement;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -18,19 +19,19 @@ namespace Bam.Net
     {
         public RoslynCompiler()
         {
-            _referenceAssemblyPaths = new HashSet<string>();
             _assembliesToReference = new HashSet<Assembly>();
+            _referenceAssemblyPaths = new HashSet<string>();
             OutputKind = OutputKind.DynamicallyLinkedLibrary;
             AssembliesToReference = DefaultAssembliesToReference;
-            ReferenceAssemblyResolver = ReferenceAssemblyResolver ?? CoreServices.AssemblyManagement.ReferenceAssemblyResolver.Current;
+            MetadataReferenceResolver = new DefaultMetadataReferenceResolver();
         }
 
-        public RoslynCompiler(IReferenceAssemblyResolver referenceAssemblyResolver) : this()
+        public RoslynCompiler(IMetadataReferenceResolver metadataReferenceResolver) : this()
         {
-            ReferenceAssemblyResolver = referenceAssemblyResolver;
+            MetadataReferenceResolver = metadataReferenceResolver;
         }
-        
-        public IReferenceAssemblyResolver ReferenceAssemblyResolver { get; set; } // TOOD: revisit this; this does not work the way it was orignially intended and should be removed.
+
+        public IMetadataReferenceResolver MetadataReferenceResolver { get; set; }
 
         readonly HashSet<Assembly> _assembliesToReference;
         public Assembly[] AssembliesToReference
@@ -44,64 +45,48 @@ namespace Bam.Net
         }
 
         readonly HashSet<string> _referenceAssemblyPaths;
-        public string[] ReferenceAssemblyPaths => _referenceAssemblyPaths.ToArray();
+        public string[] ExtraReferenceAssemblyPaths
+        {
+            get
+            {
+                return _referenceAssemblyPaths.ToArray();
+            }
+        }
 
         public OutputKind OutputKind { get; set; }
 
-        public RoslynCompiler AddAssemblyReference(Type type)
-        {
-            return AddAssemblyReference(type.Assembly);
-        }
-
-        public RoslynCompiler AddAssemblyReference(Assembly assembly)
-        {
-            _assembliesToReference.Add(assembly);
-            return this;
-        }
-
-        public RoslynCompiler AddResolvedAssemblyReference(string assemblyName)
-        {
-            return AddAssemblyReference(ReferenceAssemblyResolver.ResolveReferenceAssemblyPath(assemblyName));
-        } 
-        
-        public RoslynCompiler AddAssemblyReference(string path)
+        public ICompiler AddAssemblyReference(string path)
         {
             _referenceAssemblyPaths.Add(path);
             return this;
         }
-        
-        public RoslynCompiler AddAssemblyReference(FileInfo assemblyFile)
+
+        public Assembly CompileDirectoriesToAssembly(string assemblyFileName, params DirectoryInfo[] directoryInfos)
         {
-            _assembliesToReference.Add(Assembly.Load(assemblyFile.FullName));
-            return this;
+            return CompileFilesToAssembly(assemblyFileName, directoryInfos.SelectMany(di => di.GetFiles("*.cs")).ToArray());
         }
 
-        public Assembly CompileAssembly(string assemblyFileName, DirectoryInfo directoryInfo)
+        public Assembly CompileFilesToAssembly(string assemblyFileName, params FileInfo[] sourceFiles)
         {
-            return CompileAssembly(assemblyFileName, directoryInfo.GetFiles("*.cs").ToArray());
-        }
-
-        public Assembly CompileAssembly(string assemblyFileName, params FileInfo[] sourceFiles)
-        {
-            return Assembly.Load(Compile(assemblyFileName, sourceFiles));
+            return Assembly.Load(CompileFiles(assemblyFileName, sourceFiles));
         }
 
         public byte[] Compile(string assemblyFileName, DirectoryInfo directoryInfo)
         {
-            return Compile(assemblyFileName, directoryInfo.GetFiles("*.cs").ToArray());
+            return CompileFiles(assemblyFileName, directoryInfo.GetFiles("*.cs").ToArray());
         }
         
-        public byte[] Compile(string assemblyFileName, params FileInfo[] sourceFiles)
+        public byte[] CompileFiles(string assemblyFileName, params FileInfo[] sourceFiles)
         {
             return Compile(assemblyFileName, sourceFiles.Select(f => SyntaxFactory.ParseSyntaxTree(f.ReadAllText(), CSharpParseOptions.Default, f.FullName)).ToArray());
         }
 
-        public Assembly CompileAssembly(string assemblyName, string sourceCode, Func<MetadataReference[]> getMetaDataReferences = null)
+        public Assembly CompileAssembly(string assemblyName, string sourceCode, Func<MetadataReference[]>? getMetaDataReferences = null)
         {
             return Assembly.Load(Compile(assemblyName, sourceCode, getMetaDataReferences));
         }
 
-        public byte[] Compile(string assemblyName, string sourceCode)
+        public byte[] CompileSource(string assemblyName, string sourceCode)
         {
             return Compile(assemblyName, sourceCode, GetMetaDataReferences);
         }
@@ -120,12 +105,10 @@ namespace Bam.Net
             });
         }
 
-        public byte[] Compile(string assemblyName, string sourceCode, Func<MetadataReference[]> getMetaDataReferences)
+        public byte[] Compile(string assemblyName, string sourceCode, Func<MetadataReference[]>? getMetaDataReferences)
         {
             SyntaxTree tree = SyntaxFactory.ParseSyntaxTree(sourceCode);
-            HashSet<MetadataReference> metadataReferences = new HashSet<MetadataReference>();
-            getMetaDataReferences().Each(mdr => metadataReferences.Add(mdr));
-            return Compile(assemblyName, () => metadataReferences.ToArray(), tree);
+            return Compile(assemblyName, getMetaDataReferences, tree);
         }
 
         public byte[] Compile(string assemblyName, params SyntaxTree[] syntaxTrees)
@@ -133,7 +116,7 @@ namespace Bam.Net
             return Compile(assemblyName, GetMetaDataReferences, syntaxTrees);
         }
 
-        public byte[] Compile(string assemblyName, Func<MetadataReference[]> getMetaDataReferences, params SyntaxTree[] syntaxTrees)
+        public byte[] Compile(string assemblyName, Func<MetadataReference[]>? getMetaDataReferences, params SyntaxTree[] syntaxTrees)
         {
             getMetaDataReferences = getMetaDataReferences ?? GetMetaDataReferences;
             MetadataReference[] metaDataReferences = getMetaDataReferences();
@@ -180,29 +163,16 @@ namespace Bam.Net
 
         private MetadataReference[] GetMetaDataReferences()
         {
-            List<MetadataReference> references = new List<MetadataReference>
-            {   
-                // Get the path to the mscorlib and private mscorlib
-                // libraries that are required for compilation to succeed.
-                MetadataReference.CreateFromFile(RuntimeSettings.GetReferenceAssembliesDirectory() + Path.DirectorySeparatorChar + "mscorlib.dll"),
-                MetadataReference.CreateFromFile(typeof(object).GetTypeInfo().Assembly.Location),
-                MetadataReference.CreateFromFile(RuntimeSettings.GetReferenceAssembliesDirectory() + Path.DirectorySeparatorChar + "netstandard.dll")
-            };
-            AssemblyName[] referencedAssemblies = Assembly.GetEntryAssembly().GetReferencedAssemblies();
-            foreach (AssemblyName referencedAssembly in referencedAssemblies)
-            {
-                Assembly loadedAssembly = Assembly.Load(referencedAssembly);
-
-                references.Add(MetadataReference.CreateFromFile(loadedAssembly.Location));
-            }
+            List<MetadataReference> references = new List<MetadataReference>(MetadataReferenceResolver.GetMetaDataReferences());
             if(_assembliesToReference.Count > 0)
             {
                 _assembliesToReference.Each(assembly => references.Add(MetadataReference.CreateFromFile(assembly.Location)));
             }
-            if(_referenceAssemblyPaths.Count > 0)
+            if (_referenceAssemblyPaths.Count > 0)
             {
                 _referenceAssemblyPaths.Each(path => references.Add(MetadataReference.CreateFromFile(path)));
             }
+
             return references.ToArray();
         }
     }

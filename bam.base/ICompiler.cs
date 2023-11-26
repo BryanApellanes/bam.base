@@ -8,11 +8,12 @@ namespace Bam.Net
 {
     public interface ICompiler
     {
+        ICompiler AddAssemblyReference(string assemblyPath);
         Assembly[] AssembliesToReference { get; set; }
 
-        Assembly CompileAssembly(string assemblyFileName, DirectoryInfo directoryInfo);
-        Assembly CompileAssembly(string assemblyFileName, FileInfo[] files);
-        byte[] Compile(string assemblyFileName, params FileInfo[] sourceFiles);
-        byte[] Compile(string assemblyFileName, string sourceCode);        
+        Assembly CompileDirectoriesToAssembly(string assemblyFileName, params DirectoryInfo[] directoryInfo);
+        Assembly CompileFilesToAssembly(string assemblyFileName, params FileInfo[] files);
+        byte[] CompileFiles(string assemblyFileName, params FileInfo[] sourceFiles);
+        byte[] CompileSource(string assemblyFileName, string sourceCode);        
     }
 }

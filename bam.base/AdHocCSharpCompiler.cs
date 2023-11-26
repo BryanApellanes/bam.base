@@ -11,6 +11,7 @@ using Microsoft.CSharp;
 
 namespace Bam.Net
 {
+    [Obsolete("Use RoslynCompiler instead")]
     public static partial class AdHocCSharpCompiler
     {        
         static string[] _referenceAssemblies = new string[] { };

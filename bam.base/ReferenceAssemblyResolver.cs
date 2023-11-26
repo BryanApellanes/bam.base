@@ -24,6 +24,7 @@ namespace Bam.Net.CoreServices.AssemblyManagement
         }
 
         public static IReferenceAssemblyResolver Current => ReferenceAssemblyResolvers[OSInfo.Current];
+        public abstract string ResolveSystemRuntimePath();
 
         public virtual Assembly ResolveReferenceAssembly(Type type)
         {

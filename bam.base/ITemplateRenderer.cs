@@ -2,10 +2,10 @@
 
 namespace Bam.Net
 {
-    public interface ITemplateRenderer
+    public interface ITemplateRenderer : IRenderer
     {
-        string Render(string templateName, object toRender);
-        void Render(object toRender, Stream output);
-        void Render(string templateName, object toRender, Stream output);
+        string Render(string templateName, object? toRender);
+        void Render(object? toRender, Stream output);
+        void Render(string templateName, object? toRender, Stream output);
     }
 }

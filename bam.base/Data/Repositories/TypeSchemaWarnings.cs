@@ -5,6 +5,7 @@ namespace Bam.Net.Data.Repositories
         Invalid,
         KeyPropertyNotFound,
         ReferencingPropertyNotFound,
-        ChildParentPropertyNotFound
+        ChildParentPropertyNotFound,
+        DifferentTypeNamespacesFound
     }
 }
