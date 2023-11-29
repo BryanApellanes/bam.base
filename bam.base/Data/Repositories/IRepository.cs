@@ -14,7 +14,8 @@ namespace Bam.Net.Data.Repositories
 {
 	public interface IRepository : ILoggable, IExtendedCrudProvider
     {
-		IEnumerable<Type> StorableTypes { get; }
+        Exception LastException { get; }
+        IEnumerable<Type> StorableTypes { get; }
 		void AddType(Type type);
         void AddNamespace(Type type);
         void AddNamespace(Assembly assembly, string ns);

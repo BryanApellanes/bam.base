@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Bam.Net.Configuration;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -11,7 +12,7 @@ using System.Web;
 
 namespace Bam.Net
 {
-    public static partial class RuntimeSettings
+    public static class RuntimeSettings
     {
         static RuntimeConfig _runtimeConfig;
         static object _runtimeConfigLock = new object();
@@ -40,8 +41,42 @@ namespace Bam.Net
             }); 
         }
 
-        static string _appDataFolder;
-        static readonly object _appDataFolderLock = new object();
+        static string _processDataFolder;
+        static readonly object _processDataFolderLock = new object();
+
+        // TODO: change this to direct to ~/.bam/opt
+        public static string ProcessDataFolder
+        {
+            get
+            {
+                return _processDataFolderLock.DoubleCheckLock(ref _processDataFolder, () =>
+                {
+                    if (!OSInfo.IsUnix)
+                    {
+                        StringBuilder path = new StringBuilder();
+                        path.Append(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));
+                        if (!path.ToString().EndsWith(Path.DirectorySeparatorChar.ToString()))
+                        {
+                            path.Append(Path.DirectorySeparatorChar);
+                        }
+
+                        path.Append(DefaultConfiguration.GetAppSetting("ApplicationName", ApplicationNameProvider.Default.GetApplicationName()) + Path.DirectorySeparatorChar);
+                        FileInfo fileInfo = new FileInfo(path.ToString());
+                        if (!Directory.Exists(fileInfo.Directory.FullName))
+                        {
+                            Directory.CreateDirectory(fileInfo.Directory.FullName);
+                        }
+                        _processDataFolder = path.ToString();
+                        return _processDataFolder;
+                    }
+                    else
+                    {
+                        return Path.Combine(BamHome.DataPath, Config.Current?.ApplicationName ?? ApplicationDiagnosticInfo.UnknownApplication);
+                    }
+                });
+            }
+            set => _processDataFolder = value;
+        }
 
         public static Func<Type, bool> ClrTypeFilter
         {
@@ -90,23 +125,75 @@ namespace Bam.Net
         public static string LinGenDir => Path.Combine(GenDir, "lin");
         public static string OsxGenDir => Path.Combine(GenDir, "osx");
         
-        static Dictionary<OSNames, string> _referenceAssemblies = new Dictionary<OSNames, string>()
+        static Dictionary<OSNames, string> _referenceAssemblyRootDirectories = new Dictionary<OSNames, string>()
         {
-            { OSNames.Windows, "C:\\Program Files\\dotnet\\packs\\Microsoft.NETCore.App.Ref\\5.0.0\\ref\\net5.0" },
-            { OSNames.Linux, "/usr/share/dotnet/packs/Microsoft.NETCore.App.Ref/5.0.0/ref/net5.0" },
-            { OSNames.OSX, "/usr/local/share/dotnet/packs/Microsoft.NETCore.App.Ref/5.0.0/ref/net5.0" }
+            { OSNames.Windows, "C:\\Program Files\\dotnet\\packs\\Microsoft.NETCore.App.Ref" }, 
+            { OSNames.Linux, "/usr/share/dotnet/packs/Microsoft.NETCore.App.Ref" }, 
+            { OSNames.OSX, "/usr/local/share/dotnet/packs/Microsoft.NETCore.App.Ref" } 
         };
+
+        public static string ResolveReferenceAssemblyPathOrDie(string assemblyFileName)
+        {
+            string filePath = ResolveReferenceAssemblyPath(assemblyFileName);
+            if (!File.Exists(filePath))
+            {
+                throw new ArgumentException($"The specified assembly was not found ({assemblyFileName}): {filePath}");
+            }
+
+            return filePath;
+        }
+
+        public static string ResolveReferenceAssemblyPath(string assemblyFileName)
+        {
+            if (assemblyFileName == null)
+            {
+                throw new ArgumentNullException(nameof(assemblyFileName));
+            }
+            if (!assemblyFileName.EndsWith(".dll"))
+            {
+                assemblyFileName = $"{assemblyFileName}.dll";
+            }
+            return Path.Join(GetReferenceAssembliesDirectory(), assemblyFileName);
+        }
 
         public static string GetReferenceAssembliesDirectory()
         {
             return GetReferenceAssembliesDirectory(OSInfo.Current);
         }
 
-        public static string GetReferenceAssembliesDirectory(OSNames osNames)
+        public static string GetReferenceAssembliesDirectory(OSNames osName)
         {
-            return _referenceAssemblies[osNames];
+            string root = _referenceAssemblyRootDirectories[osName];
+            string version = GetLatestInstalledDotNetVersion(osName);
+            string refRoot = Path.Join(root, version, "ref");
+            DirectoryInfo refRootDirectory = new DirectoryInfo(refRoot);
+            string subFolder = refRootDirectory.GetDirectories().First().Name;
+            return Path.Join(refRoot, subFolder);
         }
 
+        public static string GetLatestInstalledDotNetVersion()
+        {
+            return GetLatestInstalledDotNetVersion(OSInfo.Current);
+        }
+
+        public static string[] GetInstalledDotNetVersions()
+        {
+            return GetInstalledDotNetVersions(OSInfo.Current);
+        }
+
+        private static string GetLatestInstalledDotNetVersion(OSNames osName)
+        {
+            string[] versions = GetInstalledDotNetVersions(osName);
+            return versions[versions.Length - 1];
+        }
+
+        private static string[] GetInstalledDotNetVersions(OSNames osName)
+        {
+            DirectoryInfo root = new DirectoryInfo(_referenceAssemblyRootDirectories[osName]);
+            List<string> versions = root.GetDirectories().Select(d => d.Name).ToList();
+            versions.Sort();
+            return versions.ToArray();
+        }
 
         /// <summary>
         /// The path to the '.bam' directory found in the home directory of the owner of the
@@ -122,7 +209,7 @@ namespace Bam.Net
         /// <summary>
         /// The path to the home directory of the user that owns the current process.
         /// </summary>
-        public static string ProcessProfileDir => IsUnix ? Environment.GetEnvironmentVariable("HOME") : Environment.ExpandEnvironmentVariables("%HOMEDRIVE%%HOMEPATH%");
+        public static string? ProcessProfileDir => IsUnix ? Environment.GetEnvironmentVariable("HOME") : Environment.ExpandEnvironmentVariables("%HOMEDRIVE%%HOMEPATH%");
 
         /// <summary>
         /// Gets a value indicating if the current process is running on Windows.
@@ -146,7 +233,7 @@ namespace Bam.Net
         /// </summary>
         public static bool IsOSX => RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
         
-        public static string GetEntryDirectoryFilePathFor(string fileName)
+        public static string GetEntryAssemblyDirectoryFilePathFor(string fileName)
         {
             Assembly entry = Assembly.GetEntryAssembly();
             FileInfo file = entry.GetFileInfo();

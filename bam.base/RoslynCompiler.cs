@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Xml;
+using System.Xml.Serialization;
 using Bam.CoreServices.AssemblyManagement;
 using Bam.Net.CoreServices.AssemblyManagement;
 using Microsoft.CodeAnalysis;
@@ -22,16 +24,20 @@ namespace Bam.Net
             _assembliesToReference = new HashSet<Assembly>();
             _referenceAssemblyPaths = new HashSet<string>();
             OutputKind = OutputKind.DynamicallyLinkedLibrary;
-            AssembliesToReference = DefaultAssembliesToReference;
-            MetadataReferenceResolver = new DefaultMetadataReferenceResolver();
+            //AssembliesToReference = DefaultAssembliesToReference;
+            MetadataReferenceResolver = new AggregateMetadataReferenceResolver
+                (
+                    new DefaultMetadataReferenceResolver(),
+                    new ReferencedAssemblyMetadataReferenceResolver()
+                );
         }
 
         public RoslynCompiler(IMetadataReferenceResolver metadataReferenceResolver) : this()
         {
-            MetadataReferenceResolver = metadataReferenceResolver;
+            MetadataReferenceResolver.Resolvers.Add(metadataReferenceResolver);
         }
 
-        public IMetadataReferenceResolver MetadataReferenceResolver { get; set; }
+        public AggregateMetadataReferenceResolver MetadataReferenceResolver { get; set; }
 
         readonly HashSet<Assembly> _assembliesToReference;
         public Assembly[] AssembliesToReference
@@ -143,15 +149,17 @@ namespace Bam.Net
             {
                 if (_defaultAssembliesToReference.Length == 0)
                 {
-                    List<Assembly> defaultAssemblies = new List<Assembly>
+                    HashSet<Assembly> defaultAssemblies = new HashSet<Assembly>
                     {
                         typeof(DynamicObject).Assembly,
                         typeof(XmlDocument).Assembly,
                         typeof(DataTable).Assembly,
                         typeof(object).Assembly,
                         typeof(JsonWriter).Assembly,
-                        typeof(FileInfo).Assembly,
                         typeof(Enumerable).Assembly,
+                        typeof(MarshalByValueComponent).Assembly,
+                        typeof(IComponent).Assembly,
+                        typeof(IServiceProvider).Assembly,
                         Assembly.GetExecutingAssembly()
                     };
                     _defaultAssembliesToReference = defaultAssemblies.ToArray();

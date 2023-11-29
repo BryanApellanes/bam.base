@@ -13,7 +13,7 @@ namespace Bam.CoreServices.AssemblyManagement
     {
         public MetadataReference[] GetMetaDataReferences()
         {
-            List<MetadataReference> references = new List<MetadataReference>
+            HashSet<MetadataReference> references = new HashSet<MetadataReference>
             {   
                 // Get the path to the mscorlib and private mscorlib
                 // libraries that are required for compilation to succeed.
@@ -21,17 +21,6 @@ namespace Bam.CoreServices.AssemblyManagement
                 MetadataReference.CreateFromFile(typeof(object).GetTypeInfo().Assembly.Location),
                 MetadataReference.CreateFromFile(RuntimeSettings.GetReferenceAssembliesDirectory() + Path.DirectorySeparatorChar + "netstandard.dll")
             };
-            Assembly? entryAssembly = Assembly.GetEntryAssembly();
-            if(entryAssembly != null)
-            {
-                AssemblyName[] referencedAssemblies = entryAssembly.GetReferencedAssemblies();
-                foreach (AssemblyName referencedAssembly in referencedAssemblies)
-                {
-                    Assembly loadedAssembly = Assembly.Load(referencedAssembly);
-
-                    references.Add(MetadataReference.CreateFromFile(loadedAssembly.Location));
-                }
-            }
             return references.ToArray();
         }
     }
