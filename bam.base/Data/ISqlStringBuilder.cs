@@ -34,7 +34,7 @@ namespace Bam.Net.Data
         IEnumerable<T> ExecuteReader<T>(IDatabase db) where T : class, new();
         ISqlStringBuilder FormatInsert<T>(string tableName, params AssignValue[] values) where T : SetFormat, new();
         DataSet GetDataSet(IDatabase db, bool releaseConnection = true, DbConnection conn = null, DbTransaction tx = null);
-        DataSet GetDataSet<T>(IDatabase db, bool releaseConnection = true, DbConnection conn = null, DbTransaction tx = null);
+        DataTable ExecuteGetDataTable(IDatabase db);
         DataTable GetDataTable(IDatabase db);
         ISqlStringBuilder Go();
         ISqlStringBuilder Id();

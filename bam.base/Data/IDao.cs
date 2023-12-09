@@ -19,7 +19,7 @@ namespace Bam.Net.Data
         string DefaultSortProperty { get; set; }
         bool ForceInsert { get; set; }
         bool ForceUpdate { get; set; }
-        ulong? IdValue { get; set; }
+        ulong? DbId { get; set; }
         Action<IDao> Initializer { get; set; }
         bool IsNew { get; set; }
         string KeyColumnName { get; }
@@ -49,7 +49,7 @@ namespace Bam.Net.Data
         void Delete(IDatabase database = null);
         DataTypes GetDataType(string columnName);
         string GetDbDataType(string columnName);
-        ulong? GetId();
+        ulong? GetDbId();
         Type[] GetSchemaTypes();
         TypeCode GetTypeCode(DataTypes dataTypes);
         IQueryFilter GetUniqueFilter();
@@ -62,8 +62,8 @@ namespace Bam.Net.Data
         void Save();
         void Save(IDatabase db);
         Task SaveAsync(IDatabase db = null);
-        void SetId(object value);
-        void SetId(ulong? id);
+        void SetDbId(object value);
+        void SetDbId(ulong? id);
         void SetUuid();
         void SetValue(string columnName, object value);
         string TableName();

@@ -449,6 +449,10 @@ namespace Bam.Net
             {
                 return instead;
             }
+            if(instance as string == string.Empty)
+            {
+                return instead;
+            }
             return instance;
         }
 

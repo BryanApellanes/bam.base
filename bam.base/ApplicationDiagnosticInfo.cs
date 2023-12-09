@@ -10,6 +10,7 @@ using System.Threading;
 using System.Diagnostics;
 using Bam.Net.Configuration;
 using Bam.Net.Logging;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Bam.Net
 {
@@ -61,6 +62,46 @@ namespace Bam.Net
         {
             get;
             set;
+        }
+
+        public string UtcShortDate
+        {
+            get
+            {
+                return this.Utc.ToShortDateString();
+            }
+        }
+
+        public DateTime Local
+        {
+            get
+            {
+                return Utc.ToLocalTime();
+            }
+        }
+
+        public string LocalShortTime
+        {
+            get
+            {
+                return this.Local.ToShortTimeString();
+            }
+        }
+
+        public string LocalShortDate
+        {
+            get
+            {
+                return this.Local.ToShortDateString();
+            }
+        }
+
+        public string UtcShortTime
+        {
+            get
+            {
+                return this.Utc.ToShortTimeString();
+            }
         }
 
         public int ThreadHashCode

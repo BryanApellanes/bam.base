@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using Bam.Net.CommandLine;
 using Bam.Net.Configuration;
+using Bam.Console;
 
 namespace Bam.Net.Logging
 {
@@ -249,7 +250,7 @@ namespace Bam.Net.Logging
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Failed to create logger of type ({0}): ({1})", loggerType.Name, ex.Message);
+                System.Console.WriteLine("Failed to create logger of type ({0}): ({1})", loggerType.Name, ex.Message);
                 return new ConsoleLogger();
             }
         }

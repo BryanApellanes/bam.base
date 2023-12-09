@@ -513,10 +513,39 @@ namespace Bam.Net
                 {
                     throw new ExpectationFailedException($"value ({valueToCheck}) is not greater than ({valueToCompareTo})");
                 }
-            }
-            
+            }            
         }
-        
+
+        public static void ShouldBeGreaterThan(this long valueToCheck, long valueToCompareTo, string? message = null)
+        {
+            if (!(valueToCheck > valueToCompareTo))
+            {
+                if (!string.IsNullOrEmpty(message))
+                {
+                    throw new ExpectationFailedException(message);
+                }
+                else
+                {
+                    throw new ExpectationFailedException($"value ({valueToCheck}) is not greater than ({valueToCompareTo})");
+                }
+            }
+        }
+
+        public static void ShouldBeGreaterThan(this ulong valueToCheck, ulong valueToCompareTo, string? message = null)
+        {
+            if (!(valueToCheck > valueToCompareTo))
+            {
+                if (!string.IsNullOrEmpty(message))
+                {
+                    throw new ExpectationFailedException(message);
+                }
+                else
+                {
+                    throw new ExpectationFailedException($"value ({valueToCheck}) is not greater than ({valueToCompareTo})");
+                }
+            }
+        }
+
         public static void ShouldBeGreaterThan(this uint valueToCheck, uint valueToCompareTo, string? message = null)
         {
             if (!(valueToCheck > valueToCompareTo))
@@ -531,7 +560,8 @@ namespace Bam.Net
                 }
             }
         }
-        public static void ShouldBeGreaterThanOrEqualTo(this long valueToCheck, long valueToCompareTo, string message = null)
+
+        public static void ShouldBeGreaterThanOrEqualTo(this long valueToCheck, long valueToCompareTo, string? message = null)
         {
             if (!(valueToCheck >= valueToCompareTo))
             {
@@ -545,7 +575,23 @@ namespace Bam.Net
                 }
             }
         }
-        public static void ShouldBeGreaterThanOrEqualTo(this int valueToCheck, int valueToCompareTo, string message = null)
+
+        public static void ShouldBeGreaterThanOrEqualTo(this ulong valueToCheck, ulong valueToCompareTo, string? message = null)
+        {
+            if (!(valueToCheck >= valueToCompareTo))
+            {
+                if (!string.IsNullOrEmpty(message))
+                {
+                    throw new ExpectationFailedException(message);
+                }
+                else
+                {
+                    throw new ExpectationFailedException($"value ({valueToCheck}) is not greater than ({valueToCompareTo})");
+                }
+            }
+        }
+
+        public static void ShouldBeGreaterThanOrEqualTo(this int valueToCheck, int valueToCompareTo, string? message = null)
         {
             if (!(valueToCheck >= valueToCompareTo))
             {
@@ -575,21 +621,12 @@ namespace Bam.Net
             }
         }
         
-        public static void ShouldBeGreaterThan(this long valueToCheck, long valueToCompareTo, string message = null)
-        {
-            if (!(valueToCheck > valueToCompareTo))
-            {
-                if (!string.IsNullOrEmpty(message))
-                {
-                    throw new ExpectationFailedException(message);
-                }
-                else
-                {
-                    throw new ExpectationFailedException($"value ({valueToCheck}) is not greater than ({valueToCompareTo})");
-                }
-            }
-        }
-
+        /// <summary>
+        /// Does a vlaue equality check.
+        /// </summary>
+        /// <param name="objectToCheck"></param>
+        /// <param name="compareTo"></param>
+        /// <param name="failureMessage"></param>
         public static void ShouldEqual(this object objectToCheck, object compareTo, string? failureMessage = null)
         {
             ShouldBeEqualTo(objectToCheck, compareTo, failureMessage);
@@ -720,12 +757,12 @@ namespace Bam.Net
             }
         }
         
-        public static void ShouldBeNull(this object objectToCheck, string? failureMessage = null)
+        public static void ShouldBeNull(this object? objectToCheck, string? failureMessage = null)
         {
             IsNull(objectToCheck, failureMessage);
         }
         
-        public static void IsNull(this object objectToCheck)
+        public static void IsNull(this object? objectToCheck)
         {
             IsNull(objectToCheck, "objectToCheck was not null as expected");
         }
@@ -736,7 +773,7 @@ namespace Bam.Net
         /// <typeparam name="T"></typeparam>
         /// <param name="objectToCheck"></param>
         /// <param name="failureMessage"></param>
-        public static void IsNull(object objectToCheck, string failureMessage) 
+        public static void IsNull(object? objectToCheck, string? failureMessage) 
         {
             if (objectToCheck != null)
             {

@@ -1,8 +1,8 @@
 using System;
 
-namespace Bam.Net.Data.Repositories
+namespace Bam.Data.Schema
 {
-    public class TypeSchemaWarningEventArgs: EventArgs
+    public class TypeSchemaWarningEventArgs : EventArgs
     {
         public TypeSchemaWarnings Warning { get; set; }
         public Type? ParentType { get; set; }

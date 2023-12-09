@@ -14,6 +14,16 @@ namespace Bam
         {
         }
 
+        ServiceRegistry _serviceRegistry;
+        object _serviceRegistryLock = new object();
+        public ServiceRegistry ServiceRegistry
+        {
+            get
+            {
+                return _serviceRegistryLock.DoubleCheckLock(ref _serviceRegistry, () => GetServiceRegistry());
+            }
+        }
+
         static BamContext _current;
         static object _currentLock = new object();
         public static BamContext Current

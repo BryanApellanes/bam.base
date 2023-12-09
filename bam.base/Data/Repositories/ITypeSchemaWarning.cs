@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Bam.Net.Data.Repositories
+namespace Bam.Data.Schema
 {
     public interface ITypeSchemaWarning
     {

@@ -21,9 +21,10 @@ namespace Bam.Net.Analytics
             tokens = new List<DiffReportToken>();
             inserted = new List<InsertedDiffReportToken>();
             deleted = new List<DeletedDiffReportToken>();
-            Dictionary<string, Action<string>> savers = new Dictionary<string, Action<string>>();
-            savers.Add(".json", this.ToJsonFile);
-            //savers.Add(".xml", this.ToXmlFile);
+            Dictionary<string, Action<string>> savers = new Dictionary<string, Action<string>>
+            {
+                { ".json", this.ToJsonFile }
+            };
             this._savers = savers;
             
         }

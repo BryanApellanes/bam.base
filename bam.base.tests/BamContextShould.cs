@@ -1,5 +1,5 @@
-﻿using Bam.Net;
-using Bam.Net.CommandLine;
+﻿using Bam.Console;
+using Bam.Net;
 using Bam.Net.CoreServices;
 using Bam.Net.Logging;
 using Bam.Testing;

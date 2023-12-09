@@ -6,10 +6,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Bam.Net.Logging;
-using Bam.Net;
 using System.Runtime.Serialization;
 
-namespace Bam.Net.CommandLine
+namespace Bam.Console
 {
     // TODO: break this up into ConsoleLogger and DetailConsoleLogger
     public class ConsoleLogger : Logger
@@ -21,7 +20,7 @@ namespace Bam.Net.CommandLine
             UseColors = true;
             ShowTime = true;
         }
-		
+
         public bool UseColors { get; set; }
         public bool AddDetails { get; set; }
 
@@ -49,25 +48,25 @@ namespace Bam.Net.CommandLine
                 switch (logEvent.Severity)
                 {
                     case LogEventType.None:
-                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        System.Console.ForegroundColor = ConsoleColor.Cyan;
                         break;
                     case LogEventType.Information:
-                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        System.Console.ForegroundColor = ConsoleColor.Cyan;
                         break;
                     case LogEventType.Warning:
-                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        System.Console.ForegroundColor = ConsoleColor.Yellow;
                         break;
                     case LogEventType.Error:
-                        Console.ForegroundColor = ConsoleColor.Magenta;
+                        System.Console.ForegroundColor = ConsoleColor.Magenta;
                         break;
                     case LogEventType.Fatal:
-                        Console.ForegroundColor = ConsoleColor.Red;
+                        System.Console.ForegroundColor = ConsoleColor.Red;
                         break;
                 }
             }
             StringBuilder time = GetTimeString(logEvent);
-            Console.WriteLine($"{time.ToString()}{logEvent.Message}");
-            Console.ResetColor();
+            System.Console.WriteLine($"{time.ToString()}{logEvent.Message}");
+            System.Console.ResetColor();
         }
 
         private StringBuilder GetTimeString(LogEvent logEvent)
@@ -85,7 +84,7 @@ namespace Bam.Net.CommandLine
         private static DateTime GetLocalTime(DateTime input)
         {
             DateTime local = input;
-            if(input.Kind == DateTimeKind.Utc)
+            if (input.Kind == DateTimeKind.Utc)
             {
                 local = input.ToLocalTime();
             }

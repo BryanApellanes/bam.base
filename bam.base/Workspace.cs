@@ -79,7 +79,7 @@ namespace Bam.Net
         /// <param name="args"></param>
         public void WriteLine(string format, params object[] args)
         {
-            Console.WriteLine(format, args);
+            System.Console.WriteLine(format, args);
             string message = $"{string.Format(format, args)}\r\n";
             FileInfo file = new FileInfo(Path("Console"));
             if (file.Exists && file.Length >= 1048576)

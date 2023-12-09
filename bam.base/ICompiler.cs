@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Bam.CoreServices.AssemblyManagement;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -8,8 +9,8 @@ namespace Bam.Net
 {
     public interface ICompiler
     {
-        ICompiler AddAssemblyReference(string assemblyPath);
-        Assembly[] AssembliesToReference { get; set; }
+        AggregateMetadataReferenceResolver MetadataReferenceResolver { get; set; }
+        void AddMetadataReferenceResolver(IMetadataReferenceResolver resolver);
 
         Assembly CompileDirectoriesToAssembly(string assemblyFileName, params DirectoryInfo[] directoryInfo);
         Assembly CompileFilesToAssembly(string assemblyFileName, params FileInfo[] files);
