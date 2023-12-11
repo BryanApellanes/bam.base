@@ -827,9 +827,9 @@ namespace Bam.Net
         /// </summary>
         /// <param name="property"></param>
         /// <returns></returns>
-        public static Type GetEnumerableType(this PropertyInfo property)
+        public static Type? GetEnumerableType(this PropertyInfo property)
         {
-            Type result = null;
+            Type? result = null;
             if (property.PropertyType.IsArray)
             {
                 result = property.PropertyType.GetElementType();

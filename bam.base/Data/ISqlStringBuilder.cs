@@ -46,6 +46,8 @@ namespace Bam.Net.Data
         ISqlStringBuilder OrderBy(string columnName, SortOrder order = SortOrder.Ascending);
         ISqlStringBuilder OrderBy<C>(IOrderBy<C> orderBy) where C : IQueryFilter, IFilterToken, new();
         void Reset();
+        ISqlStringBuilder Select(Type daoType);
+        ISqlStringBuilder Select(Type daoType, params string[] columnNames);
         ISqlStringBuilder Select(string tableName, params string[] columnNames);
         ISqlStringBuilder Select<T>() where T : IDao, new();
         ISqlStringBuilder Select<T>(params string[] columns);

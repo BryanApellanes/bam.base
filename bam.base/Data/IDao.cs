@@ -21,7 +21,7 @@ namespace Bam.Net.Data
         bool ForceUpdate { get; set; }
         ulong? DbId { get; set; }
         Action<IDao> Initializer { get; set; }
-        bool IsNew { get; set; }
+        bool IsNew { get; }
         string KeyColumnName { get; }
         object PrimaryKey { get; set; }
         DependencyProvider ServiceProvider { get; }
