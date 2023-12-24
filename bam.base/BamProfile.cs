@@ -48,7 +48,7 @@ namespace Bam.Net
             {
                 if (OSInfo.Current == OSNames.Windows)
                 {
-                    return Environment.ExpandEnvironmentVariables("%HOMEDRIVE%%HOMEPATH%");
+                    return Environment.GetEnvironmentVariable("USERPROFILE") ?? System.IO.Path.Combine(Environment.GetEnvironmentVariable("HOMEDRIVE"), Environment.GetEnvironmentVariable("HOMEPATH"));
                 }
                 else
                 {

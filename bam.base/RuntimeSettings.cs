@@ -44,35 +44,17 @@ namespace Bam.Net
         static string _processDataFolder;
         static readonly object _processDataFolderLock = new object();
 
-        // TODO: change this to direct to ~/.bam/opt
         public static string ProcessDataFolder
         {
             get
             {
                 return _processDataFolderLock.DoubleCheckLock(ref _processDataFolder, () =>
                 {
-                    if (!OSInfo.IsUnix)
-                    {
-                        StringBuilder path = new StringBuilder();
-                        path.Append(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));
-                        if (!path.ToString().EndsWith(Path.DirectorySeparatorChar.ToString()))
-                        {
-                            path.Append(Path.DirectorySeparatorChar);
-                        }
+                    string appName = DefaultConfiguration.GetAppSetting("ApplicationName", ApplicationNameProvider.Default.GetApplicationName());
 
-                        path.Append(DefaultConfiguration.GetAppSetting("ApplicationName", ApplicationNameProvider.Default.GetApplicationName()) + Path.DirectorySeparatorChar);
-                        FileInfo fileInfo = new FileInfo(path.ToString());
-                        if (!Directory.Exists(fileInfo.Directory.FullName))
-                        {
-                            Directory.CreateDirectory(fileInfo.Directory.FullName);
-                        }
-                        _processDataFolder = path.ToString();
-                        return _processDataFolder;
-                    }
-                    else
-                    {
-                        return Path.Combine(BamHome.DataPath, Config.Current?.ApplicationName ?? ApplicationDiagnosticInfo.UnknownApplication);
-                    }
+                    string path = Path.Combine(BamProfile.AppsPath, appName);
+                    Directory.CreateDirectory(path);
+                    return path;
                 });
             }
             set => _processDataFolder = value;

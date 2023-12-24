@@ -1,6 +1,5 @@
 using System.IO;
 using System.Reflection;
-//using Bam.Net.CoreServices.ApplicationRegistration.Data;
 
 namespace Bam.Net
 {

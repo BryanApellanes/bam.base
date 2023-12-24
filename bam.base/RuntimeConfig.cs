@@ -8,7 +8,7 @@ namespace Bam.Net
 
         public RuntimeConfig() 
         {
-            this.NugetPackageRoot = BamHome.NugetPackagePath;
+            this.NugetPackageRoot = BamProfile.NugetPackagePath;
         }
 
         public string ReferenceAssemblies { get; set; }

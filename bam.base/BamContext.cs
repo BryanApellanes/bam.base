@@ -1,14 +1,18 @@
 ﻿using Bam.Net;
+using Bam.Net.Configuration;
 using Bam.Net.CoreServices;
+using Bam.Net.Logging;
+using Bam.Shell.Console;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Bam
 {
-    public class BamContext
+    public class BamContext : IBamContext
     {
         public BamContext() 
         {
@@ -16,11 +20,15 @@ namespace Bam
 
         ServiceRegistry _serviceRegistry;
         object _serviceRegistryLock = new object();
-        public ServiceRegistry ServiceRegistry
+        public virtual ServiceRegistry ServiceRegistry
         {
             get
             {
                 return _serviceRegistryLock.DoubleCheckLock(ref _serviceRegistry, () => GetServiceRegistry());
+            }
+            protected set
+            {
+                _serviceRegistry = value;
             }
         }
 
@@ -31,6 +39,30 @@ namespace Bam
             get
             {
                 return _currentLock.DoubleCheckLock(ref _current, () => new BamContext());
+            }
+        }
+
+        public IApplicationNameProvider ApplicationNameProvider
+        {
+            get
+            {
+                return ServiceRegistry.Get<IApplicationNameProvider>();
+            }
+        }
+
+        public IConfigurationProvider ConfigurationProvider
+        {
+            get
+            {
+                return ServiceRegistry.Get<IConfigurationProvider>();
+            }
+        }
+
+        public ILogger Logger
+        {
+            get
+            {
+                return ServiceRegistry.Get<ILogger>();
             }
         }
 
@@ -95,6 +127,11 @@ namespace Bam
                 newRegistry.CopyFrom(existing.ServiceRegistry);
                 existing.ServiceRegistry = configurer(newRegistry);
             }
+        }
+
+        public void Configure(Action<ServiceRegistry> configure)
+        {
+            configure(this.ServiceRegistry);
         }
     }
 }

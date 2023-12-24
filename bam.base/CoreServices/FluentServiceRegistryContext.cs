@@ -55,6 +55,13 @@ namespace Bam.Net.CoreServices
             return svcRegistry;
         }
 
+        public ServiceRegistry UseSingleton<T>(T instance)
+        {
+            ServiceRegistry svcRegistry = ServiceRegistry ?? new ServiceRegistry();
+            svcRegistry.Set(typeof(I), instance);
+            return svcRegistry;
+        }
+
         public ServiceRegistry UseTransient<T>()
         {
             return Returns<T>();

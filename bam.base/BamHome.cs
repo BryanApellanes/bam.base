@@ -7,7 +7,7 @@ using System.Text;
 namespace Bam.Net
 {
     /// <summary>
-    /// Paths rooted in the root of the bam installation. (/opt/bam on *nix, /c/bam on windows)
+    /// Paths rooted in the root of the bam installation. (/opt/bam on *nix, c:bam/opt on windows)
     /// </summary>
     public static class BamHome
     {
@@ -43,32 +43,10 @@ namespace Bam.Net
         public static string PublicPath => System.IO.Path.Combine(Path, "public");
 
         /// <summary>
-        /// The default path where the bam toolkit should be found.  Same as BamProfile.ToolkitPath.
-        /// </summary>
-        public static string ToolkitPath => BamProfile.ToolkitPath;
-
-        /// <summary>
-        /// Path segments representing the path where the bam toolkit should be found.  Same as BamProfile.ToolkitSegments
-        /// </summary>
-        public static string[] ToolkitSegments => BamProfile.ToolkitSegments;
-
-        public static string CurrentRuntimeToolkitPath => System.IO.Path.Combine(CurrentRuntimeToolkitSegments);
-        
-        public static string[] CurrentRuntimeToolkitSegments => new List<string>(ToolkitSegments) {OSInfo.CurrentRuntime}.ToArray();
-        
-        public static string NugetPackagePath => BamProfile.NugetPackagePath;
-        
-        public static string[] NugetPackageSegments => BamProfile.NugetPackageSegments;
-        
-        /// <summary>
         /// The path where third party tools are found, including sysinternals and opencover.
         /// </summary>
         public static string ToolsPath => System.IO.Path.Combine(ToolsSegments);
         public static string[] ToolsSegments => new List<string>() {Path, "bin", "tools"}.ToArray();
-        
-        public static string TestsPath => System.IO.Path.Combine(TestsSegments);
-
-        public static string[] TestsSegments => new List<string>() {UserHome, ".bam", "tests"}.ToArray();
 
         public static string ContentPath => System.IO.Path.Combine(ContentSegments);
 

@@ -11,7 +11,7 @@ using Bam.Services;
 
 namespace Bam.Net.CoreServices
 {
-    public partial class ServiceRegistry: DependencyProvider
+    public class ServiceRegistry: DependencyProvider
     {
         static ServiceRegistry()
         {

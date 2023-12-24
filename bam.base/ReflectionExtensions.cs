@@ -478,6 +478,11 @@ namespace Bam.Net
             else
             {
                 value = (T)property.GetValue(instance);
+                if(typeof(T) == typeof(string) && string.IsNullOrEmpty(value as string))
+                {
+                    value = ifPropertyNotFound;
+                    return false;
+                }
                 return true;
             }
         }

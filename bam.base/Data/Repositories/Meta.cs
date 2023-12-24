@@ -130,7 +130,13 @@ namespace Bam.Net.Data.Repositories
 			}
 		}
 
-		public T ReadProperty<T>(PropertyInfo propInfo)
+        public HashAlgorithms HashAlgorithm
+        {
+            get;
+            private set;
+        }
+
+        public T? ReadProperty<T>(PropertyInfo propInfo)
 		{
 			if (propInfo != null)
 			{
@@ -138,7 +144,7 @@ namespace Bam.Net.Data.Repositories
 				return result;
 			}
 
-			return default(T);
+			return default;
 		}
 
 		public T ReadPropertyVersion<T>(PropertyInfo propInfo, int version)
@@ -152,7 +158,7 @@ namespace Bam.Net.Data.Repositories
 			return default(T);
 		}
 
-		public void WriteProperty(PropertyInfo propInfo, object propertyValue)
+		public void WriteProperty(PropertyInfo propInfo, object? propertyValue)
 		{
 			if (propInfo != null)
 			{
@@ -220,7 +226,7 @@ namespace Bam.Net.Data.Repositories
 
 		public IMetaProperty Property(string propertyName)
 		{
-			PropertyInfo prop = Data.GetType().GetProperty(propertyName);
+			PropertyInfo? prop = Data.GetType().GetProperty(propertyName);
 			if (prop != null)
 			{
 				IMetaProperty property = new MetaProperty(this, prop);
@@ -247,7 +253,7 @@ namespace Bam.Net.Data.Repositories
 			SetMeta();
 		}
 
-		public static bool AreEqual(object one, object two)
+		public static bool AreEqual(object? one, object? two)
 		{
 			return UuidsAreEqual(one, two);
 		}
@@ -257,12 +263,12 @@ namespace Bam.Net.Data.Repositories
 			return Meta.GetId(one) == Meta.GetId(two);
 		}
 
-		public static bool UuidsAreEqual(object one, object two)
+		public static bool UuidsAreEqual(object? one, object? two)
 		{
 			return Meta.GetUuid(one).Equals(Meta.GetUuid(two));
 		}
 
-		public override bool Equals(object obj)
+		public override bool Equals(object? obj)
 		{
 			return AreEqual(this, obj);
 		}
@@ -338,16 +344,16 @@ namespace Bam.Net.Data.Repositories
 			return $"{uuid}::{type.FullName}".Md5(); // TODO: make the algorithm configurable
         }
 
-        public static string GetUuidHash(object value, Type type)
+        public static string GetUuidHash(object? value, Type type)
         {
             string result = GetUuidHash("", Type.Missing.GetType());
             if (value != null)
             {
                 result = GetUuidHash("", type);
-                PropertyInfo uuidProp = value.GetType().GetProperty("Uuid");
+                PropertyInfo? uuidProp = value.GetType().GetProperty("Uuid");
                 if (uuidProp != null)
                 {
-                    string uuid = (string)uuidProp.GetValue(value);
+                    string? uuid = uuidProp.GetValue(value) as string;
                     if (!string.IsNullOrEmpty(uuid))
                     {
                         result = GetUuidHash(uuid, type);
@@ -369,28 +375,37 @@ namespace Bam.Net.Data.Repositories
             return "{0}::{1}".Format(id, type.FullName).Md5();
         }
 
-        public static string GetIdHash(ulong id, Type type)
+        public static string GetIdHash(ulong? id, Type type)
         {
+			if(id == null)
+			{
+				return string.Empty;
+			}
+			if(type == null)
+			{
+				return string.Empty;
+			}
+
             return "{0}::{1}".Format(id, type.FullName).Md5();
         }
 
-        protected internal static string GetUuid(object data, bool throwIfUuidPropertyMissing = false)
+        protected internal static string GetUuid(object? data, bool throwIfUuidPropertyMissing = false)
         {
             return GetPropValue(data, "Uuid", throwIfUuidPropertyMissing);
         }
 
-        protected internal static string GetCuid(object data, bool throwIfCuidPropertyMissing = false)
+        protected internal static string GetCuid(object? data, bool throwIfCuidPropertyMissing = false)
         {
             return GetPropValue(data, "Cuid", throwIfCuidPropertyMissing);
         }
 
-        protected internal static string GetPropValue(object data, string propName, bool throwIfPropertyMissing = false)
+        protected internal static string GetPropValue(object? data, string propName, bool throwIfPropertyMissing = false)
 		{
 			string result = string.Empty;
 			if (data != null)
 			{
 				Type dataType = data.GetType();
-				PropertyInfo prop = dataType.GetProperty(propName);
+				PropertyInfo? prop = dataType.GetProperty(propName);
 				if (prop != null)
 				{
 					result = (string)prop.GetValue(data);
@@ -418,7 +433,7 @@ namespace Bam.Net.Data.Repositories
 		protected internal static bool IdIsSet(object data)
 		{
 			bool result = false;
-			PropertyInfo key;
+			PropertyInfo? key;
 			if (HasKeyProperty(data, out key))
 			{
 				result = (long)key.GetValue(data) > 0;
@@ -430,7 +445,7 @@ namespace Bam.Net.Data.Repositories
 		protected internal static bool UuidIsSet(object data)
 		{
 			bool result = false;
-			PropertyInfo uuidProp = data.GetType().GetProperty("Uuid");
+			PropertyInfo? uuidProp = data.GetType().GetProperty("Uuid");
 			if (uuidProp != null)
 			{
 				result = !string.IsNullOrEmpty((string)uuidProp.GetValue(data));
@@ -439,9 +454,9 @@ namespace Bam.Net.Data.Repositories
 			return result;
 		}
 
-		protected internal static PropertyInfo GetKeyProperty(Type type, bool throwIfNoIdProperty = true)
+		protected internal static PropertyInfo? GetKeyProperty(Type type, bool throwIfNoIdProperty = true)
 		{
-			PropertyInfo keyProp = type.GetFirstProperyWithAttributeOfType<KeyAttribute>();
+			PropertyInfo? keyProp = type.GetFirstProperyWithAttributeOfType<KeyAttribute>();
 			if (keyProp == null)
 			{
 				keyProp = type.GetProperty("Id");
@@ -466,8 +481,12 @@ namespace Bam.Net.Data.Repositories
 
         protected internal static ulong? GetId(object value, bool throwIfNoIdProperty = true)
         {
-            PropertyInfo pocoProp = GetKeyProperty(value.GetType(), throwIfNoIdProperty);
-            object idValue = pocoProp.GetValue(value);   
+            PropertyInfo? pocoProp = GetKeyProperty(value.GetType(), throwIfNoIdProperty);
+            if (pocoProp == null)
+            {
+				return null;
+            }
+            object? idValue = pocoProp.GetValue(value);   
             return (ulong?)idValue;
         }
 		
@@ -482,7 +501,7 @@ namespace Bam.Net.Data.Repositories
 		{
 			objectReaderWriter = objectReaderWriter ?? this.ObjectPersister;
 			Type type = value.GetType();
-			PropertyInfo idProp = type.GetProperty("Id");
+			PropertyInfo? idProp = type.GetProperty("Id");
 			if (idProp != null)
 			{
 				ulong id = (ulong)idProp.GetValue(value);
@@ -501,15 +520,15 @@ namespace Bam.Net.Data.Repositories
 		/// </summary>
 		/// <param name="data"></param>
 		/// <param name="uuid"></param>
-		internal static void SetUuid(object data, string uuid = "")
+		internal static void SetUuid(object data, string? uuid = null)
 		{
 			Type type = data.GetType();
-			PropertyInfo uuidProp = type.GetProperty("Uuid");
+			PropertyInfo? uuidProp = type.GetProperty("Uuid");
 			if (uuidProp != null)
 			{
 				if (string.IsNullOrEmpty(uuid))
 				{
-					uuid = (string)uuidProp.GetValue(data);
+					uuid = uuidProp.GetValue(data) as string;
 				}
                 if (!Guid.TryParse(uuid, out Guid guid) || string.IsNullOrEmpty(uuid))
                 {
@@ -519,15 +538,15 @@ namespace Bam.Net.Data.Repositories
 			}
 		}
 
-        internal static void SetCuid(object data, string cuid = "", RandomSource randomSource = RandomSource.Simple)
+        internal static void SetCuid(object data, string? cuid = null, RandomSource randomSource = RandomSource.Simple)
         {
             Type type = data.GetType();
-            PropertyInfo cuidProp = type.GetProperty("Cuid");
+            PropertyInfo? cuidProp = type.GetProperty("Cuid");
             if(cuidProp != null)
             {
                 if (string.IsNullOrEmpty(cuid))
                 {
-                    cuid = (string)cuidProp.GetValue(data);
+                    cuid = cuidProp.GetValue(data) as string;
                 }
                 if (string.IsNullOrEmpty(cuid))
                 {
