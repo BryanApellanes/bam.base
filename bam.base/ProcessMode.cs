@@ -6,17 +6,10 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Bam.Net;
 
-namespace Bam.Net
+namespace Bam
 {
-    [JsonConverter(typeof(StringEnumConverter))]
-    public enum ProcessModes
-    {
-        Dev,
-        Test,
-        Prod
-    }
-
     /// <summary>
     /// Represents the mode that the current process is
     /// in.  Intended primarily to determine where to
@@ -46,7 +39,7 @@ namespace Bam.Net
 
         public static ProcessMode FromEnvironment
         {
-            get { return new ProcessMode {Mode = BamEnvironmentVariables.ProcessMode()}; }
+            get { return new ProcessMode { Mode = BamEnvironmentVariables.ProcessMode() }; }
         }
 
         static ProcessMode _current;
@@ -76,7 +69,7 @@ namespace Bam.Net
         public static ProcessMode Dev { get { return new ProcessMode { Mode = ProcessModes.Dev }; } }
         public static ProcessMode Test { get { return new ProcessMode { Mode = ProcessModes.Test }; } }
         public static ProcessMode Prod { get { return new ProcessMode { Mode = ProcessModes.Prod }; } }
-        
+
         public static ProcessMode FromString(string value)
         {
             return new ProcessMode { Mode = (ProcessModes)Enum.Parse(typeof(ProcessModes), value) };
@@ -94,7 +87,7 @@ namespace Bam.Net
 
         public override bool Equals(object obj)
         {
-            if(obj is ProcessMode mode)
+            if (obj is ProcessMode mode)
             {
                 return mode.Mode.Equals(Mode);
             }

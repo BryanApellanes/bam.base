@@ -14,7 +14,7 @@ namespace Bam.Net.Logging
         }
         public string Format { get; set; }
         public string[] FormatArgs { get; set; }
-
+        public Type SourceType { get; set; }
         public override string ToString()
         {
             return string.Format(Format, FormatArgs);
@@ -27,7 +27,12 @@ namespace Bam.Net.Logging
 
         public virtual void Log(ILogger logger, LogEventType eventType)
         {
-            logger.AddEntry(Format, eventType, FormatArgs);
+            string format = this.Format;
+            if(this.SourceType != null)
+            {
+                format = $"{this.SourceType.FullName}::{this.Format}";
+            }
+            logger.AddEntry(format, eventType, FormatArgs);
         }
     }
 }

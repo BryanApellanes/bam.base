@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Bam.Net.CommandLine;
 using Bam.Net.Logging;
 
 namespace Bam.Net
@@ -20,7 +21,33 @@ namespace Bam.Net
             _threads = new Dictionary<string, Thread>(500);
         }
 
-        public static ProcessThread GetThread(int managedThreadId)
+        public static ProcessOutput Respawn()
+        {
+            string[] arguments = Environment.GetCommandLineArgs();
+            string[] trimmed = new string[arguments.Length - 1];
+            arguments.CopyTo(trimmed, 1); // remove the first argument which is the executable itself
+
+            return Spawn(trimmed);
+        }
+
+        public static ProcessOutput Spawn(string[] arguments)
+        {
+            Process process = Process.GetCurrentProcess();
+            if(process.MainModule != null)
+            {
+                FileInfo main = new FileInfo(process.MainModule.FileName);
+                return Spawn(main.FullName, arguments);
+            }
+
+            return new ProcessOutput();
+        }
+
+        public static ProcessOutput Spawn(string exePath, string[] arguments)
+        {
+            return $"{exePath} {string.Join(" ", arguments)}".Run();
+        }
+
+        public static ProcessThread? GetThread(int managedThreadId)
         {
             
             Process currentProcess = Process.GetCurrentProcess();
@@ -192,6 +219,11 @@ namespace Bam.Net
             return new NamedThread(name, thread);
         }
 
+        /// <summary>
+        /// Kill the thread with the specified name.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="joinBlock"></param>
         public static void Kill(string name, int joinBlock = 3000)
         {
             if (_threads.ContainsKey(name))
@@ -291,7 +323,7 @@ namespace Bam.Net
                 bool? tookTooLong = false;
                 if (string.IsNullOrEmpty(threadName))
                 {
-                    threadName = "Bam.Net.Thread_".RandomString(8);
+                    threadName = "Bam.Thread_".RandomString(8);
                 }
 
                 int suffix = 1;

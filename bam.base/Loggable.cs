@@ -11,7 +11,6 @@ using Bam.Net.Configuration;
 using Newtonsoft.Json;
 using System.Diagnostics;
 using System.Xml.Serialization;
-//using Bam.Net.CoreServices.ApplicationRegistration.Data;
 using YamlDotNet.Serialization;
 using EventInfo = System.Reflection.EventInfo;
 
@@ -41,10 +40,10 @@ namespace Bam.Net.Logging
         
         public static IEnumerable<ILoggable> AllInstances => _allInstances.ToArray();
 
-        public string LoggableIdentifier => $"TypeName={GetType().Name};{IdentifierExtension?.Invoke()}";
+        public string LoggableIdentifier => $"TypeName={GetType().Name};{IdentifierTag?.Invoke()}";
 
 
-        public Func<string> IdentifierExtension { get; set; }
+        public Func<string> IdentifierTag { get; set; }
 
         /// <summary>
         /// A value from 0 - 5, represented by the LogEventType enum.
@@ -68,7 +67,7 @@ namespace Bam.Net.Logging
 
 		/// <summary>
 		/// Subscribe the current Loggables subscribers
-		/// to the specified Loggable and vice versa
+		/// to the specified Loggable and vice versa.
 		/// </summary>
 		/// <param name="loggable"></param>
         [Exclude]
@@ -103,17 +102,18 @@ namespace Bam.Net.Logging
         {
             Subscribe(logger, LogVerbosity);
         }
-        
+
         /// <summary>
         /// Subscribe the specified logger to
-        /// all the events of the current type
-        /// where the event delegate is defined
-        /// as an EventHandler.  This method 
-        /// will also take into account the 
+        /// all the events of the current instance.
+        /// </summary>
+        ///
+        /// <remarks>
+        /// Considers the 
         /// current value of LogVerbosity if
         /// the events found are adorned with the 
-        /// Verbosity attribute
-        /// </summary>
+        /// Verbosity attribute.
+        /// </remarks>
         /// <param name="logger"></param>
         [Exclude]
         [DebuggerStepThrough]
@@ -138,6 +138,7 @@ namespace Bam.Net.Logging
 
                         if (shouldSubscribe)
                         {
+                            // TODO: review this to determine how to properly handle generic EventHandler<TEventArgs>
                             if (eventInfo.EventHandlerType == typeof(EventHandler))
                             {
                                 eventInfo.AddEventHandler(this, (EventHandler)((s, a) =>
@@ -208,7 +209,7 @@ namespace Bam.Net.Logging
         }
 
         /// <summary>
-        /// Output the to the console and fire the Message
+        /// Output a message to the console and fire the Message
         /// event with  the specified information message.
         /// </summary>
         /// <param name="messageFormat"></param>
@@ -231,7 +232,7 @@ namespace Bam.Net.Logging
         [Exclude]
         public void EventMessage(LogEventType eventType, string format, params string[] args)
         {
-            FireEvent(MessageReceived, new MessageEventArgs() {LogEventType = eventType, LogMessage = new LogMessage(format, args)});
+            FireEvent(MessageReceived, new MessageEventArgs() {LogEventType = eventType, LogMessage = new LogMessage(format, args) { SourceType = this.GetType() } });
         }
         
         /// <summary>
@@ -270,7 +271,7 @@ namespace Bam.Net.Logging
         
         /// <summary>
         /// Fire the specified event if there are
-        /// subscribers
+        /// subscribers.
         /// </summary>
         /// <param name="eventHandler"></param>
         protected void FireEvent(EventHandler eventHandler)

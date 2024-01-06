@@ -16,6 +16,17 @@ namespace Bam.Net
 {
     public static class StringExtensions
     {
+        public static string YamlToJson(this string yaml)
+        {
+            Deserializer deserializer = new Deserializer();
+            object? dict = deserializer.Deserialize(new StringReader(yaml));
+            if(dict != null)
+            {
+                return dict.ToJson();
+            }
+            return "{}";
+        }
+
         /// <summary>
         /// Convert text to a byte array using the specified encoding or UTF8.
         /// </summary>

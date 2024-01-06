@@ -4,7 +4,7 @@ using Bam.Net.Configuration;
 using Bam.Net.CoreServices;
 using Bam.Net.Logging;
 
-namespace Bam.Shell.Console
+namespace Bam
 {
     public interface IBamContext
     {
@@ -13,7 +13,5 @@ namespace Bam.Shell.Console
         ILogger Logger { get; }
 
         ServiceRegistry ServiceRegistry { get; }
-
-        void Configure(Action<ServiceRegistry> configure);
     }
 }

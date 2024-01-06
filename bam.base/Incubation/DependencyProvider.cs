@@ -162,7 +162,7 @@ namespace Bam.Net.Incubation
 
         /// <summary>
         /// Construct an instance of the specified type
-        /// injecting constructor params from the current 
+        /// injecting constructor arguments from the current 
         /// dependencyProvider
         /// </summary>
         /// <param name="type"></param>

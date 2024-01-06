@@ -22,7 +22,7 @@ namespace Bam.Net.CoreServices
         public ServiceRegistryLoaderAttribute(string registryName)
         {
             RegistryName = registryName;
-            ProcessModes = new List<ProcessModes>(new ProcessModes[] { Bam.Net.ProcessModes.Dev, Bam.Net.ProcessModes.Test, Bam.Net.ProcessModes.Prod });
+            ProcessModes = new List<ProcessModes>(new ProcessModes[] { Bam.ProcessModes.Dev, Bam.ProcessModes.Test, Bam.ProcessModes.Prod });
         }
 
         public ServiceRegistryLoaderAttribute(string registryName, params ProcessModes[] modes)

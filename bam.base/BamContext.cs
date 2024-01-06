@@ -2,7 +2,6 @@
 using Bam.Net.Configuration;
 using Bam.Net.CoreServices;
 using Bam.Net.Logging;
-using Bam.Shell.Console;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Bam
 {
-    public class BamContext : IBamContext
+    public abstract class BamContext : IBamContext
     {
         public BamContext() 
         {
@@ -24,12 +23,17 @@ namespace Bam
         {
             get
             {
-                return _serviceRegistryLock.DoubleCheckLock(ref _serviceRegistry, () => GetServiceRegistry());
+                return _serviceRegistryLock.DoubleCheckLock(ref _serviceRegistry, () => GetDefaultContextServiceRegistry());
             }
             protected set
             {
                 _serviceRegistry = value;
             }
+        }
+
+        public virtual ServiceRegistry GetDefaultContextServiceRegistry()
+        {
+            return GetServiceRegistry();
         }
 
         static BamContext _current;
@@ -38,7 +42,7 @@ namespace Bam
         {
             get
             {
-                return _currentLock.DoubleCheckLock(ref _current, () => new BamContext());
+                return _currentLock.DoubleCheckLock(ref _current, () => new DefaultBamContext());
             }
         }
 
@@ -127,11 +131,6 @@ namespace Bam
                 newRegistry.CopyFrom(existing.ServiceRegistry);
                 existing.ServiceRegistry = configurer(newRegistry);
             }
-        }
-
-        public void Configure(Action<ServiceRegistry> configure)
-        {
-            configure(this.ServiceRegistry);
         }
     }
 }

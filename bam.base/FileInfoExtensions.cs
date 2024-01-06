@@ -32,6 +32,12 @@ namespace Bam.Net
             return deserializer.Deserialize<T>(fileInfo.FullName.SafeReadFile());
         }
 
+        public static object? FromYamlFile(this FileInfo fileInfo, Type type)
+        {
+            Deserializer deserializer = new Deserializer();
+            return deserializer.Deserialize(fileInfo.FullName.SafeReadFile(), type);
+        }
+
         /// <summary>
         /// Reads the file and deserializes the contents as the specified
         /// generic type T
@@ -44,6 +50,14 @@ namespace Bam.Net
             using (StreamReader sr = new StreamReader(file.FullName))
             {
                 return sr.ReadToEnd().FromJson<T>();
+            }
+        }
+
+        public static object FromJsonFile(this FileInfo file, Type type)
+        {
+            using (StreamReader sr = new StreamReader(file.FullName))
+            {
+                return sr.ReadToEnd().FromJson(type);
             }
         }
 

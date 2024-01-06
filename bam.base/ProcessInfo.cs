@@ -6,9 +6,10 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Bam.Net;
 using Bam.Net.CommandLine;
 
-namespace Bam.Net
+namespace Bam
 {
     /// <summary>
     /// Provides information about the current process.
@@ -22,24 +23,27 @@ namespace Bam.Net
             MachineName = Environment.MachineName;
             ProcessId = _currentProcess.Id;
             StartTime = _currentProcess.StartTime;
-            FilePath = new FileInfo(_currentProcess.MainModule.FileName).FullName;
-            EntryAssembly = Assembly.GetEntryAssembly().GetFilePath();
+            if (_currentProcess.MainModule != null)
+            {
+                FilePath = new FileInfo(_currentProcess.MainModule.FileName).FullName;
+            }
+            EntryAssembly = Assembly.GetEntryAssembly()?.GetFilePath();
             CommandLineArgs = Environment.GetCommandLineArgs();
             CommandLine = Environment.CommandLine;
         }
 
-        private static ProcessInfo _current;
+        private static ProcessInfo? _current;
         static readonly object _currentLock = new object();
-        public static ProcessInfo Current
+        public static ProcessInfo? Current
         {
             get { return _currentLock.DoubleCheckLock(ref _current, () => new ProcessInfo()); }
         }
-        
+
         public string MachineName { get; set; }
         public int ProcessId { get; set; }
         public DateTime StartTime { get; set; }
-        public string FilePath { get; set; }
-        public string EntryAssembly { get; set; }
+        public string? FilePath { get; set; }
+        public string? EntryAssembly { get; set; }
         public string CommandLine { get; set; }
 
         public string[] CommandLineArgs { get; set; }
@@ -48,7 +52,7 @@ namespace Bam.Net
         {
             return ToStartInfo(CommandLineArgs);
         }
-        
+
         public ProcessStartInfo ToStartInfo(params string[] commandLineArgs)
         {
             commandLineArgs = commandLineArgs ?? CommandLineArgs;
@@ -58,18 +62,24 @@ namespace Bam.Net
             return startInfo;
         }
 
-        public ProcessOutput ReRun(params string[] newCommandLineArgs)
+        public ProcessOutput ReStart()
+        {
+            ProcessInfo copy = this.CopyAs<ProcessInfo>();
+            return copy.Run();
+        }
+
+        public ProcessOutput ReStart(params string[] newCommandLineArgs)
         {
             ProcessInfo copy = this.CopyAs<ProcessInfo>();
             copy.CommandLineArgs = newCommandLineArgs;
             return copy.Run();
         }
-        
+
         public ProcessOutput Run()
         {
             return ToStartInfo().Run();
         }
-        
+
         public ProcessOutput Run(params string[] commandLineArgs)
         {
             return ToStartInfo(commandLineArgs).Run();
