@@ -816,9 +816,7 @@ namespace Bam.Net
         /// <returns></returns>
         public static ProcessOutput Run(this string command, bool promptForAdmin, StringBuilder output = null, StringBuilder error = null, int timeout = 600000)
         {
-            // fixed this to handle output correctly based on http://stackoverflow.com/questions/139593/processstartinfo-hanging-on-waitforexit-why
             ValidateCommand(command);
-
             GetExeAndArguments(command, out string exe, out string arguments);
 
             return Run(string.IsNullOrEmpty(exe) ? command : exe, arguments, promptForAdmin, output, error, timeout);

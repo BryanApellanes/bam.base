@@ -16,6 +16,11 @@ namespace Bam
             return processStartInfo;
         }
 
+        internal static ProcessStartInfo CreateStartInfo()
+        {
+            return CreateStartInfo(false);
+        }
+
         internal static ProcessStartInfo CreateStartInfo(bool promptForAdmin)
         {
             ProcessStartInfo startInfo = new ProcessStartInfo

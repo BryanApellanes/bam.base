@@ -15,9 +15,9 @@ namespace Bam.Net.Data.Schema
         ITable[] Tables { get; set; }
         IXrefTable[] Xrefs { get; set; }
 
-        ISchemaManagerResult AddForeignKey(IForeignKeyColumn fk);
-        ISchemaManagerResult AddTable(ITable table);
-        ISchemaManagerResult AddXref(IXrefTable xref);
+        IDaoSchemaManagerResult AddForeignKey(IForeignKeyColumn fk);
+        IDaoSchemaManagerResult AddTable(ITable table);
+        IDaoSchemaManagerResult AddXref(IXrefTable xref);
         ITable GetTable(string tableName);
         IXrefTable GetXref(string tableName);
         IDaoSchemaDefinition CombineWith(IDaoSchemaDefinition schemaDefinition);

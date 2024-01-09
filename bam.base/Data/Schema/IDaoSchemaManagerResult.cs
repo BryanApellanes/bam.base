@@ -5,7 +5,7 @@ using System.IO;
 
 namespace Bam.Net.Data.Schema
 {
-    public interface ISchemaManagerResult
+    public interface IDaoSchemaManagerResult
     {
         FileInfo DaoAssembly { get; set; }
         string ExceptionMessage { get; set; }
