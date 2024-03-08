@@ -15,8 +15,8 @@ namespace Bam.Net
         public static string Path => System.IO.Path.Combine(Environment.CurrentDirectory, ".bam");
         
         
-        public static string ToolkitPath => System.IO.Path.Combine(ToolkitSegments);
-        public static string[] ToolkitSegments => new List<string>() {Path, "toolkit"}.ToArray();
+        public static string ToolsPath => System.IO.Path.Combine(ToolsSegments);
+        public static string[] ToolsSegments => new List<string>() {Path, "tools"}.ToArray();
         public static string NugetOutputPath => System.IO.Path.Combine(NugetOutputSegments);
         
         public static string[] NugetOutputSegments => new List<string>() {Path, "nupkg"}.ToArray();

@@ -46,7 +46,7 @@ namespace Bam.Net
         /// The path where third party tools are found, including sysinternals and opencover.
         /// </summary>
         public static string ToolsPath => System.IO.Path.Combine(ToolsSegments);
-        public static string[] ToolsSegments => new List<string>() {Path, "bin", "tools"}.ToArray();
+        public static string[] ToolsSegments => new List<string>() {Path, "tools"}.ToArray();
 
         public static string ContentPath => System.IO.Path.Combine(ContentSegments);
 
