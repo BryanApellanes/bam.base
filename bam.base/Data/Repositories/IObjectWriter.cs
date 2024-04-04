@@ -5,15 +5,20 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Bam.Net.Data.Repositories
+namespace Bam.Data.Repositories
 {
-    public interface IObjectWriter: IObjectPersisterDirectoryProvider
+    public interface IObjectWriter//: IObjectPersisterDirectoryProvider
     {
+        void Enqueue(object data);
         void Enqueue(Type type, object data);
-        void Write(Type type, object data);
-        void WriteProperty(PropertyInfo prop, object value);
+        Task WriteAsync(object data);
+        Task WriteAsync(Type type, object data);
+        Task WritePropertyAsync(PropertyInfo prop, object propertyValue, object parentData);
         bool Delete(object data, Type type = null);
 
+        event EventHandler WriteObjectStarted;
+        event EventHandler WriteObjectComplete;
+        
         event EventHandler WriteObjectFailed;
         event EventHandler WriteObjectPropertiesFailed;
         event EventHandler DeleteFailed;

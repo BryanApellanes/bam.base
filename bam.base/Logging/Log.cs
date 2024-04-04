@@ -23,7 +23,7 @@ namespace Bam.Net.Logging
             {
                 if (_debug == null)
                 {
-                    _debug = Environment.GetCommandLineArgs().Count(arg => arg.Equals("/debug")) > 0;
+                    _debug = Environment.GetCommandLineArgs().Count(arg => arg.Equals("/debug") || arg.Equals("-debug") || arg.Equals("--debug")) > 0;
                 }
                 return _debug.Value;
             }

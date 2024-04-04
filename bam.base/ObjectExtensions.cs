@@ -18,6 +18,19 @@ namespace Bam
 {
     public static class ObjectExtensions
     {
+        public static Dictionary<string, T> ToDictionary<T>(this object instance, Func<PropertyInfo, string> keyMunger, Func<object, T> valueConverter)
+        {
+            Type dyn = instance.GetType();
+            Dictionary<string, T> result = new Dictionary<string, T>();
+            foreach (PropertyInfo prop in dyn.GetProperties())
+            {
+                string key = keyMunger(prop);
+                result[key] = valueConverter(prop.GetValue(instance));
+            }
+            return result;
+
+        }
+        
         /// <summary>
         /// Double null check the specified toInit locking on the current
         /// object using the specified ifNull function to instantiate if 
@@ -652,7 +665,7 @@ namespace Bam
         public static void EncodeToFile(this object value, string filePath)
         {
             IObjectEncoding encoding = value.Encode();
-            File.WriteAllBytes(filePath, encoding.Bytes);
+            File.WriteAllBytes(filePath, encoding.Value);
         }
 
         /// <summary>

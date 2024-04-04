@@ -4,6 +4,7 @@
 using System;
 using System.IO;
 using System.Reflection;
+using Bam.Data.Repositories;
 
 namespace Bam.Net.Data.Repositories
 {

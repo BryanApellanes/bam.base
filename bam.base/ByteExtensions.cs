@@ -20,6 +20,19 @@ namespace Bam.Net
             return BitConverter.ToString(bytes).Replace("-", "").ToLower();
         }
 
+        public static byte[] HexToByteArray(this string hex)
+        {
+            return HashToByteArray(hex);
+        }
+        
+        public static byte[] HashToByteArray(this string hex) {
+            return Enumerable.Range(0, hex.Length)
+                .Where(x => x % 2 == 0)
+                .Select(x => Convert.ToByte(hex.Substring(x, 2), 16))
+                .ToArray();
+        }
+        
+        
         public static string ToBase64UrlEncoded(this byte[] data)
         {
             return WebEncoders.Base64UrlEncode(data);

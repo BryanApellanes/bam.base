@@ -48,7 +48,7 @@ namespace Bam.Net
         /// <typeparam name="T"></typeparam>
         /// <param name="arr"></param>
         /// <param name="action"></param>
-        public static void Each<T>(this T[] arr, Action<T> action)
+        /*public static void Each<T>(this T[] arr, Action<T> action)
         {
             if (arr != null)
             {
@@ -58,7 +58,7 @@ namespace Bam.Net
                     action(arr[i]);
                 }
             }
-        }
+        }*/
 
         /// <summary>
         /// Iterate over the current IEnumerable passing

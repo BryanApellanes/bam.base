@@ -33,8 +33,8 @@ namespace Bam.Net.Data.Repositories
         /// Initializes a new instance of the <see cref="Meta{T}"/> class.
         /// </summary>
         /// <param name="data">The data.</param>
-        /// <param name="objectReaderWriter">The object reader writer.</param>
-        public Meta(T data, IObjectPersister objectReaderWriter) : base(data, objectReaderWriter)
+        /// <param name="objectPersister">The object reader writer.</param>
+        public Meta(T data, IObjectPersister objectPersister) : base(data, objectPersister)
         {
             Type = typeof(T);
         }
@@ -89,12 +89,12 @@ namespace Bam.Net.Data.Repositories
         /// Initializes a new instance of the <see cref="Meta"/> class.
         /// </summary>
         /// <param name="data">The data.</param>
-        /// <param name="objectReaderWriter">The object reader writer.</param>
+        /// <param name="objectPersister">The object reader writer.</param>
         /// <param name="setMeta">if set to <c>true</c> [set meta].</param>
-        public Meta(object data, IObjectPersister objectReaderWriter, bool setMeta = true)
+        public Meta(object data, IObjectPersister objectPersister, bool setMeta = true)
 		{
 			RequireIdProperty = true;
-			ObjectPersister = objectReaderWriter;
+			ObjectPersister = objectPersister;
 			if (setMeta)
 			{
 				SetMeta(data);
@@ -163,7 +163,7 @@ namespace Bam.Net.Data.Repositories
 			if (propInfo != null)
 			{
 				propInfo.SetValue(Data, propertyValue);
-				ObjectPersister.Write(Type, Data);
+				ObjectPersister.WriteAsync(Type, Data);
 			}
 		}
 

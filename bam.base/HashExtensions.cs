@@ -221,7 +221,7 @@ namespace Bam.Net
             return HashBytes(bytes, algorithm).ToBase64UrlEncoded();
         }
         
-        public static byte[] HashBytes(byte[] bytes, HashAlgorithms algorithm)
+        public static byte[] HashBytes(this byte[] bytes, HashAlgorithms algorithm)
         {
             HashAlgorithm alg = HashAlgorithms[algorithm]();
             byte[] hashBytes = alg.ComputeHash(bytes);
@@ -262,7 +262,7 @@ namespace Bam.Net
             return BitConverter.ToUInt64(hashBytes, 0);
         }
 
-        public static byte[] ToHashBytes(string toBeHashed, HashAlgorithms algorithm, Encoding encoding = null)
+        public static byte[] ToHashBytes(this string toBeHashed, HashAlgorithms algorithm, Encoding encoding = null)
         {
             HashAlgorithm alg = HashAlgorithms[algorithm]();
             encoding = encoding ?? Encoding.UTF8;

@@ -14,7 +14,7 @@ namespace Bam.Net
     /// enqueued items in a background thread.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class BackgroundThreadQueue<T>//: Loggable
+    public class BackgroundThreadQueue<T>
     {
         bool _warned;
         public BackgroundThreadQueue()
@@ -26,7 +26,6 @@ namespace Bam.Net
                 {
                     _warned = true;
                     Exception?.Invoke(this, new BackgroundThreadQueueEventArgs { Exception = new InvalidOperationException("No processor defined") });
-                    //FireEvent(Exception, new BackgroundThreadQueueEventArgs { Exception = new InvalidOperationException("No processor defined") });
                 }
             };
         }
@@ -100,10 +99,8 @@ namespace Bam.Net
                             try
                             {
                                 Waiting?.Invoke(this, new BackgroundThreadQueueEventArgs());
-                                //FireEvent(Waiting, new BackgroundThreadQueueEventArgs());
                                 _waitSignal.WaitOne();
                                 Processing?.Invoke(this, new BackgroundThreadQueueEventArgs());
-                                //FireEvent(Processing, new BackgroundThreadQueueEventArgs());
                                 while (_processQueue.Count > 0)
                                 {
                                     if (_processQueue.TryDequeue(out T val))
@@ -112,12 +109,10 @@ namespace Bam.Net
                                     }
                                 }
                                 QueueEmptied?.Invoke(this, new BackgroundThreadQueueEventArgs());
-                                //FireEvent(QueueEmptied, new BackgroundThreadQueueEventArgs());
                             }
                             catch (Exception ex)
                             {
                                 Exception?.Invoke(this, new BackgroundThreadQueueEventArgs { Exception = ex });
-                                //FireEvent(Exception, new BackgroundThreadQueueEventArgs { Exception = ex });
                             }
                         }
                     })
