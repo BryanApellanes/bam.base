@@ -40,7 +40,7 @@ namespace Bam.Net.Incubation
             set;
         }
 
-        public DependencyProvider Clone()
+        public virtual DependencyProvider Clone()
         {
             lock (_accessLock)
             {

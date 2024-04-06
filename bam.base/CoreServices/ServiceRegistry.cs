@@ -29,7 +29,7 @@ namespace Bam.Net.CoreServices
         {
             return new FluentServiceRegistryContext<I>(this);
         }
-
+        
         public ServiceRegistry Include(DependencyProvider dependencyProvider)
         {
             CombineWith(dependencyProvider, true);
