@@ -649,7 +649,7 @@ namespace Bam.Net
                 }
                 else
                 {
-                    throw new ExpectationFailedException($"Expected {objectToCheck?.ToString()}.Equals({compareTo?.ToString()}) to be true");
+                    throw new ExpectationFailedException($"Expected \r\n\r\n{objectToCheck?.ToString()}\r\n\r\n to equal\r\n\r\n{compareTo?.ToString()}");
                 }
             }
         }

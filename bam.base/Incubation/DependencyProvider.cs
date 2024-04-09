@@ -834,19 +834,28 @@ namespace Bam.Net.Incubation
                         }
                         else
                         {
-                            object existing = this[paramInfo.ParameterType] ?? Get(paramInfo.ParameterType, GetCtorParams(paramInfo.ParameterType).ToArray());
-                            if (existing != null)
+                            try
                             {
-                                if (existing is Delegate d)
+                                object existing = this[paramInfo.ParameterType] ?? Get(paramInfo.ParameterType,
+                                    GetCtorParams(paramInfo.ParameterType).ToArray());
+                                if (existing != null)
                                 {
-                                    existing = d.DynamicInvoke();
+                                    if (existing is Delegate d)
+                                    {
+                                        existing = d.DynamicInvoke();
+                                    }
+
+                                    ctorParams.Add(existing);
                                 }
-                                ctorParams.Add(existing);
+                                else
+                                {
+                                    ctorParams.Clear();
+                                    break;
+                                }
                             }
-                            else
+                            catch (BindingNotFoundException bindingNotFoundException)
                             {
-                                ctorParams.Clear();
-                                break;
+                                throw new TypedBindingNotFoundException(type, bindingNotFoundException.InterfaceType);
                             }
                         }
                     }

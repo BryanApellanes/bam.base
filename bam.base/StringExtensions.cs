@@ -1306,6 +1306,12 @@ namespace Bam.Net
             return result.ToString();
         }
         
+        /// <summary>
+        /// Splits a string into substrings of the specified size.
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="chunkSize"></param>
+        /// <returns></returns>
         public static IEnumerable<string> Split(this string str, int chunkSize)
         {
             return Enumerable.Range(0, str.Length / chunkSize)
