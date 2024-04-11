@@ -10,6 +10,5 @@ namespace Bam.Net
     public interface IObjectEncoding : IRawData
     {
         Type Type { get; }
-        byte[] Value { get; }
     }
 }

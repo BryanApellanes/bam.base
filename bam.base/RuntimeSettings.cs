@@ -60,6 +60,10 @@ namespace Bam.Net
             set => _processDataFolder = value;
         }
 
+        /// <summary>
+        /// Gets a function that returns true if the specified type is not abstract, does not have the
+        /// CompilerGeneratedAttribute and is not NestedPrivate, Sealed, Serializable or BeforeFieldInit.
+        /// </summary>
         public static Func<Type, bool> ClrTypeFilter
         {
             get
@@ -74,7 +78,7 @@ namespace Bam.Net
             }
         }
 
-        static Dictionary<OSNames, string> _osAliases = new Dictionary<OSNames, string>()
+        static readonly Dictionary<OSNames, string> _osAliases = new Dictionary<OSNames, string>()
         {
             { OSNames.Windows, "win" },
             { OSNames.Linux, "lin" },
@@ -89,7 +93,7 @@ namespace Bam.Net
         public static FileInfo EntryExecutable => Assembly.GetEntryAssembly().GetFileInfo();
         public static DirectoryInfo EntryDirectory => EntryExecutable.Directory;
 
-        static Dictionary<OSNames, string> _genDirs = new Dictionary<OSNames, string>()
+        static readonly Dictionary<OSNames, string> _genDirs = new Dictionary<OSNames, string>()
         {
             { OSNames.Windows, WinGenDir },
             { OSNames.Linux, LinGenDir },
@@ -107,7 +111,7 @@ namespace Bam.Net
         public static string LinGenDir => Path.Combine(GenDir, "lin");
         public static string OsxGenDir => Path.Combine(GenDir, "osx");
         
-        static Dictionary<OSNames, string> _referenceAssemblyRootDirectories = new Dictionary<OSNames, string>()
+        static readonly Dictionary<OSNames, string> _referenceAssemblyRootDirectories = new Dictionary<OSNames, string>()
         {
             { OSNames.Windows, "C:\\Program Files\\dotnet\\packs\\Microsoft.NETCore.App.Ref" }, 
             { OSNames.Linux, "/usr/share/dotnet/packs/Microsoft.NETCore.App.Ref" }, 
