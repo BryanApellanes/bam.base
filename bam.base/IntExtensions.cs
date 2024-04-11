@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Bam.Net;
 
-namespace Bam.Net
+namespace Bam
 {
     public static class IntExtensions
     {
@@ -100,6 +101,18 @@ namespace Bam.Net
         public static int RandomNumber(int max)
         {
             return RandomHelper.Next(max);
+        }
+        
+        public static int Largest(this int[] longs)
+        {
+            if (longs.Length == 0)
+            {
+                return -1;
+            }
+
+            int largest = longs[0];
+            longs.Each(l => largest = l > largest ? l : largest);
+            return largest;
         }
     }
 }
