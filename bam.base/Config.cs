@@ -148,9 +148,9 @@ namespace Bam.Net
         {
             get
             {
-                if (AppSettings.ContainsKey(key))
+                if (AppSettings.TryGetValue(key, out var item))
                 {
-                    return AppSettings[key];
+                    return item;
                 }
 
                 if (!string.IsNullOrEmpty(defaultValue))

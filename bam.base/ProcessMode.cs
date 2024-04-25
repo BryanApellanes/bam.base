@@ -61,9 +61,9 @@ namespace Bam
                     }
                 }
 
-                return _current ?? (_current = FromBamConfig);
+                return _current ??= FromBamConfig;
             }
-            set { _current = value; }
+            set => _current = value;
         }
 
         public static ProcessMode Dev { get { return new ProcessMode { Mode = ProcessModes.Dev }; } }
