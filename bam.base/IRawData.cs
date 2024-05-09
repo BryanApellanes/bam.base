@@ -11,4 +11,5 @@ public interface IRawData
     string HashString { get; }
     byte[] Hash { get; }
     byte[] Value { get; }
+    T Convert<T>();
 }

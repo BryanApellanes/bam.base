@@ -9,8 +9,7 @@ namespace Bam.Net
     public static class BamDir
     {
         /// <summary>
-        /// The path to the .bam directory in the home directory of the current process' user.
-        /// This value is the same as BamHome.Profile.
+        /// The path to the .bam directory in the current working directory.
         /// </summary>
         public static string Path => System.IO.Path.Combine(Environment.CurrentDirectory, ".bam");
         
