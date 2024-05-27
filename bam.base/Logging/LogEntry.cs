@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
 
-namespace Bam.Net.Logging
+namespace Bam.Logging
 {
     [Serializable]
     public class LogEntry

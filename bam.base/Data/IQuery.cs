@@ -4,7 +4,7 @@
 using System;
 using System.Data;
 
-namespace Bam.Net.Data
+namespace Bam.Data
 {
     public interface IQuery<C, T> 
         where C : IQueryFilter, IFilterToken, new()

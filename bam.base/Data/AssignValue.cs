@@ -7,7 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
-namespace Bam.Net.Data
+namespace Bam.Data
 {
     /// <summary>
     /// Statement used to assign a value to a variable or parameter

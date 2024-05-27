@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Bam.Net
+namespace Bam
 {
     public interface IAssemblyGenerator: IWriteSource
     {

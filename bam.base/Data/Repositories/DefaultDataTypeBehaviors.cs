@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Bam.Net.Data.Repositories
+namespace Bam.Data.Repositories
 {
 	/// <summary>
 	/// Enumerates the desired behaviors if a data type is not explicitly specified when managing

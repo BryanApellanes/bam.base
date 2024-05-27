@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 
-namespace Bam.Net
+namespace Bam
 {
     public static class Args
     {

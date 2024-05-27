@@ -1,8 +1,8 @@
 ﻿using Bam.Console;
-using Bam.Net;
-using Bam.Net.Configuration;
-using Bam.Net.CoreServices;
-using Bam.Net.Logging;
+using Bam;
+using Bam.Configuration;
+using Bam.CoreServices;
+using Bam.Logging;
 
 namespace Bam
 {

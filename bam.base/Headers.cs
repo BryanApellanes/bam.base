@@ -4,17 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Bam.Net.Web
+namespace Bam.Web
 {
     public static class Headers
     {
         /// <summary>
-        /// The header that identifies the current process using Bam.Net.CoreServices.ApplicationRegistration.Data.ProcessDescriptor.LocalIdentifier.
+        /// The header that identifies the current process using Bam.CoreServices.ApplicationRegistration.Data.ProcessDescriptor.LocalIdentifier.
         /// </summary>
         public static string ProcessLocalIdentifier => "X-Bam-Process-Local-Id";
 
         /// <summary>
-        /// The header that describes the current process using Bam.Net.CoreServices.ApplicationRegistration.Data.ProcessDescriptor.Current.ToString();
+        /// The header that describes the current process using Bam.CoreServices.ApplicationRegistration.Data.ProcessDescriptor.Current.ToString();
         /// </summary>
         public static string ProcessDescriptor => "X-Bam-Process-Descriptor";
 

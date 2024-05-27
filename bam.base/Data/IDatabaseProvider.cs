@@ -1,7 +1,7 @@
-﻿using Bam.Net.Logging;
+﻿using Bam.Logging;
 using System;
 
-namespace Bam.Net.Data
+namespace Bam.Data
 {
     public interface IDatabaseProvider
     {

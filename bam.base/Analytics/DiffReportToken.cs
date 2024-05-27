@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Xml.Serialization;
 
-namespace Bam.Net.Analytics
+namespace Bam.Analytics
 {
     [Serializable]
     [XmlInclude(typeof(DeletedDiffReportToken))]

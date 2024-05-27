@@ -1,4 +1,4 @@
-﻿namespace Bam.Net.Logging
+﻿namespace Bam.Logging
 {
     public interface ILogEventCommitter
     {

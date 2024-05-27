@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Bam.Net.Analytics
+namespace Bam.Analytics
 {
     public abstract class DiffReportFormatter
     {

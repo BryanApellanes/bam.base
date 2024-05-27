@@ -1,7 +1,7 @@
 ﻿/*
 	Copyright © Bryan Apellanes 2015  
 */
-namespace Bam.Net.Data.Schema
+namespace Bam.Data.Schema
 {
     public interface ITable
     {

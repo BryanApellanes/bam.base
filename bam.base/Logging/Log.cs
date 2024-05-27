@@ -8,11 +8,11 @@ using System.Text;
 using System.Reflection;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using Bam.Net.CommandLine;
-using Bam.Net.Configuration;
+using Bam.CommandLine;
+using Bam.Configuration;
 using Bam.Console;
 
-namespace Bam.Net.Logging
+namespace Bam.Logging
 {
     public static partial class Log
     {
@@ -171,7 +171,7 @@ namespace Bam.Net.Logging
             return _currentLogger;
         }
 
-        const string _loggingNamespace = "Bam.Net.Logging";
+        const string _loggingNamespace = "Bam.Logging";
         /// <summary>
         /// Creates a logger of the specified type.  If the containing assembly is already loaded 
         /// the type should be the namespace qualified name of the ILogger implementation to 

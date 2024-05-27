@@ -3,7 +3,7 @@
 */
 using System.IO;
 
-namespace Bam.Net.Data.Schema
+namespace Bam.Data.Schema
 {
     public interface IDaoSchemaManagerResult
     {

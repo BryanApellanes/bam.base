@@ -9,7 +9,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Bam.Net
+namespace Bam
 {
 	public partial class CompilationException: Exception
 	{

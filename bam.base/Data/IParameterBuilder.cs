@@ -6,9 +6,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Data.Common;
-using Bam.Net.Data;
+using Bam.Data;
 
-namespace Bam.Net.Data
+namespace Bam.Data
 {
     public interface IParameterBuilder
     {

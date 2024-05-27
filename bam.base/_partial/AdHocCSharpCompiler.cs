@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text;
 using Microsoft.CSharp;
 
-namespace Bam.Net
+namespace Bam
 {
     public static partial class AdHocCSharpCompiler
     {

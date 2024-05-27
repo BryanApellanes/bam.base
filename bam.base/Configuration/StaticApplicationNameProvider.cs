@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Bam.Net.Configuration
+namespace Bam.Configuration
 {
     public class StaticApplicationNameProvider : IApplicationNameProvider
     {

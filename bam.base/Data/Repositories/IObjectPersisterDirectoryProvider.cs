@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Bam.Net.Data.Repositories
+namespace Bam.Data.Repositories
 {
     public interface IObjectPersisterDirectoryProvider
     {

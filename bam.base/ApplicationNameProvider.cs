@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Bam.Net.Configuration;
+using Bam.Configuration;
 
-namespace Bam.Net
+namespace Bam
 {
     public static class ApplicationNameProvider
     {

@@ -5,7 +5,7 @@
 // Just want to acknowledge that ;) -BA
 //
 
-namespace Bam.Net.Analytics
+namespace Bam.Analytics
 {
   using System;
   using System.Collections;

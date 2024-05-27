@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Bam.Net.Configuration
+namespace Bam.Configuration
 {
     /// <summary>
     /// Represents the settings used to resolve a configuration value and 

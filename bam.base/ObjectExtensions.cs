@@ -1,5 +1,5 @@
-﻿using Bam.Net;
-using Bam.Net.Data.Repositories;
+﻿using Bam;
+using Bam.Data.Repositories;
 using Newtonsoft.Json;
 using System;
 using System.Collections;

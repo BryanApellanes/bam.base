@@ -1,5 +1,5 @@
-﻿using Bam.Net;
-using Bam.Net.CoreServices;
+﻿using Bam;
+using Bam.CoreServices;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;

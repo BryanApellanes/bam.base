@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace Bam.Net.CoreServices
+namespace Bam.CoreServices
 {
     public interface IAssemblyResolver
     {

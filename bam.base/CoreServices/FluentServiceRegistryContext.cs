@@ -1,11 +1,11 @@
-﻿using Bam.Net.Incubation;
+﻿using Bam.Incubation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Bam.Net.CoreServices
+namespace Bam.CoreServices
 {
     public class FluentServiceRegistryContext<I>
     {

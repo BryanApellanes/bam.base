@@ -5,7 +5,7 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 
-namespace Bam.Net
+namespace Bam
 {
     public interface ICompiler
     {

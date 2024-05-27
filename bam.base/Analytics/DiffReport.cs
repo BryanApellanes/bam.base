@@ -9,7 +9,7 @@ using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
 
-namespace Bam.Net.Analytics
+namespace Bam.Analytics
 {
 
     [Serializable]

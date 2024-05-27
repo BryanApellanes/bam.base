@@ -1,4 +1,4 @@
-namespace Bam.Net.ServiceProxy
+namespace Bam.ServiceProxy
 {
     public interface IContextCloneable
     {

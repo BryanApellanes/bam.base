@@ -6,7 +6,7 @@ using System.Security;
 using System.Security.Cryptography;
 using NCuid;
 
-namespace Bam.Net
+namespace Bam
 {
     /// <summary>
     /// Utility class to generate CUIDs see https://github.com/dilvie/cuid for complete manifesto

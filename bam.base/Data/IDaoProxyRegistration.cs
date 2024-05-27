@@ -1,11 +1,11 @@
 ﻿/*
 	Copyright © Bryan Apellanes 2015  
 */
-using Bam.Net.Incubation;
+using Bam.Incubation;
 using System.Reflection;
 using System.Text;
 
-namespace Bam.Net.Data
+namespace Bam.Data
 {
     public interface IDaoProxyRegistration
     {

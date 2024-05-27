@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Collections.Concurrent;
-using Bam.Net.Logging;
+using Bam.Logging;
 
-namespace Bam.Net
+namespace Bam
 {
     public static class FileSystemWatchingExtensions
     {

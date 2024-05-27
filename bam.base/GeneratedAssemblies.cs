@@ -8,9 +8,9 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using Bam.Net;
+using Bam;
 
-namespace Bam.Net
+namespace Bam
 {
 	public static class GeneratedAssemblies
 	{

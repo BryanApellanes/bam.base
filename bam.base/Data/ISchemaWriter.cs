@@ -4,7 +4,7 @@
 using System;
 using System.Reflection;
 
-namespace Bam.Net.Data
+namespace Bam.Data
 {
     public interface ISchemaWriter
     {

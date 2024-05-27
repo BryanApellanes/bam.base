@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Xml.Serialization;
 using YamlDotNet.Serialization;
 
-namespace Bam.Net
+namespace Bam
 {
     public static class StreamExtensions
     {

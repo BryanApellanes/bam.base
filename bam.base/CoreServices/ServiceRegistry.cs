@@ -4,12 +4,12 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using Bam.Net.Incubation;
-using Bam.Net.Data.Repositories;
+using Bam.Incubation;
+using Bam.Data.Repositories;
 using YamlDotNet.Serialization;
 using Bam.Services;
 
-namespace Bam.Net.CoreServices
+namespace Bam.CoreServices
 {
     public class ServiceRegistry: DependencyProvider
     {

@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 
-namespace Bam.Net
+namespace Bam
 {
     /// <summary>
     /// A utility for making assertions

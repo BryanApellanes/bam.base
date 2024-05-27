@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Reflection;
 
-namespace Bam.Net
+namespace Bam
 {
     public interface IWriteSource
     {

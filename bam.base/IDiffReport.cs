@@ -1,7 +1,7 @@
 ﻿/*
 	Copyright © Bryan Apellanes 2015  
 */
-namespace Bam.Net.Analytics
+namespace Bam.Analytics
 {
     public interface IDiffReport
     {

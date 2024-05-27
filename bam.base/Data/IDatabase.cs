@@ -1,8 +1,8 @@
 ﻿/*
 	Copyright © Bryan Apellanes 2015  
 */
-using Bam.Net.Incubation;
-using Bam.Net.Logging;
+using Bam.Incubation;
+using Bam.Logging;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -10,7 +10,7 @@ using System.Data.Common;
 using System.Reflection;
 using Bam.Data;
 
-namespace Bam.Net.Data
+namespace Bam.Data
 {
     public interface IDatabase
     {

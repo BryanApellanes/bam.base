@@ -1,6 +1,6 @@
 using System;
 
-namespace Bam.Net
+namespace Bam
 {
     [AttributeUsage(AttributeTargets.Assembly)]
     public class AssemblyCommitAttribute : Attribute

@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Bam.Net.Data
+namespace Bam.Data
 {
     public interface IHasFilters
     {

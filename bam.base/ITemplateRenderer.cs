@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace Bam.Net
+namespace Bam
 {
     public interface ITemplateRenderer : IRenderer
     {

@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace Bam.Net
+namespace Bam
 {
     public class ConfigChangedEventArgs: EventArgs
     {

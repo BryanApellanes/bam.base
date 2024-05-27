@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Security.Principal;
 
-namespace Bam.Net.ServiceProxy
+namespace Bam.ServiceProxy
 {
     public interface IHttpContext
     {

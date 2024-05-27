@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Bam.Net.CommandLine
+namespace Bam.CommandLine
 {
     /// <summary>
     /// Handles standard and error output from a process.

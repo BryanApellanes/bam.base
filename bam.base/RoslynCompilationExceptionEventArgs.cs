@@ -1,6 +1,6 @@
 using System;
 
-namespace Bam.Net
+namespace Bam
 {
     public class RoslynCompilationExceptionEventArgs : EventArgs
     {

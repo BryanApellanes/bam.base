@@ -8,7 +8,7 @@ using System.Text;
 using System.Web;
 using System.Security.Principal;
 
-namespace Bam.Net
+namespace Bam
 {
     /// <summary>
     /// Utility for getting information about the current user.

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 
-namespace Bam.Net.Data
+namespace Bam.Data
 {
     public interface ISqlStringBuilder: IHasFilters
     {

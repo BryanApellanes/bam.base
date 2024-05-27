@@ -1,4 +1,4 @@
-﻿using Bam.Net.CoreServices.AssemblyManagement;
+﻿using Bam.CoreServices.AssemblyManagement;
 using Microsoft.CodeAnalysis;
 using System;
 using System.Collections.Generic;

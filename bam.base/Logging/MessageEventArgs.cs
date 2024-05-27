@@ -1,6 +1,6 @@
 using System;
 
-namespace Bam.Net.Logging
+namespace Bam.Logging
 {
     public class MessageEventArgs: EventArgs
     {

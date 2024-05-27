@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Bam.Net.Data.Repositories
+namespace Bam.Data.Repositories
 {
     public interface IReflectionCrudProvider: ICrudProvider
     {

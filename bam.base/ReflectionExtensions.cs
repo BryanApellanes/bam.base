@@ -8,10 +8,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using Bam.Net.Data;
+using Bam.Data;
 using ParameterInfo = System.Reflection.ParameterInfo;
 
-namespace Bam.Net
+namespace Bam
 {
     public static class ReflectionExtensions
     {

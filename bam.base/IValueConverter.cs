@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Bam.Net
+namespace Bam
 {
     public interface IValueConverter<TData> : IValueConverter
     {

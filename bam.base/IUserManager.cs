@@ -1,9 +1,9 @@
 ﻿using System;
-using Bam.Net.ServiceProxy;
-using Bam.Net.Messaging;
-using Bam.Net.UserAccounts.Data;
+using Bam.ServiceProxy;
+using Bam.Messaging;
+using Bam.UserAccounts.Data;
 
-namespace Bam.Net.UserAccounts
+namespace Bam.UserAccounts
 {
     public interface IUserManager: ICloneable, IRequiresHttpContext, ISmtpSettingsProvider
     {

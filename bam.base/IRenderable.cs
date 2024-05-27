@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 
-namespace Bam.Net
+namespace Bam
 {
     public interface IRenderable
     {

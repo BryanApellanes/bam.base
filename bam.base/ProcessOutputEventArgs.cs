@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Bam.Net.CommandLine
+namespace Bam.CommandLine
 {
     public class ProcessOutputEventArgs : EventArgs
     {

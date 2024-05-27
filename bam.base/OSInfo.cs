@@ -1,11 +1,11 @@
-﻿using Bam.Net.CommandLine;
+﻿using Bam.CommandLine;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
-using Bam.Net.Logging;
+using Bam.Logging;
 
-namespace Bam.Net
+namespace Bam
 {
     public class OSInfo
     {

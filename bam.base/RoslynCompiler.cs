@@ -9,13 +9,13 @@ using System.Reflection;
 using System.Xml;
 using System.Xml.Serialization;
 using Bam.CoreServices.AssemblyManagement;
-using Bam.Net.CoreServices.AssemblyManagement;
+using Bam.CoreServices.AssemblyManagement;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
 using Newtonsoft.Json;
 
-namespace Bam.Net
+namespace Bam
 {
     public class RoslynCompiler : ICompiler
     {

@@ -9,7 +9,7 @@ using System.Text;
 using System.Net;
 using System.IO;
 
-namespace Bam.Net.ServiceProxy
+namespace Bam.ServiceProxy
 {
     public interface IRequest
     {

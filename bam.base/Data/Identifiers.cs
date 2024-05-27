@@ -1,4 +1,4 @@
-namespace Bam.Net.Data
+namespace Bam.Data
 {
     /// <summary>
     /// Class that represents the identifiers for a specific instance of Data.

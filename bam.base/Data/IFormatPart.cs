@@ -1,7 +1,7 @@
 ﻿/*
 	Copyright © Bryan Apellanes 2015  
 */
-namespace Bam.Net.Data
+namespace Bam.Data
 {
     public interface IFormatPart
     {

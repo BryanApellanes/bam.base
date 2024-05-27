@@ -1,4 +1,4 @@
-namespace Bam.Net
+namespace Bam
 {
     public class CompilationExceptionInfo
     {

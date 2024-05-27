@@ -6,7 +6,7 @@ using System.Collections.Generic;
 //using System.Linq;
 using System.Text;
 
-namespace Bam.Net.Configuration
+namespace Bam.Configuration
 {
     /// <summary>
     /// This interface is intended for implementation by classes

@@ -8,7 +8,7 @@ using System.Text;
 using System.Web;
 using System.Runtime.Serialization;
 
-namespace Bam.Net
+namespace Bam
 {
     public partial class ExpectationFailedException: Exception
     {        

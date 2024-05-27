@@ -1,4 +1,4 @@
-namespace Bam.Net.Web
+namespace Bam.Web
 {
     public enum HttpVerbs
     {

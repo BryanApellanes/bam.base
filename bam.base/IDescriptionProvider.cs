@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Bam.Net.Documentation
+namespace Bam.Documentation
 {
     /// <summary>
     /// Provides descriptions for reflected MemberInfos

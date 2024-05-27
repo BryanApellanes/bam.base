@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Bam.Net.ExceptionHandling
+namespace Bam.ExceptionHandling
 {
     public class ReflectionTypeLoadAggregateException: Exception
     {

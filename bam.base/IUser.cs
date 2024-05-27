@@ -2,9 +2,9 @@
 	This file was generated and should not be modified directly
 */
 // Model is Table
-using Bam.Net.Data;
+using Bam.Data;
 
-namespace Bam.Net.UserAccounts.Data
+namespace Bam.UserAccounts.Data
 {
     public interface IUser
     {

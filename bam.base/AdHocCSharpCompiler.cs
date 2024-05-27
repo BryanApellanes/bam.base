@@ -9,7 +9,7 @@ using System.Reflection;
 using System.Text;
 using Microsoft.CSharp;
 
-namespace Bam.Net
+namespace Bam
 {
     [Obsolete("Use RoslynCompiler instead")]
     public static partial class AdHocCSharpCompiler

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Reflection;
 using System.Threading.Tasks;
-using Bam.Net.CoreServices.AssemblyManagement.Data;
+using Bam.CoreServices.AssemblyManagement.Data;
 
-namespace Bam.Net.CoreServices
+namespace Bam.CoreServices
 {
     public interface IAssemblyService: IAssemblyResolver
     {

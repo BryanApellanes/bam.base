@@ -1,15 +1,15 @@
 ﻿/*
 	Copyright © Bryan Apellanes 2015  
 */
-using Bam.Net.Data.Schema;
-using Bam.Net.Logging;
+using Bam.Data.Schema;
+using Bam.Logging;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace Bam.Net.Data.Repositories
+namespace Bam.Data.Repositories
 {
     public interface IDaoRepository : IRepository
     {

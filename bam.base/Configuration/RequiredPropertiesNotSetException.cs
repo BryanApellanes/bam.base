@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Reflection;
 
-namespace Bam.Net.Configuration
+namespace Bam.Configuration
 {
     /// <summary>
     /// 

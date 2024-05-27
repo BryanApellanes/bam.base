@@ -2,9 +2,9 @@
 	Copyright © Bryan Apellanes 2015  
 */
 using System;
-using Bam.Net.Incubation;
+using Bam.Incubation;
 
-namespace Bam.Net.Data
+namespace Bam.Data
 {
     public interface IDatabaseInitializer
     {

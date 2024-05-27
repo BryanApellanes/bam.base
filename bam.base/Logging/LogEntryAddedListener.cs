@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Bam.Net.Logging
+namespace Bam.Logging
 {
     public delegate void LogEntryAddedListener(string applicationName, LogEvent logEvent);   
 }

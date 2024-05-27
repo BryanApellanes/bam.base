@@ -1,6 +1,6 @@
-//using Bam.Net.Application;
+//using Bam.Application;
 
-namespace Bam.Net
+namespace Bam
 {
     public class RuntimeConfig
     {

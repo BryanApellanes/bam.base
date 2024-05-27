@@ -7,10 +7,10 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Diagnostics;
-using Bam.Net.Configuration;
+using Bam.Configuration;
 using System.Collections.Concurrent;
 
-namespace Bam.Net.Logging
+namespace Bam.Logging
 {
     public abstract class Logger : ILogger, IHasRequiredProperties
     {

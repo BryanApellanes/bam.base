@@ -1,7 +1,7 @@
 ﻿/*
 	Copyright © Bryan Apellanes 2015  
 */
-namespace Bam.Net.ServiceProxy
+namespace Bam.ServiceProxy
 {
     public interface IServiceProxyResponse
     {

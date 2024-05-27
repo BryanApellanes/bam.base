@@ -1,5 +1,5 @@
 using Bam.Data.Dynamic.Objects;
-using Bam.Net;
+using Bam;
 
 namespace Bam;
 

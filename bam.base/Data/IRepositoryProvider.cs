@@ -1,7 +1,7 @@
-using Bam.Net.Data.Repositories;
-using Bam.Net.Logging;
+using Bam.Data.Repositories;
+using Bam.Logging;
 
-namespace Bam.Net.Data
+namespace Bam.Data
 {
 /*    public interface IRepositoryProvider
     {

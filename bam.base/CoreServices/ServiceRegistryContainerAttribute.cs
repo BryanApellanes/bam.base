@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Bam.Net.CoreServices
+namespace Bam.CoreServices
 {
     /// <summary>
     /// Attribute used to decorate a class that contains a 

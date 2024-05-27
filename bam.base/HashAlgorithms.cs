@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace Bam.Net
+namespace Bam
 {
     [JsonConverter(typeof(StringEnumConverter))]
     public enum HashAlgorithms

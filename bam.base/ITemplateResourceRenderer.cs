@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace Bam.Net
+namespace Bam
 {
     public interface ITemplateResourceRenderer: ITemplateRenderer
     {

@@ -6,11 +6,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Bam.Net.Logging;
+using Bam.Logging;
 using System.Reflection;
 using System.Collections;
 
-namespace Bam.Net.Data.Repositories
+namespace Bam.Data.Repositories
 {
 	public interface IRepository : ILoggable, IExtendedCrudProvider
     {

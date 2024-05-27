@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Bam.Net
+namespace Bam
 {
     public static class TypeExtensions
     {

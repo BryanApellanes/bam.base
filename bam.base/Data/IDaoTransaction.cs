@@ -3,7 +3,7 @@
 */
 using System;
 
-namespace Bam.Net.Data
+namespace Bam.Data
 {
     public interface IDaoTransaction
     {

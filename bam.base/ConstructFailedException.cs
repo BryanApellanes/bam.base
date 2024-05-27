@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Bam.Net.Incubation
+namespace Bam.Incubation
 {
     [Serializable]
     public class ConstructFailedException: Exception

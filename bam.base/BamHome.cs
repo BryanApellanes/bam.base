@@ -1,10 +1,10 @@
-﻿using Bam.Net;
+﻿using Bam;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace Bam.Net
+namespace Bam
 {
     /// <summary>
     /// Paths rooted in the root of the bam installation. (/opt/bam on *nix, c:bam/opt on windows)

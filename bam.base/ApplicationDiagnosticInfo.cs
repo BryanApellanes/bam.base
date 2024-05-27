@@ -8,11 +8,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Diagnostics;
-using Bam.Net.Configuration;
-using Bam.Net.Logging;
+using Bam.Configuration;
+using Bam.Logging;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace Bam.Net
+namespace Bam
 {
     /// <summary>
     /// Diagnostic information about the current

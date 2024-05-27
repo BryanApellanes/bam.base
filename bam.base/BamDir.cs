@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Bam.Net
+namespace Bam
 {
     /// <summary>
     /// Paths rooted in the .bam folder of the current directory.

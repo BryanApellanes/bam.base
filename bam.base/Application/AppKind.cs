@@ -4,7 +4,7 @@ using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace Bam.Net.Application
+namespace Bam.Application
 {
 
     [JsonConverter(typeof(StringEnumConverter))]

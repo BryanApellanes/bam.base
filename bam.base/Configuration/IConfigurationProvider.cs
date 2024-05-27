@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Bam.Net.Configuration
+namespace Bam.Configuration
 {
     /// <summary>
     /// 

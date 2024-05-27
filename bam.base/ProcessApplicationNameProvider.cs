@@ -1,7 +1,7 @@
 using System.IO;
 using System.Reflection;
 
-namespace Bam.Net
+namespace Bam
 {
     /// <summary>
     /// Gets the Application name from the environment variable BAM_APPLICATION_NAME

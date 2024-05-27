@@ -1,4 +1,4 @@
-﻿using Bam.Net.Configuration;
+﻿using Bam.Configuration;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 
-namespace Bam.Net
+namespace Bam
 {
     public static class RuntimeSettings
     {

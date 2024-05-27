@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Bam.Net.Data.Repositories
+namespace Bam.Data.Repositories
 {
 	/// <summary>
 	/// Specifies that a property should be used as the 

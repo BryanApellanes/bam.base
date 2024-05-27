@@ -1,4 +1,4 @@
-﻿using Bam.Net.Incubation;
+﻿using Bam.Incubation;
 using System;
 using System.Collections.Generic;
 using System.Linq;

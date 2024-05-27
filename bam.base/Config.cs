@@ -4,11 +4,11 @@ using System.Configuration;
 using System.IO;
 using System.Reflection;
 using System.Security.Permissions;
-using Bam.Net.Data;
-using Bam.Net.Logging;
-using Bam.Net.Services;
+using Bam.Data;
+using Bam.Logging;
+using Bam.Services;
 
-namespace Bam.Net
+namespace Bam
 {
     public class Config: Loggable
     {
@@ -305,7 +305,7 @@ namespace Bam.Net
             string typeConfigsFolderName = applicationNameProvider.GetApplicationName();
             if (string.IsNullOrEmpty(typeConfigsFolderName))
             {
-                typeConfigsFolderName = ApplicationDiagnosticInfo.UnknownApplication;//Bam.Net.CoreServices.ApplicationRegistration.Data.Application.Unknown.Name;
+                typeConfigsFolderName = ApplicationDiagnosticInfo.UnknownApplication;//Bam.CoreServices.ApplicationRegistration.Data.Application.Unknown.Name;
             }
             
             return new DirectoryInfo(Path.Combine(configDir.FullName, typeConfigsFolderName));

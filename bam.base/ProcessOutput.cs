@@ -7,7 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
-namespace Bam.Net.CommandLine
+namespace Bam.CommandLine
 {
     public class ProcessOutput
     {

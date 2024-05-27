@@ -6,11 +6,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Bam.Net.Logging;
-using Bam.Net.Services;
+using Bam.Logging;
+using Bam.Services;
 using Bam.Services;
 
-namespace Bam.Net.Incubation
+namespace Bam.Incubation
 {
     /// <summary>
     /// A simple dependency injection container.

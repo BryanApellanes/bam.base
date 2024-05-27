@@ -12,7 +12,7 @@ using System.Xml.Serialization;
 using System.IO;
 using System.Data;
 
-namespace Bam.Net.Configuration
+namespace Bam.Configuration
 {
     /// <summary>
     /// A simple wrapper around the ConfigurationManager that simplifies

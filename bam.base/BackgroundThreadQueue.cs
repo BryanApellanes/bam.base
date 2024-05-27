@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Bam.Net.Logging;
+using Bam.Logging;
 
-namespace Bam.Net
+namespace Bam
 {
     /// <summary>
     /// A queue processing facility that processes

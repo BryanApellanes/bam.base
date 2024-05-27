@@ -5,11 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Reflection;
 using System.IO;
-using Bam.Net.Logging;
+using Bam.Logging;
 using NCuid;
-using Bam.Net.CoreServices;
+using Bam.CoreServices;
 
-namespace Bam.Net.Data.Repositories
+namespace Bam.Data.Repositories
 {
     public partial class Meta
     {

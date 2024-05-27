@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Bam.Net.Configuration;
+using Bam.Configuration;
 
-namespace Bam.Net
+namespace Bam
 {
     /// <summary>
     /// Provides an interface to a specific place in the filesystem.

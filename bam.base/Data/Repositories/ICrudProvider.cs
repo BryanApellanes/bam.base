@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 
-namespace Bam.Net.Data.Repositories
+namespace Bam.Data.Repositories
 {
     public interface ICrudProvider
     {

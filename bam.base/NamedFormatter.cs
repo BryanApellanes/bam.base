@@ -11,7 +11,7 @@ using System.IO;
 using System.Diagnostics;
 using System.Reflection;
 
-namespace Bam.Net
+namespace Bam
 {
     public static class NamedFormatter
     {

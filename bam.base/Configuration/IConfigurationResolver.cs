@@ -1,10 +1,10 @@
-﻿using Bam.Net.Logging;
+﻿using Bam.Logging;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 
-namespace Bam.Net.Configuration
+namespace Bam.Configuration
 {
     public interface IConfigurationResolver
     {

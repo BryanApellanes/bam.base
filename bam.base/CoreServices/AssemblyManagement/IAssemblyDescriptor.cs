@@ -1,7 +1,7 @@
-﻿using Bam.Net.Data.Repositories;
+﻿using Bam.Data.Repositories;
 using System.Collections.Generic;
 
-namespace Bam.Net.CoreServices.AssemblyManagement.Data
+namespace Bam.CoreServices.AssemblyManagement.Data
 {
     public interface IAssemblyDescriptor
     {

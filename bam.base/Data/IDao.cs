@@ -1,12 +1,12 @@
 ﻿/*
 	Copyright © Bryan Apellanes 2015  
 */
-using Bam.Net.Incubation;
+using Bam.Incubation;
 using System;
 using System.Data;
 using System.Threading.Tasks;
 
-namespace Bam.Net.Data
+namespace Bam.Data
 {
     public interface IDao
     {

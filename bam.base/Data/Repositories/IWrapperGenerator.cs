@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace Bam.Net.Data.Repositories
+namespace Bam.Data.Repositories
 {
     public interface IWrapperGenerator
     {

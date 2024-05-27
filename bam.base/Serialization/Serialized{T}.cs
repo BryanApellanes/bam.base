@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Bam.Net.Serialization
+namespace Bam.Serialization
 {
     public class Serialized<T> : Serialized
     {

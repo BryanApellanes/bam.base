@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Bam.Net.CoreServices.AssemblyManagement.Data
+namespace Bam.CoreServices.AssemblyManagement.Data
 {
     public interface IProcessRuntimeDescriptor
     {

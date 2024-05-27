@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Bam.Net.Logging
+namespace Bam.Logging
 {
     public class LogMessage
     {

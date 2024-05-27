@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Reflection;
 
-namespace Bam.Net
+namespace Bam
 {
     /// <summary>
     /// Using reflection, finds any custom attributes that

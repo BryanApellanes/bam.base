@@ -1,10 +1,10 @@
 ﻿/*
 	Copyright © Bryan Apellanes 2015  
 */
-using Bam.Net.Logging;
+using Bam.Logging;
 using System;
 
-namespace Bam.Net
+namespace Bam
 {
     public interface IIpcMessage : ILoggable
     {

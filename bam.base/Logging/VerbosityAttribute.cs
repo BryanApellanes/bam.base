@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Bam.Net.Logging
+namespace Bam.Logging
 {
     [AttributeUsage(AttributeTargets.Event)]
     public class VerbosityAttribute: Attribute

@@ -6,9 +6,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Reflection;
-using Bam.Net;
+using Bam;
 
-namespace Bam.Net.Data
+namespace Bam.Data
 {
     /// <summary>
     /// Used to define a Column in a Table in Schema.

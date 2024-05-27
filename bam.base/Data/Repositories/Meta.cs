@@ -8,16 +8,16 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Reflection;
 using System.IO;
-using Bam.Net;
-using Bam.Net.Logging;
+using Bam;
+using Bam.Logging;
 
-namespace Bam.Net.Data.Repositories
+namespace Bam.Data.Repositories
 {
 	/// <summary>
 	/// Provides meta data about persisted or persistable objects. 
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
-	/// <seealso cref="Bam.Net.Data.Repositories.Meta" />
+	/// <seealso cref="Bam.Data.Repositories.Meta" />
 	[Serializable]
 	public class Meta<T>: Meta
 	{
@@ -73,7 +73,7 @@ namespace Bam.Net.Data.Repositories
     /// <summary>
     /// Provides meta data about persisted or persistable objects.
     /// </summary>
-    /// <seealso cref="Bam.Net.Data.Repositories.Meta" />
+    /// <seealso cref="Bam.Data.Repositories.Meta" />
     [Serializable]
 	public partial class Meta
 	{

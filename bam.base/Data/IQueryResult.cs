@@ -3,7 +3,7 @@
 */
 using System.Data;
 
-namespace Bam.Net.Data
+namespace Bam.Data
 {
     public interface IQueryResult
     {

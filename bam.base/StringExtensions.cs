@@ -1,5 +1,5 @@
-﻿using Bam.Net.CommandLine;
-using Bam.Net.Incubation;
+﻿using Bam.CommandLine;
+using Bam.Incubation;
 using Microsoft.AspNetCore.WebUtilities;
 using Newtonsoft.Json;
 using System;
@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using System.Xml.Serialization;
 using YamlDotNet.Serialization;
 
-namespace Bam.Net
+namespace Bam
 {
     public static class StringExtensions
     {

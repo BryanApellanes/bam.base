@@ -1,9 +1,9 @@
 ﻿using Bam.Console;
-using Bam.Net.CommandLine;
+using Bam.CommandLine;
 using System.Diagnostics;
 using System.Text;
 
-namespace Bam.Net
+namespace Bam
 {
     public static class ProcessStartInfoExtensions
     {

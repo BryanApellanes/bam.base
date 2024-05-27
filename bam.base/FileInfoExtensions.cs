@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using YamlDotNet.Serialization;
 using System.Data;
 
-namespace Bam.Net
+namespace Bam
 {
     public static class FileInfoExtensions
     {

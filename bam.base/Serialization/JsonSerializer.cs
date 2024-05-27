@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 
-namespace Bam.Net.Serialization
+namespace Bam.Serialization
 {
     internal class JsonSerializer : ISerializer
     {

@@ -10,7 +10,7 @@ using System.IO;
 using System.Net;
 using System.Net.Mail;
 
-namespace Bam.Net
+namespace Bam
 {
     public class Email
     {        

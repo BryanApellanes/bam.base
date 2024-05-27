@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Bam.Net.Logging
+namespace Bam.Logging
 {
     /// <summary>
     /// The same values as LogEventType.

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace Bam.Net
+namespace Bam
 {
     /// <summary>
     /// Paths rooted in the current process' user profile.

@@ -10,11 +10,11 @@ using System.IO;
 using System.Reflection;
 using System.CodeDom.Compiler;
 using System.Xml.Serialization;
-using Bam.Net.Logging;
+using Bam.Logging;
 using Newtonsoft.Json;
 using YamlDotNet.Serialization;
 
-namespace Bam.Net
+namespace Bam
 {
     /// <summary>
     /// Provides information about dynamically generated assemblies

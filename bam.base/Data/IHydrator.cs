@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Bam.Net.Data
+namespace Bam.Data
 {
     /// <summary>
     /// When implemented provides a Dao hydration mechanism.  See Hydrator.

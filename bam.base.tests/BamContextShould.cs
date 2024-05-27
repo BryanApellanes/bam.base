@@ -1,7 +1,7 @@
 ﻿using Bam.Console;
-using Bam.Net;
-using Bam.Net.CoreServices;
-using Bam.Net.Logging;
+using Bam;
+using Bam.CoreServices;
+using Bam.Logging;
 using Bam.Testing;
 using System;
 using System.Collections.Generic;

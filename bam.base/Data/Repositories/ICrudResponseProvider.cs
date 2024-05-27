@@ -1,6 +1,6 @@
-﻿using Bam.Net.ServiceProxy;
+﻿using Bam.ServiceProxy;
 
-namespace Bam.Net.Data.Repositories
+namespace Bam.Data.Repositories
 {
     public interface ICrudResponseProvider
     {

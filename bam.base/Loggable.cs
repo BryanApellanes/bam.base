@@ -6,15 +6,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Bam.Net;
-using Bam.Net.Configuration;
+using Bam;
+using Bam.Configuration;
 using Newtonsoft.Json;
 using System.Diagnostics;
 using System.Xml.Serialization;
 using YamlDotNet.Serialization;
 using EventInfo = System.Reflection.EventInfo;
 
-namespace Bam.Net.Logging
+namespace Bam.Logging
 {
     /// <summary>
     /// An abstract base class providing methods for 

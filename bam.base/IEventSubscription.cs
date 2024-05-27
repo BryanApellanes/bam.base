@@ -2,7 +2,7 @@
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace Bam.Net
+namespace Bam
 {
     public interface IEventSubscription
     {

@@ -8,10 +8,10 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Bam.Net.CommandLine;
-using Bam.Net.Logging;
+using Bam.CommandLine;
+using Bam.Logging;
 
-namespace Bam.Net
+namespace Bam
 {
     public static class Exec
     {

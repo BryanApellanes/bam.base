@@ -5,7 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Bam.Net.Data
+namespace Bam.Data
 {
     public interface IQueryFilter<C>: IQueryFilter where C : IFilterToken, new()
     {

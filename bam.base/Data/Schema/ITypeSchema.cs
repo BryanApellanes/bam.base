@@ -5,7 +5,7 @@ using Bam.Data.Schema;
 using System;
 using System.Collections.Generic;
 
-namespace Bam.Net.Data.Repositories
+namespace Bam.Data.Repositories
 {
     public interface ITypeSchema
     {
