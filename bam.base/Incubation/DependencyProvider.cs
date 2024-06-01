@@ -592,7 +592,8 @@ namespace Bam.Incubation
         {
             if (throwIfSet && Contains(t))
             {
-                throw new InvalidOperationException(string.Format("Type of ({0}) already set in this {1}", t.Name, nameof(DependencyProvider)));
+                throw new InvalidOperationException(
+                    $"Type of ({t.Name}) already set in this {nameof(DependencyProvider)}");
             }
         }
 
@@ -600,7 +601,8 @@ namespace Bam.Incubation
         {
             if (throwIfSet && Contains<T>())
             {
-                throw new InvalidOperationException(string.Format("Type of <{0}> already set in this dependencyProvider", typeof(T).Name));
+                throw new InvalidOperationException(
+                    $"Type of <{typeof(T).Name}> already set in this dependencyProvider");
             }
         }
 
@@ -716,13 +718,25 @@ namespace Bam.Incubation
         {
             get
             {
-                if (_typeInstanceDictionary.ContainsKey(type))
+                if (_typeInstanceDictionary.TryGetValue(type, out var result))
                 {
-                    object result = _typeInstanceDictionary[type];
-                    if(result is Delegate d)
+                    if (result is Delegate d)
                     {
-                        result = d.DynamicInvoke();
+                        try
+                        {
+                            result = d.DynamicInvoke();
+                        }
+                        catch (Exception ex)
+                        {
+                            if (ex.InnerException != null)
+                            {
+                                throw ex.InnerException;
+                            }
+
+                            throw;
+                        }
                     }
+
                     return result;
                 }
                 else

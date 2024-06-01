@@ -636,6 +636,22 @@ namespace Bam
             return deserializer.Deserialize<T>(yaml);
         }
 
+        public static T FromYaml<T>(this string yaml, bool ignoreUnmatchedProperties)
+        {
+            if (ignoreUnmatchedProperties)
+            {
+                YamlDotNet.Serialization.IDeserializer deserializer = new DeserializerBuilder()
+                    .IgnoreUnmatchedProperties()
+                    .Build();
+
+                return deserializer.Deserialize<T>(yaml);
+            }
+            else
+            {
+                return FromYaml<T>(yaml);
+            }
+        }
+
         /// <summary>
         /// Deserialize the current string as the specified
         /// generic type T.
