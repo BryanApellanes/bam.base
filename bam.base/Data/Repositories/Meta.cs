@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Reflection;
 using System.IO;
 using Bam;
+using Bam.CoreServices;
 using Bam.Logging;
 
 namespace Bam.Data.Repositories
@@ -75,8 +76,55 @@ namespace Bam.Data.Repositories
     /// </summary>
     /// <seealso cref="Bam.Data.Repositories.Meta" />
     [Serializable]
-	public partial class Meta
+	public class Meta
 	{
+		IObjectPersister _objectPersister;
+		object _objectPersisterLock = new object();
+		/// <summary>
+		/// Gets or sets the object reader writer.
+		/// </summary>
+		/// <value>
+		/// The object reader writer.
+		/// </value>
+		public IObjectPersister ObjectPersister
+		{
+			get
+			{
+				return _objectPersisterLock.DoubleCheckLock(ref _objectPersister, () => ServiceRegistry.Default.Get<IObjectPersister>());
+			}
+			set
+			{
+				_objectPersister = value;
+			}
+		}
+
+		protected internal ulong GetNextId(Type type, IObjectPersister objectReaderWriter = null)
+		{
+			objectReaderWriter = objectReaderWriter ?? this.ObjectPersister;
+			DirectoryInfo dir = new DirectoryInfo(Path.Combine(objectReaderWriter.RootDirectory, type.Name));
+			FileInfo metaFile = new FileInfo(Path.Combine(dir.FullName, "meta.id"));
+			if (metaFile.Exists)
+			{
+				string idString = metaFile.FullName.SafeReadFile();
+				idString = string.IsNullOrEmpty(idString) ? "0" : idString;
+				ulong result = 0;
+				if (ulong.TryParse(idString, out ulong parsed))
+				{
+					result = ++parsed;
+				}
+				else
+				{
+					++result;
+				}
+				metaFile.FullName.SafeWriteFile(result.ToString());
+				return result;
+			}
+			else
+			{
+				"1".SafeWriteToFile(metaFile.FullName);
+				return 1;
+			}
+		}
         /// <summary>
         /// Initializes a new instance of the <see cref="Meta"/> class.
         /// </summary>
