@@ -46,7 +46,7 @@ namespace Bam
             }
         }
 
-        public IApplicationNameProvider ApplicationNameProvider
+        public virtual IApplicationNameProvider ApplicationNameProvider
         {
             get
             {
@@ -54,7 +54,7 @@ namespace Bam
             }
         }
 
-        public IConfigurationProvider ConfigurationProvider
+        public virtual IConfigurationProvider ConfigurationProvider
         {
             get
             {
@@ -62,7 +62,7 @@ namespace Bam
             }
         }
 
-        public ILogger Logger
+        public virtual ILogger Logger
         {
             get
             {
