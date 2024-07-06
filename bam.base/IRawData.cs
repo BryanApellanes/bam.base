@@ -8,7 +8,10 @@ public interface IRawData
     HashAlgorithms HashAlgorithm { get; }
     Encoding Encoding { get; }
     ulong HashId { get; }
-    string HashString { get; }
+    /// <summary>
+    /// Gets the hash hex string equivalent.
+    /// </summary>
+    string HashHexString { get; }
     byte[] Hash { get; }
     byte[] Value { get; }
     T Convert<T>();
