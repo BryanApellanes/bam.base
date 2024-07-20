@@ -33,7 +33,9 @@ namespace Bam.Incubation
             _classNameTypeDictionary = new Dictionary<string, Type>();
             _ctorParams = new Dictionary<Type, Dictionary<string, object>>();
         }
-
+        
+        // TODO: implement Circular dependency check
+        
         public static DependencyProvider Default
         {
             get;
@@ -79,7 +81,7 @@ namespace Bam.Incubation
         /// </summary>
         /// <param name="dependencyProvider">The dependencyProvider to copy from</param>
         /// <param name="overwrite">If true, values in the current dependencyProvider
-        /// are over written by values of the same types from the specified
+        /// are overwritten by values of the same types from the specified
         /// dependencyProvider otherwise the current value is kept.</param>
         public void CopyFrom(DependencyProvider dependencyProvider, bool overwrite = true)
         {
@@ -476,7 +478,7 @@ namespace Bam.Incubation
 
             return GetInternal<T>();
         }
-
+        
         /// <summary>
         /// Gets an object of type T if it has been instantiated otherwise
         /// sets the inner instance to the specified setToIfNull and returns
@@ -819,12 +821,12 @@ namespace Bam.Incubation
                 Throw(type, ctorParams.Select(p => p.GetType()).ToArray());
             }
         }
-
+        
         public List<object> GetCtorParams(Type type)
         {
             return GetCtorParams(type, out _);
         }
-
+        
         public List<object> GetCtorParams(Type type, out ConstructorInfo ctorInfo)
         {
             ctorInfo = null;
