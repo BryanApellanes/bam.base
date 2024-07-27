@@ -1,7 +1,7 @@
 ﻿using Bam;
 using Bam.CoreServices;
 using Bam.Shell;
-using Bam.Testing;
+using Bam.Test;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,6 +39,52 @@ namespace Bam.Tests
 
             refOne.ShouldNotBe(refTwo);
             refOne.Name.ShouldNotBeEqualTo(refTwo.Name);
+        }
+
+        [UnitTest]
+        public void ReplaceAType()
+        {
+            ServiceRegistry svcRegistry = ServiceRegistry
+                .Create()
+                .For<ITestClass>().Use<TestClass>()
+                .For<ITestClass>().Use<DifferentTestClass>();
+
+            ITestClass testClass = svcRegistry.Get<ITestClass>();
+            testClass.GetType().ShouldEqual(typeof(DifferentTestClass));
+        }
+
+        [UnitTest]
+        public void UseTheReplacedType()
+        {
+            // Test to ensure that specifying the same interface
+            // multiple times causes the latest to be used 
+            // when constructing a class
+            ServiceRegistry svcRegistry = ServiceRegistry
+                .Create()
+                .For<DependentClass>().Use<DependentClass>()
+                .For<ITestClass>().Use<TestClass>()
+                .For<ITestClass>().Use<DifferentTestClass>();
+
+            DependentClass instance = svcRegistry.Get<DependentClass>();
+            instance.TestClass.ShouldNotBeNull();
+            instance.TestClass.GetType().ShouldEqual(typeof(DifferentTestClass));
+        }
+
+        [UnitTest]
+        public void ConstructTheRequestedClass()
+        {
+            // Test to ensure that it isn't necessary to 
+            // specify a type in the registry as long as
+            // the required constructor parameters are
+            // in the registry.
+            ServiceRegistry svcRegistry = ServiceRegistry
+                .Create()
+                .For<ITestClass>().Use<TestClass>()
+                .For<ITestClass>().Use<DifferentTestClass>();
+
+            DependentClass instance = svcRegistry.Get<DependentClass>();
+            instance.TestClass.ShouldNotBeNull();
+            instance.TestClass.GetType().ShouldEqual(typeof(DifferentTestClass));
         }
     }
 }
