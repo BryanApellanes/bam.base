@@ -18,17 +18,14 @@ namespace Bam
         }
 
         ServiceRegistry _serviceRegistry;
-        object _serviceRegistryLock = new object();
+        readonly object _serviceRegistryLock = new object();
         public virtual ServiceRegistry ServiceRegistry
         {
             get
             {
-                return _serviceRegistryLock.DoubleCheckLock(ref _serviceRegistry, () => GetDefaultContextServiceRegistry());
+                return _serviceRegistryLock.DoubleCheckLock(ref _serviceRegistry, GetDefaultContextServiceRegistry);
             }
-            protected set
-            {
-                _serviceRegistry = value;
-            }
+            set => _serviceRegistry = value;
         }
 
         public virtual ServiceRegistry GetDefaultContextServiceRegistry()
