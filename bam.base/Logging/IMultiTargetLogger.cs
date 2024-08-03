@@ -8,7 +8,5 @@ namespace Bam.Logging
         ILogger[] Loggers { get; }
 
         void AddLogger(ILogger logger);
-        void CommitLogEvent(LogEvent logEvent);
-        ILogger StartLoggingThread();
     }
 }

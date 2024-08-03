@@ -19,14 +19,14 @@ namespace Bam
         public FieldInfo FieldInfo { get; set; }
         public EventInfo EventInfo { get; set; }
 
-        public virtual object Invoke(params object[] args)
+        public virtual object? Invoke(params object[] args)
         {
-            return Delegate.DynamicInvoke(args);
+            return Delegate?.DynamicInvoke(args);
         }
 
-        public virtual async Task<object> InvokeAsync(params object[] args)
+        public virtual async Task<object?> InvokeAsync(params object[] args)
         {
-            return await Task.Run(() => Delegate.DynamicInvoke(args));
+            return await Task.Run(() => Delegate?.DynamicInvoke(args));
         }
         
         public override int GetHashCode()
@@ -34,7 +34,7 @@ namespace Bam
             return this.GetHashCode(EventName, Delegate);
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             EventSubscription compareTo = obj as EventSubscription;
             if(compareTo == null)

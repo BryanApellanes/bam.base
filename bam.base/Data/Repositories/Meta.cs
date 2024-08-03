@@ -98,7 +98,7 @@ namespace Bam.Data.Repositories
 			}
 		}
 
-		protected internal ulong GetNextId(Type type, IObjectPersister objectReaderWriter = null)
+		protected internal ulong GetNextId(Type type, IObjectPersister? objectReaderWriter = null)
 		{
 			objectReaderWriter = objectReaderWriter ?? this.ObjectPersister;
 			DirectoryInfo dir = new DirectoryInfo(Path.Combine(objectReaderWriter.RootDirectory, type.Name));
@@ -411,7 +411,7 @@ namespace Bam.Data.Repositories
             return result;
         }
 
-        public static string GetIdHash(object value, Type type = null)
+        public static string GetIdHash(object value, Type? type = null)
         {
             type = type ?? value.GetType();
             ulong id = Meta.GetId(value).Value;

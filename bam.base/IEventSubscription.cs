@@ -13,7 +13,7 @@ namespace Bam
 
         bool Equals(EventHandler handler);
         bool Equals(object obj);
-        object Invoke(params object[] args);
-        Task<object> InvokeAsync(params object[] args);
+        object? Invoke(params object[] args);
+        Task<object?> InvokeAsync(params object[] args);
     }
 }

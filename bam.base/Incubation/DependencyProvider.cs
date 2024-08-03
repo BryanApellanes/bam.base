@@ -8,7 +8,6 @@ using System.Linq;
 using System.Reflection;
 using Bam.Logging;
 using Bam.Services;
-using Bam.Services;
 
 namespace Bam.Incubation
 {

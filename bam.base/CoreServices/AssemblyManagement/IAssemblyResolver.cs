@@ -4,6 +4,6 @@ namespace Bam.CoreServices
 {
     public interface IAssemblyResolver
     {
-        Assembly ResolveAssembly(string assemblyName, string assemblyDirectory = null);
+        Assembly ResolveAssembly(string assemblyName, string? assemblyDirectory = null);
     }
 }

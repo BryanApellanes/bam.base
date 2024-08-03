@@ -22,7 +22,7 @@ namespace Bam.CommandLine
             ErrorHandler = (e) => StandardError.AppendLine(e);
             ExitCode = -100;
         }
-        public ProcessOutputCollector(Action<string> dataHandler = null, Action<string> errorHandler = null)
+        public ProcessOutputCollector(Action<string>? dataHandler = null, Action<string>? errorHandler = null)
         {
             StandardOutput = new StringBuilder();
             StandardError = new StringBuilder();

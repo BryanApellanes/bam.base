@@ -121,12 +121,12 @@ namespace Bam
             set => _current = value;
         }
         
-        public static Config Create(string configFilePath = null)
+        public static Config Create(string? configFilePath = null)
         {
             return For(ApplicationNameProvider.GetApplicationName(), configFilePath);
         }
 
-        public static Config For(string applicationName, string configFilePath = null)
+        public static Config For(string applicationName, string? configFilePath = null)
         {
             return new Config(applicationName, configFilePath);
         }
@@ -144,7 +144,7 @@ namespace Bam
 
         public Dictionary<string, string> AppSettings { get; set; }
         
-        public string this[string key, string defaultValue = null]
+        public string? this[string key, string? defaultValue = null]
         {
             get
             {
@@ -270,7 +270,7 @@ namespace Bam
         /// <param name="applicationNameProvider"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static T Load<T>(IApplicationNameProvider applicationNameProvider = null) where T : class, new()
+        public static T Load<T>(IApplicationNameProvider? applicationNameProvider = null) where T : class, new()
         {
             DirectoryInfo processDir = GetDirectory(applicationNameProvider);
             string fileName = $"{typeof(T).Namespace}.{typeof(T).Name}.config.yaml";
@@ -282,7 +282,7 @@ namespace Bam
             return file.FromYamlFile<T>();
         }
         
-        public static Dictionary<string, string> AppSettingsFor<T>(IApplicationNameProvider applicationNameProvider = null)
+        public static Dictionary<string, string> AppSettingsFor<T>(IApplicationNameProvider? applicationNameProvider = null)
         {
             string fileName = $"{typeof(T).Namespace}.{typeof(Type).Name}.appsettings.yaml";
             FileInfo file = new FileInfo(Path.Combine(GetDirectory(applicationNameProvider).FullName, fileName));
@@ -298,7 +298,7 @@ namespace Bam
         /// </summary>
         /// <param name="applicationNameProvider"></param>
         /// <returns></returns>
-        public static DirectoryInfo GetDirectory(IApplicationNameProvider applicationNameProvider = null)
+        public static DirectoryInfo GetDirectory(IApplicationNameProvider? applicationNameProvider = null)
         {
             DirectoryInfo configDir = GetBamHomeConfigFile().Directory;
 			applicationNameProvider = applicationNameProvider ?? ProcessApplicationNameProvider.Current;
@@ -311,7 +311,7 @@ namespace Bam
             return new DirectoryInfo(Path.Combine(configDir.FullName, typeConfigsFolderName));
         }
         
-        public static FileInfo GetBamHomeConfigFile(IApplicationNameProvider applicationNameProvider = null)
+        public static FileInfo GetBamHomeConfigFile(IApplicationNameProvider? applicationNameProvider = null)
         {
             applicationNameProvider = applicationNameProvider ?? ProcessApplicationNameProvider.Current;
             Log.Trace("Config using applicationNameProvider of type ({0})", applicationNameProvider?.GetType().Name);
@@ -325,7 +325,7 @@ namespace Bam
         /// </summary>
         /// <param name="applicationNameProvider"></param>
         /// <returns></returns>
-        public static FileInfo GetBamProfileConfigFile(IApplicationNameProvider applicationNameProvider = null)
+        public static FileInfo GetBamProfileConfigFile(IApplicationNameProvider? applicationNameProvider = null)
         {
 			applicationNameProvider = applicationNameProvider ?? ProcessApplicationNameProvider.Current;
             Log.Trace("Config using applicationNameProvider of type ({0})", applicationNameProvider?.GetType().Name);

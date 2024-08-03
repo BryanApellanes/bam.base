@@ -11,6 +11,6 @@ namespace Bam.Data
         string ColumnName { get; set; } 
         int? Number { get; set; }
         int? SetNumber(int? value);
-        object Value { get; set; }
+        object? Value { get; set; }
     }
 }

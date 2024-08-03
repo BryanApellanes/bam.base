@@ -2,8 +2,7 @@
 {
     public interface IKeyedAuditRepoData : ICompositeKeyAuditRepoData
     {
-        ulong Key { get; set; } // TODO: remove this
-
+        new ulong Key { get; set; } 
         T LoadByKey<T>(IRepository repository) where T : class, new();
         T SaveByKey<T>(IRepository repository) where T : class, new();
     }

@@ -9,7 +9,7 @@ namespace Bam
 {
     public static class ByteExtensions
     {
-        public static string FromBytes(this byte[] text, Encoding encoding = null)
+        public static string FromBytes(this byte[] text, Encoding? encoding = null)
         {
             encoding = encoding ?? Encoding.UTF8;
             return encoding.GetString(text);

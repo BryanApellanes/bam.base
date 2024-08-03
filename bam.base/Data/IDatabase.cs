@@ -17,8 +17,8 @@ namespace Bam.Data
         Func<ColumnAttribute, string> ColumnNameProvider { get; set; }
         ColumnNameListProvider ColumnNameListProvider { get; }
         IDbConnectionManager ConnectionManager { get; set; }
-        string ConnectionName { get; set; }
-        string ConnectionString { get; set; }
+        string? ConnectionName { get; set; }
+        string? ConnectionString { get; set; }
         int MaxConnections { get; set; }
         string Name { get; }
         string ParameterPrefix { get; set; }
@@ -40,15 +40,15 @@ namespace Bam.Data
         bool Equals(object obj);
         DbDataReader ExecuteReader(ISqlStringBuilder sqlStatement);
         DbDataReader ExecuteReader(string sqlStatement, CommandType commandType, DbParameter[] dbParameters, DbConnection conn);
-        DbDataReader ExecuteReader(string sqlStatement, DbParameter[] dbParameters, DbConnection conn = null);
+        DbDataReader ExecuteReader(string sqlStatement, DbParameter[] dbParameters, DbConnection? conn = null);
         DbDataReader ExecuteReader(string sqlStatement, DbParameter[] dbParameters, out DbConnection conn);
         DbDataReader ExecuteReader(string sqlStatement, object dbParameters);
         DbDataReader ExecuteReader(string sqlStatement, object dbParameters, out DbConnection conn);
-        IEnumerable<T> ExecuteReader<T>(ISqlStringBuilder sqlStatement, Action<DbDataReader> onReaderExecuted = null) where T : class, new();
-        IEnumerable<T> ExecuteReader<T>(string sqlStatement, CommandType commandType, DbParameter[] dbParameters, DbConnection conn, bool closeConnection = true, Action<DbDataReader> onReaderExecuted = null) where T : class, new();
-        IEnumerable<T> ExecuteReader<T>(string sqlStatement, DbParameter[] dbParameters, DbConnection conn = null, bool closeConnection = true, Action<DbDataReader> onReaderExecuted = null) where T : class, new();
-        IEnumerable<T> ExecuteReader<T>(string sqlStatement, DbParameter[] dbParameters, out DbConnection conn, Action<DbDataReader> onReaderExecuted = null) where T : class, new();
-        IEnumerable<T> ExecuteReader<T>(string sqlStatement, object dbParameters, Action<DbDataReader> onReaderExecuted = null) where T : class, new();
+        IEnumerable<T> ExecuteReader<T>(ISqlStringBuilder sqlStatement, Action<DbDataReader>? onReaderExecuted = null) where T : class, new();
+        IEnumerable<T> ExecuteReader<T>(string sqlStatement, CommandType commandType, DbParameter[] dbParameters, DbConnection conn, bool closeConnection = true, Action<DbDataReader>? onReaderExecuted = null) where T : class, new();
+        IEnumerable<T> ExecuteReader<T>(string sqlStatement, DbParameter[] dbParameters, DbConnection? conn = null, bool closeConnection = true, Action<DbDataReader>? onReaderExecuted = null) where T : class, new();
+        IEnumerable<T> ExecuteReader<T>(string sqlStatement, DbParameter[] dbParameters, out DbConnection conn, Action<DbDataReader>? onReaderExecuted = null) where T : class, new();
+        IEnumerable<T> ExecuteReader<T>(string sqlStatement, object dbParameters, Action<DbDataReader>? onReaderExecuted = null) where T : class, new();
         IEnumerable<T> ExecuteReader<T>(string sqlStatement, params DbParameter[] dbParameters) where T : class, new();
         void ExecuteSql(ISqlStringBuilder builder);
         void ExecuteSql(ISqlStringBuilder builder, IParameterBuilder parameterBuilder);

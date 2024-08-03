@@ -14,7 +14,7 @@ namespace Bam.Data.Repositories
         Task WriteAsync(object data);
         Task WriteAsync(Type type, object data);
         Task WritePropertyAsync(PropertyInfo prop, object propertyValue, object parentData);
-        bool Delete(object data, Type type = null);
+        bool Delete(object data, Type? type = null);
 
         event EventHandler WriteObjectStarted;
         event EventHandler WriteObjectComplete;

@@ -8,7 +8,7 @@ namespace Bam.Configuration
 {
     public interface IConfigurationResolver
     {
-        ConfigurationValue this[string key, string defaultValue = null, bool callConfigService = false] { get; }
+        ConfigurationValue this[string key, string? defaultValue = null, bool callConfigService = false] { get; }
 
         Dictionary<string, string> AppSettings { get; }
         Config Config { get; }

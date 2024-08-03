@@ -15,8 +15,7 @@ namespace Bam.Data
         DataTable GetDataTable();
         DataTable GetDataTable(IDatabase database);
         ISqlStringBuilder ToSqlStringBuilder(IDatabase db);
-        DataTable Where(Func<C, IQueryFilter<C>> where, IOrderBy<C> orderBy = null, IDatabase db = null);
-        //DataTable Where(QiQuery query, IDatabase db = null);
-        DataTable Where(WhereDelegate<C> where, IDatabase db = null);
+        DataTable Where(Func<C, IQueryFilter<C>> where, IOrderBy<C>? orderBy = null, IDatabase? db = null);
+        DataTable Where(WhereDelegate<C> where, IDatabase? db = null);
     }
 }

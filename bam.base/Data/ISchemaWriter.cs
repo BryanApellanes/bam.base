@@ -20,7 +20,7 @@ namespace Bam.Data
         string GetColumnDefinition(ColumnAttribute column);
         string GetKeyColumnDefinition(KeyColumnAttribute keyColumn);
         void WriteAddForeignKey(string tableName, string nameOfReference, string nameOfColumn, string referencedTable, string referencedKey);
-        void WriteCreateTable(string tableName, string columnDefinitions, dynamic[] fks = null);
+        void WriteCreateTable(string tableName, string columnDefinitions, dynamic[]? fks = null);
         ISchemaWriter WriteDropTable(string tableName);
         bool WriteSchemaScript(Assembly assembly);
         bool WriteSchemaScript(Type type);

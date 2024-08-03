@@ -9,7 +9,7 @@ namespace Bam.Data
     /// </summary>
     public interface IHydrator
     {
-        bool TryHydrateChildren(IDao dao, IDatabase database = null);
-        void HydrateChildren(IDao dao, IDatabase database = null);
+        bool TryHydrateChildren(IDao dao, IDatabase? database = null);
+        void HydrateChildren(IDao dao, IDatabase? database = null);
     }
 }

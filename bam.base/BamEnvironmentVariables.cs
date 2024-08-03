@@ -10,7 +10,7 @@ namespace Bam
         public const string BAM_APP_KIND = "BAM_APP_KIND";
         public const string BAM_PROCESS_MODE = "BAM_PROCESS_MODE";
 
-        public static string Home(string value = null)
+        public static string Home(string? value = null)
         {
             if (!string.IsNullOrEmpty(value))
             {
@@ -25,7 +25,7 @@ namespace Bam
             Set(BAM_APPLICATION_NAME, applicationName);
         }
         
-        public static string ApplicationName(string applicationName = null)
+        public static string ApplicationName(string? applicationName = null)
         {
             if (applicationName != null)
             {

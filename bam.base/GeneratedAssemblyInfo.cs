@@ -50,7 +50,7 @@ namespace Bam
             Assembly = compilerResults.CompiledAssembly;
         }
 
-        public GeneratedAssemblyInfo(string infoFileName, Assembly assembly, byte[] bytes = null) : this()
+        public GeneratedAssemblyInfo(string infoFileName, Assembly assembly, byte[]? bytes = null) : this()
         {
 	        InfoFileName = infoFileName;
 	        Assembly = assembly;

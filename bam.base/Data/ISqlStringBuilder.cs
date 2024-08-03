@@ -11,7 +11,6 @@ namespace Bam.Data
     public interface ISqlStringBuilder: IHasFilters
     {
         Func<string, string> ColumnNameFormatter { get; set; }
-        //IEnumerable<IFilterToken> Filters { get; }
         string GoText { get; set; }
         int? NextNumber { get; set; }
         IParameterInfo[] Parameters { get; set; }
@@ -33,7 +32,7 @@ namespace Bam.Data
         IEnumerable<dynamic> ExecuteDynamicReader(IDatabase db);
         IEnumerable<T> ExecuteReader<T>(IDatabase db) where T : class, new();
         ISqlStringBuilder FormatInsert<T>(string tableName, params AssignValue[] values) where T : SetFormat, new();
-        DataSet GetDataSet(IDatabase db, bool releaseConnection = true, DbConnection conn = null, DbTransaction tx = null);
+        DataSet GetDataSet(IDatabase db, bool releaseConnection = true, DbConnection? conn = null, DbTransaction? tx = null);
         DataTable ExecuteGetDataTable(IDatabase db);
         DataTable GetDataTable(IDatabase db);
         ISqlStringBuilder Go();

@@ -8,9 +8,9 @@ namespace Bam
 {
     public static class Ipc
     {
-        public static Func<string, Type, string, IIpcMessage>? CreateMessage { get; set; }
+        public static Func<string, Type, string, IIpcMessage?>? CreateMessage { get; set; }
 
-        public static Func<IIpcMessage, bool> MessageIsPersisted { get; set; }
+        public static Func<IIpcMessage, bool>? MessageIsPersisted { get; set; }
 
         public static void EnsureImplementationsAreSetOrDie()
         {
@@ -25,7 +25,7 @@ namespace Bam
             }
         }
 
-        public static IIpcMessage Get<T>(string name, string rootDirectory = null)
+        public static IIpcMessage Get<T>(string name, string? rootDirectory = null)
         {
             return Get(name, typeof(T), rootDirectory);
         }
@@ -38,7 +38,7 @@ namespace Bam
         /// <param name="messageType"></param>
         /// <param name="rootDirectory"></param>
         /// <returns></returns>
-        public static IIpcMessage Get(string name, Type messageType, string rootDirectory = null)
+        public static IIpcMessage Get(string name, Type messageType, string? rootDirectory = null)
         {
             if (!Exists(name, messageType, rootDirectory, out IIpcMessage result))
             {
@@ -58,7 +58,7 @@ namespace Bam
             return Create(name, type, null);
         }
 
-        public static IIpcMessage Create(string name, Type type, string rootDirectory = null, bool deleteExisting = false)
+        public static IIpcMessage Create(string name, Type type, string? rootDirectory = null, bool deleteExisting = false)
         {
             EnsureImplementationsAreSetOrDie();
             return CreateMessage(name, type, rootDirectory);
@@ -102,7 +102,7 @@ namespace Bam
             return MessageIsPersisted(result);//File.Exists(result.MessageFile);
         }
 
-        public static bool Exists(string name, Type messageType, string rootDirectory)
+        public static bool Exists(string name, Type messageType, string? rootDirectory)
         {
             return Exists(name, messageType, rootDirectory, out IIpcMessage ignore);
         }

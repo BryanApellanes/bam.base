@@ -112,7 +112,7 @@ namespace Bam
             }
         }
 
-        public static T Try<T>(Func<T> func, Action<Exception> onException = null)
+        public static T Try<T>(Func<T> func, Action<Exception>? onException = null)
         {
             Action<Exception> exceptionHandler = onException ?? ((ex) => { });
             try
@@ -126,7 +126,7 @@ namespace Bam
             }
         }
         
-        public static void Try(Action action, Action<Exception> onException = null)
+        public static void Try(Action action, Action<Exception>? onException = null)
         {
             Action<Exception> exceptionHandler = onException ?? ((ex) => { });
             try
@@ -139,7 +139,7 @@ namespace Bam
             }
         }
 
-        public static async Task TryAsync(Action action, Action<Exception> onException = null)
+        public static async Task TryAsync(Action action, Action<Exception>? onException = null)
         {
             Action<Exception> exceptionHandler = onException ?? ((ex) => { });
             await Task.Run(() =>
@@ -276,7 +276,7 @@ namespace Bam
             return function.TakesTooLong(callBack, new TimeSpan(0, 0, 0, 0, millisecondsToWait), threadName);
         }
 
-        public static bool TakesTooLong<TResult>(this Func<object, TResult> function, Func<TResult, TResult> callBack, string threadName, object state = null, int millisecondsToWait = 300)
+        public static bool TakesTooLong<TResult>(this Func<object, TResult> function, Func<TResult, TResult> callBack, string threadName, object? state = null, int millisecondsToWait = 300)
         {
             return function.TakesTooLong(callBack, new TimeSpan(0, 0, 0, 0, millisecondsToWait), state, threadName);
         }
@@ -295,7 +295,7 @@ namespace Bam
             return function.TakesTooLong(callBack, new TimeSpan(0, 0, 0, 0, millisecondsToWait));
         }
 
-        public static bool TakesTooLong<TResult>(this Func<TResult> function, Func<TResult, TResult> callBack, TimeSpan timeToWait, string threadName = null)
+        public static bool TakesTooLong<TResult>(this Func<TResult> function, Func<TResult, TResult> callBack, TimeSpan timeToWait, string? threadName = null)
         {
             return TakesTooLong((o) => function(), callBack, timeToWait, null, threadName);
         }
@@ -312,7 +312,7 @@ namespace Bam
         /// <param name="callBack">The callBack to execute when function completes</param>
         /// <param name="timeToWait">The amount of time to allow the function to execute before returning true</param>
         /// <returns>boolean</returns>
-        public static bool TakesTooLong<TResult>(this Func<object, TResult> function, Func<TResult, TResult> callBack, TimeSpan timeToWait, object state = null, string threadName = null)
+        public static bool TakesTooLong<TResult>(this Func<object, TResult> function, Func<TResult, TResult> callBack, TimeSpan timeToWait, object? state = null, string? threadName = null)
         {
             try
             {

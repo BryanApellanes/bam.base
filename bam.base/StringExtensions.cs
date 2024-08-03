@@ -33,7 +33,7 @@ namespace Bam
         /// <param name="text"></param>
         /// <param name="encoding"></param>
         /// <returns></returns>
-        public static byte[] ToBytes(this string text, Encoding encoding = null)
+        public static byte[] ToBytes(this string text, Encoding? encoding = null)
         {
             encoding = encoding ?? Encoding.UTF8;
             return encoding.GetBytes(text);
@@ -453,7 +453,7 @@ namespace Bam
         /// <param name="textToWrite"></param>
         /// <param name="postWriteAction"></param>
         public static void SafeWriteFile(this string filePath, string textToWrite,
-            Action<object> postWriteAction = null)
+            Action<object>? postWriteAction = null)
         {
             SafeWriteFile(filePath, textToWrite, false, postWriteAction);
         }
@@ -465,13 +465,13 @@ namespace Bam
         /// <param name="filePath"></param>
         /// <param name="postWriteAction"></param>
         public static void SafeWriteToFile(this string textToWrite, string filePath,
-            Action<object> postWriteAction = null)
+            Action<object>? postWriteAction = null)
         {
             filePath.SafeWriteFile(textToWrite, postWriteAction);
         }
 
         public static void SafeWriteToFile(this string textToWrite, string filePath, bool overwrite,
-            Action<object> postWriteAction = null)
+            Action<object>? postWriteAction = null)
         {
             filePath.SafeWriteFile(textToWrite, overwrite, postWriteAction);
         }
@@ -483,7 +483,7 @@ namespace Bam
         /// <param name="textToWrite">The text to write.</param>
         /// <param name="overwrite">True to overwrite.  If false and the file exists an InvalidOperationException will be thrown.</param>
         public static void SafeWriteFile(this string filePath, string textToWrite, bool overwrite,
-            Action<object> postWriteAction = null)
+            Action<object>? postWriteAction = null)
         {
             FileInfo fileInfo = HandleExisting(filePath, overwrite);
 
@@ -764,15 +764,15 @@ namespace Bam
         /// <typeparam name="T"></typeparam>
         /// <param name="xmlString"></param>
         /// <returns></returns>
-        public static T FromXml<T>(this string xmlString, Encoding encoding)
+        public static T? FromXml<T>(this string xmlString, Encoding encoding)
         {
             XmlSerializer ser = new XmlSerializer(typeof(T));
             byte[] xmlBytes = encoding.GetBytes(xmlString);
             MemoryStream ms = new MemoryStream(xmlBytes);
-            return (T)ser.Deserialize(ms);
+            return (T?)ser.Deserialize(ms);
         }
 
-        public static object FromXml(this string xml, Type type, Encoding encoding = null)
+        public static object FromXml(this string xml, Type type, Encoding? encoding = null)
         {
             XmlSerializer ser = new XmlSerializer(type);
             byte[] xmlBytes = encoding.GetBytes(xml);
@@ -830,7 +830,7 @@ namespace Bam
         /// <param name="error">The error.</param>
         /// <param name="timeout">The timeout.</param>
         /// <returns></returns>
-        public static ProcessOutput Run(this string command, bool promptForAdmin, StringBuilder output = null, StringBuilder error = null, int timeout = 600000)
+        public static ProcessOutput Run(this string command, bool promptForAdmin, StringBuilder? output = null, StringBuilder? error = null, int timeout = 600000)
         {
             ValidateCommand(command);
             GetExeAndArguments(command, out string exe, out string arguments);
@@ -1098,7 +1098,7 @@ namespace Bam
             startInfo.WorkingDirectory = workingDirectory;
             return startInfo;
         }
-        private static ProcessOutput Run(this string command, string arguments, bool promptForAdmin, StringBuilder output = null, StringBuilder error = null, int timeout = 600000)
+        private static ProcessOutput Run(this string command, string arguments, bool promptForAdmin, StringBuilder? output = null, StringBuilder? error = null, int timeout = 600000)
         {
             ProcessStartInfo startInfo = ProcessExtensions.CreateStartInfo(promptForAdmin);
 

@@ -8,6 +8,6 @@ namespace Bam.Data
     public interface IFilterToken
     {
         string Operator { get; set; }
-        string ToString();
+        string? ToString();
     }
 }

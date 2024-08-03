@@ -293,8 +293,12 @@ namespace Bam
             return this.ToString().GetHashCode();
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
+            if (obj == null)
+            {
+                return false;
+            }
             return this.ToString().Equals(obj.ToString());
         }
     }

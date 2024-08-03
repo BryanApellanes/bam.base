@@ -11,6 +11,6 @@ namespace Bam.Data
 {
 	public interface IHasConnectionStringResolver
 	{
-		IConnectionStringResolver ConnectionStringResolver { get; set; }
+		IConnectionStringResolver? ConnectionStringResolver { get; set; }
 	}
 }

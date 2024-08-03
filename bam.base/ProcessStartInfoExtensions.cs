@@ -29,7 +29,7 @@ namespace Bam
         /// <param name="error"></param>
         /// <param name="timeout"></param>
         /// <returns></returns>
-        public static ProcessOutput Run(this ProcessStartInfo startInfo, StringBuilder output, StringBuilder error = null, int timeout = 600000)
+        public static ProcessOutput Run(this ProcessStartInfo startInfo, StringBuilder output, StringBuilder? error = null, int timeout = 600000)
         {
             output = output ?? new StringBuilder();
             error = error ?? new StringBuilder();
@@ -47,7 +47,7 @@ namespace Bam
         /// <param name="errorHandler"></param>
         /// <param name="timeout"></param>
         /// <returns></returns>
-        public static ProcessOutput Run(this ProcessStartInfo startInfo, Action<string> dataHandler, Action<string> errorHandler = null, int timeout = 600000)
+        public static ProcessOutput Run(this ProcessStartInfo startInfo, Action<string> dataHandler, Action<string>? errorHandler = null, int timeout = 600000)
         {
             return Run(startInfo, new ProcessOutputCollector(dataHandler, errorHandler), timeout);
         }
@@ -74,7 +74,7 @@ namespace Bam
         /// <param name="output"></param>
         /// <param name="timeout"></param>
         /// <returns></returns>
-        public static ProcessOutput Run(this ProcessStartInfo startInfo, EventHandler onExit, ProcessOutputCollector output = null, int? timeout = null)
+        public static ProcessOutput Run(this ProcessStartInfo startInfo, EventHandler onExit, ProcessOutputCollector? output = null, int? timeout = null)
         {
             int exitCode = -1;
             bool timedOut = false;

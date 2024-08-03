@@ -9,7 +9,6 @@ using System.Reflection;
 using System.Xml;
 using System.Xml.Serialization;
 using Bam.CoreServices.AssemblyManagement;
-using Bam.CoreServices.AssemblyManagement;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;

@@ -10,7 +10,7 @@ namespace Bam.Data
 {
     public interface IDeleteable
     {
-        void Delete(IDatabase db = null);
+        void Delete(IDatabase? db = null);
         void WriteDelete(ISqlStringBuilder sql);
     }
 }

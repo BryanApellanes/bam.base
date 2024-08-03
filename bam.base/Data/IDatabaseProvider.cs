@@ -12,7 +12,7 @@ namespace Bam.Data
         IDatabase GetSysDatabase(string databaseName);
         IDatabase GetAppDatabaseFor(IApplicationNameProvider appNameProvider, object instance);
         IDatabase GetSysDatabaseFor(object instance);
-        IDatabase GetAppDatabaseFor(IApplicationNameProvider appNameProvider, Type objectType, string info = null);
-        IDatabase GetSysDatabaseFor(Type objectType, string info = null);
+        IDatabase GetAppDatabaseFor(IApplicationNameProvider appNameProvider, Type objectType, string? info = null);
+        IDatabase GetSysDatabaseFor(Type objectType, string? info = null);
     }
 }

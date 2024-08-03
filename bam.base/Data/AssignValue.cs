@@ -14,12 +14,12 @@ namespace Bam.Data
     /// </summary>
     public class AssignValue: IParameterInfo
     {
-        public AssignValue(string columnName, object value, Func<string, string> columnNameformatter = null)
+        public AssignValue(string columnName, object? value, Func<string, string>? columnNameFormatter = null)
         {
             this.ColumnName = columnName;
             this.Value = value;
-            this.number = new int?();
-            this.ColumnNameFormatter = columnNameformatter ?? (Func<string, string>)((c) => c);
+            this._number = new int?();
+            this.ColumnNameFormatter = columnNameFormatter ?? (Func<string, string>)((c) => c);
 			this.ParameterPrefix = "@";
         }
 
@@ -31,20 +31,20 @@ namespace Bam.Data
             set;
         }
 
-        int? number;
+        int? _number;
         public int? Number
         {
-            get => number;
-            set => number = value;
+            get => _number;
+            set => _number = value;
         }
 
         public int? SetNumber(int? value)
         {
-            number = value;
+            _number = value;
             return ++value;
         }
 
-        public object Value
+        public object? Value
         {
             get;
             set;
@@ -61,7 +61,7 @@ namespace Bam.Data
             return $"{ColumnNameFormatter(ColumnName)} {this.Operator} {ParameterPrefix}{ColumnName}{Number} ";
         }
 
-        public static IEnumerable<AssignValue> FromDynamic(dynamic obj, Func<string, string> columnNameFormatter = null)
+        public static IEnumerable<AssignValue> FromDynamic(dynamic obj, Func<string, string>? columnNameFormatter = null)
         {
             Args.ThrowIfNull(obj, "obj");
             Type type = obj.GetType();
@@ -71,7 +71,7 @@ namespace Bam.Data
             }
         }
 
-        public static IEnumerable<AssignValue> FromDictionary<TKey, TValue>(Dictionary<TKey, TValue> dictionary, Func<string, string> columnNameFormatter = null) where TKey : notnull
+        public static IEnumerable<AssignValue> FromDictionary<TKey, TValue>(Dictionary<TKey, TValue> dictionary, Func<string, string>? columnNameFormatter = null) where TKey : notnull
         {
             Args.ThrowIfNull(dictionary);
             foreach(TKey key in dictionary.Keys)

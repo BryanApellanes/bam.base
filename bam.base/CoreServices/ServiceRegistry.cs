@@ -73,7 +73,7 @@ namespace Bam.CoreServices
 
         public new static ServiceRegistry Default { get; set; }
 
-        public static Func<object> GetServiceLoader(Type type, object orDefault = null)
+        public static Func<object> GetServiceLoader(Type type, object? orDefault = null)
         {
             return GetServiceLoader(type, type.Assembly, orDefault);
         }
@@ -87,7 +87,7 @@ namespace Bam.CoreServices
         /// <param name="type">The type whose assembly is searched.</param>
         /// <param name="orDefault"></param>
         /// <returns></returns>
-        public static Func<object> GetServiceLoader(Type type, Assembly assembly, object orDefault = null)
+        public static Func<object> GetServiceLoader(Type type, Assembly assembly, object? orDefault = null)
         {
             if (Default == null)
             {

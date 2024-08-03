@@ -15,16 +15,16 @@ namespace Bam.Data
             this.Success = false;            
         }
 
-        public DatabaseInitializationResult(IDatabase db, Exception ex = null)
+        public DatabaseInitializationResult(IDatabase db, Exception? ex = null)
         {
             this.Database = db;
             this.Exception = ex;
             this.Success = ex == null;
         }
 
-        public IDatabase Database { get; private set; }
-        public Exception Exception { get; set; }
+        public IDatabase? Database { get; private set; }
+        public Exception? Exception { get; set; }
         public bool Success { get; set; }
-        public IDatabaseInitializer Initializer { get; set; }
+        public IDatabaseInitializer? Initializer { get; set; }
     }
 }

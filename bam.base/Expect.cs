@@ -16,7 +16,7 @@ namespace Bam
     {
         public static bool ShouldHtmlEncodeExceptions { get; set; }
 
-        public static void ShouldBeTrue(this bool boolToCheck, string failureMessage = null)
+        public static void ShouldBeTrue(this bool boolToCheck, string? failureMessage = null)
         {
             IsTrue(boolToCheck, failureMessage ?? "Expected <true>, Actual <false>");
         }
@@ -41,7 +41,7 @@ namespace Bam
             Expect.IsTrue(File.Exists(filePath), failureMessage);
         }
 
-        public static void ShouldBeFalse(this bool boolToCheck, string failureMessage = null)
+        public static void ShouldBeFalse(this bool boolToCheck, string? failureMessage = null)
         {
             IsFalse(boolToCheck, failureMessage);
         }
@@ -66,7 +66,7 @@ namespace Bam
             }
         }
 
-        public static T CanCast<T>(object instance, string failureMessage = null)
+        public static T CanCast<T>(object instance, string? failureMessage = null)
         {
             try
             {
@@ -87,7 +87,7 @@ namespace Bam
         /// </summary>
         /// <param name="actionThatThrowsException"></param>
         /// <param name="failureMessage"></param>
-        public static void Throws(Action actionThatThrowsException, string failureMessage = null)
+        public static void Throws(Action actionThatThrowsException, string? failureMessage = null)
         {
             Throws(actionThatThrowsException, null, failureMessage);
         }
@@ -100,7 +100,7 @@ namespace Bam
         /// <param name="actionThatThrowsException"></param>
         /// <param name="catchDelegate"></param>
         /// <param name="failureMessage"></param>
-        public static void Throws(Action actionThatThrowsException, Action<Exception> catchDelegate = null, string failureMessage = null)
+        public static void Throws(Action actionThatThrowsException, Action<Exception>? catchDelegate = null, string? failureMessage = null)
         {
             catchDelegate = catchDelegate ?? ((e) => { });
             bool thrown = false;
@@ -192,7 +192,7 @@ namespace Bam
                 throw new ExpectationFailedException(failureMessage);
         }
 
-        public static void IsLessThanOrEqualTo(int left, int right, string failureMessage = null)
+        public static void IsLessThanOrEqualTo(int left, int right, string? failureMessage = null)
         {
             if (!(left <= right))
             {
@@ -789,7 +789,7 @@ namespace Bam
             }
         }
 
-        public static void ShouldNotBeNull(this object objectToCheck, string failureMessage = null)
+        public static void ShouldNotBeNull(this object objectToCheck, string? failureMessage = null)
         {
             IsNotNull(objectToCheck, failureMessage);
         }
@@ -814,12 +814,12 @@ namespace Bam
             }
         }
 
-        public static void ShouldNotBeBlank(this string value, string failureMessage = null)
+        public static void ShouldNotBeBlank(this string value, string? failureMessage = null)
         {
             IsNotBlank(value, failureMessage);
         }
         
-        public static void IsNotBlank(this string value, string failureMessage = null)
+        public static void IsNotBlank(this string value, string? failureMessage = null)
         {
             if (string.IsNullOrEmpty(value))
             {

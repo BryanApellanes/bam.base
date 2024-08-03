@@ -12,7 +12,7 @@ namespace Bam.Data
     {
         bool AutoDeleteChildren { get; set; }
         bool AutoHydrateChildrenOnDelete { get; set; }
-        void HydrateChildren(IDatabase database = null);
+        void HydrateChildren(IDatabase? database = null);
         string[] Columns { get; }
         IDatabase Database { get; set; }
         DataRow DataRow { get; set; }
@@ -37,16 +37,16 @@ namespace Bam.Data
         event DaoDelegate BeforeWriteCommit;
         event DaoDelegate BeforeWriteDelete;
 
-        T Column<T>(string columnName, object value = null);
-        object ColumnValue(string columnName, object value = null);
-        T ColumnValue<T>(string columnName, object value = null);
+        T Column<T>(string columnName, object? value = null);
+        object ColumnValue(string columnName, object? value = null);
+        T ColumnValue<T>(string columnName, object? value = null);
         void Commit();
         void Commit(IDaoTransaction tx);
         void Commit(IDatabase db);
         void Commit(IDatabase db, bool commitChildren);
         int CompareTo(object obj);
         string ConnectionName();
-        void Delete(IDatabase database = null);
+        void Delete(IDatabase? database = null);
         DataTypes GetDataType(string columnName);
         string GetDbDataType(string columnName);
         ulong? GetDbId();
@@ -54,23 +54,23 @@ namespace Bam.Data
         TypeCode GetTypeCode(DataTypes dataTypes);
         IQueryFilter GetUniqueFilter();
         AssignValue[] GetNewAssignValues();
-        void Hydrate(IDatabase database = null);
-        void Insert(IDatabase db = null);
+        void Hydrate(IDatabase? database = null);
+        void Insert(IDatabase? db = null);
         void OnInitialize();
         void PreLoadChildCollections();
         void ResetChildren();
         void Save();
         void Save(IDatabase db);
-        Task SaveAsync(IDatabase db = null);
+        Task SaveAsync(IDatabase? db = null);
         void SetDbId(object value);
         void SetDbId(ulong? id);
         void SetUuid();
         void SetValue(string columnName, object value);
         string TableName();
-        ulong? TryGetId(Action<Exception> exceptionHandler = null);
-        void Undelete(IDatabase db = null);
-        void Undo(IDatabase db = null);
-        void Update(IDatabase db = null);
+        ulong? TryGetId(Action<Exception>? exceptionHandler = null);
+        void Undelete(IDatabase? db = null);
+        void Undo(IDatabase? db = null);
+        void Update(IDatabase? db = null);
         bool ValidateRequiredProperties(out string[] messages);
         void WriteChildDeletes(ISqlStringBuilder sql);
         void WriteCommit(ISqlStringBuilder sqlStringBuilder);

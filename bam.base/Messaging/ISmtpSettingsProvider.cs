@@ -9,7 +9,7 @@ namespace Bam.Messaging
     public interface ISmtpSettingsProvider
     {
         string SmtpSettingsVaultPath { get; set; }
-        object GetSmtpSettingsVault(string applicationName = null);
+        object GetSmtpSettingsVault(string? applicationName = null);
         /// <summary>
         /// When implemented should return
         /// an email whose smtp settings are already 
@@ -17,6 +17,6 @@ namespace Bam.Messaging
         /// implementation
         /// </summary>
         /// <returns></returns>
-        Email CreateEmail(string fromAddress = null, string fromDisplayName = null);
+        Email CreateEmail(string? fromAddress = null, string? fromDisplayName = null);
     }
 }

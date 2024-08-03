@@ -23,9 +23,9 @@ namespace Bam
             this.Data = Serialization.Serialization.Serialize(data, format);
         }
 
-        public Type Type { get; set; }
+        public Type? Type { get; set; }
 
-        public byte[] Data { get; set; }
+        public byte[]? Data { get; set; }
 
         public SerializationFormat Format { get; set; }
 
@@ -34,7 +34,7 @@ namespace Bam
             get => Data.Length;
         }
 
-        public object Deserialize() 
+        public virtual object? Deserialize() 
         {
             return Serialization.Serialization.Deserialize(this.Data, this.Type, this.Format);
         }

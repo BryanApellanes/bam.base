@@ -132,12 +132,12 @@ namespace Bam
             get { return _currentLock.DoubleCheckLock(ref _current, () => ForApplication()); }
         }
         
-        public static Workspace ForType<T>(IApplicationNameProvider applicationNameProvider = null)
+        public static Workspace ForType<T>(IApplicationNameProvider? applicationNameProvider = null)
         {
             return ForType(typeof(T), applicationNameProvider);
         }
         
-        public static Workspace ForType(Type type, IApplicationNameProvider applicationNameProvider = null)
+        public static Workspace ForType(Type type, IApplicationNameProvider? applicationNameProvider = null)
         {
             applicationNameProvider = applicationNameProvider ?? ProcessApplicationNameProvider.Current;
             Workspace applicationWorkspace = ForApplication(applicationNameProvider);
@@ -151,7 +151,7 @@ namespace Bam
             return ForApplication(ProcessApplicationNameProvider.Current);
         }
         
-        public static Workspace ForApplication(IApplicationNameProvider applicationNameProvider = null)
+        public static Workspace ForApplication(IApplicationNameProvider? applicationNameProvider = null)
         {
             applicationNameProvider = applicationNameProvider ?? ProcessApplicationNameProvider.Current;
             //Log.Trace(typeof(Workspace), "Workspace using applicationNameProvider of type ({0})", applicationNameProvider?.GetType().Name);

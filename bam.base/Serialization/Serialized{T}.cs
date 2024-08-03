@@ -23,9 +23,9 @@ namespace Bam.Serialization
         { 
         }
 
-        public T Deserialize()
+        public new T? Deserialize()
         {
-            return (T)Serialization.Deserialize(this.Data, typeof(T), this.Format);
+            return (T?)Serialization.Deserialize(this.Data, typeof(T), this.Format);
         }
     }
 }

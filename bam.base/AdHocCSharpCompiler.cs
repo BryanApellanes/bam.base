@@ -138,12 +138,12 @@ namespace Bam
             return codeProvider.CompileAssemblyFromFile(parameters, fileNames.ToArray());
         }
 
-        public static CompilerResults CompileFile(FileInfo file, string assemblyFileName, Assembly[] referenceAssemblies = null, bool executable = false)
+        public static CompilerResults CompileFile(FileInfo file, string assemblyFileName, Assembly[]? referenceAssemblies = null, bool executable = false)
         {
             return CompileFiles(new FileInfo[] { file }, assemblyFileName, referenceAssemblies, executable);
         }
 
-        public static CompilerResults CompileFiles(FileInfo[] files, string assemblyFileName, Assembly[] referenceAssemblies = null, bool executable = false)
+        public static CompilerResults CompileFiles(FileInfo[] files, string assemblyFileName, Assembly[]? referenceAssemblies = null, bool executable = false)
         {
             string[] refAssemblies = referenceAssemblies == null ? _defaultReferenceAssemblies : referenceAssemblies.Select(a => a.GetFilePath()).ToArray();
             return CompileFiles(files, assemblyFileName, refAssemblies, executable);
