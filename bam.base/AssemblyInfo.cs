@@ -1,14 +1,13 @@
 ﻿/*
-	Copyright © Bryan Apellanes 2015  
+	Copyright © Bryan Apellanes 2024  
 */
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyCopyright("Copyright © Bryan Apellanes 2023")]
+[assembly: AssemblyCopyright("Copyright © Bryan Apellanes 2024")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
