@@ -1149,7 +1149,7 @@ namespace Bam
         }
 
         /// <summary>
-        /// Returns true if the string equals "true", "t", "yes", "y" or "1" using a case
+        /// Returns true if the string equals "true", "t", "yes", "y" or "1" using a case-
         /// insensitive comparison.
         /// </summary>
         /// <param name="value"></param>
