@@ -273,6 +273,12 @@ namespace Bam
                 return string.Empty;
             }
         }
+
+        public static string SnakeCase(this string stringToSnakify, string separator = " ")
+        {
+            return PascalCase(stringToSnakify, true, separator).PascalSplit("_");
+        }
+        
         /// <summary>
         /// Splits the specified text at capital letters inserting a hyphen as a separator.
         /// </summary>
@@ -541,7 +547,7 @@ namespace Bam
         {
             FileInfo fileInfo = new FileInfo(filePath);
 
-            if (!(bool)(fileInfo.Directory?.Exists))//!Directory.Exists(fileInfo.Directory.FullName))
+            if (!(bool)(fileInfo.Directory?.Exists))
             {
                 Directory.CreateDirectory(fileInfo.Directory.FullName);
             }
@@ -549,6 +555,10 @@ namespace Bam
             if (File.Exists(fileInfo.FullName) && !overwrite)
             {
                 throw new InvalidOperationException("File already exists and 'overwrite' parameter was false");
+            }
+            else
+            {
+                File.Delete(fileInfo.FullName);
             }
 
             return fileInfo;
