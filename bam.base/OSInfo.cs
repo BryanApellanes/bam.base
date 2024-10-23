@@ -40,6 +40,8 @@ namespace Bam
         public static bool IsUnix => Current != OSNames.Windows;
         public static bool IsWindows => Current == OSNames.Windows;
 
+        public static bool IsOsX => Current == OSNames.OSX;
+        public static bool IsMac => IsOsX;
         public static string TargetFrameworkVersion => Config.Current["TargetFramework"].Or(DefaultTargetFrameworkVersion);
 
         private static readonly Dictionary<OSNames, string> _referenceRuntimeNames = new Dictionary<OSNames, string>
