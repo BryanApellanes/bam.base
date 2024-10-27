@@ -1,6 +1,7 @@
 ﻿using Bam;
 using Bam.Data.Repositories;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Bson;
 using System;
 using System.Collections;
 using System.Collections.Generic;

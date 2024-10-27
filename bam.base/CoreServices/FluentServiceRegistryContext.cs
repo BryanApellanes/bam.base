@@ -35,6 +35,14 @@ namespace Bam.CoreServices
             return Returns<T>();
         }
 
+        public ServiceRegistry Use<T>(params object[] ctorArgs)
+        {
+            object[] args = ctorArgs;
+            ServiceRegistry svcRegistry = ServiceRegistry ?? new ServiceRegistry();
+            svcRegistry.Set(typeof(I), ()=> svcRegistry.Construct(typeof(T), args));
+            return svcRegistry;
+        }
+        
         /// <summary>
         /// Specify the return type T for the specified 
         /// type I ( same as To )

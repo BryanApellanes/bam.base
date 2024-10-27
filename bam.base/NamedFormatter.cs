@@ -47,7 +47,7 @@ namespace Bam
         /// <param name="opener"></param>
         /// <param name="closer"></param>
         /// <returns></returns>
-        public static string NamedFormat(this string format, Dictionary<string, string> dataSource, string opener = "{", string closer = "}")
+        public static string NamedFormat(this string format, Dictionary<string, string?> dataSource, string opener = "{", string closer = "}")
         {
             Args.ThrowIfNull(dataSource, nameof(dataSource));
             string returnValue = format;
