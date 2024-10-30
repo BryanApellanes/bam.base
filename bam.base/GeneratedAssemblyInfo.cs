@@ -103,14 +103,8 @@ namespace Bam
 		[JsonIgnore]
 		public Assembly Assembly
 		{
-			get
-			{
-				return _assembly;
-			}
-			internal set
-			{
-				_assembly = value;
-			}
+			get => _assembly;
+			internal set => _assembly = value;
 		}
 
 		public Assembly GetAssembly()
@@ -138,24 +132,12 @@ namespace Bam
 		[XmlIgnore]
 		[YamlIgnore]
 		[JsonIgnore]
-		public string InfoFilePath
-		{
-			get
-			{
-                return new FileInfo(Path.Combine(Root, string.Format("{0}.genInfo.json", InfoFileName))).FullName;
-            }
-		}
+		public string InfoFilePath => new FileInfo(Path.Combine(Root, $"{InfoFileName}.genInfo.json")).FullName;
 
 		[XmlIgnore]
 		[YamlIgnore]
 		[JsonIgnore]
-		public bool InfoFileExists
-		{			
-			get
-			{
-				return File.Exists(InfoFilePath);
-			}
-		}
+		public bool InfoFileExists => File.Exists(InfoFilePath);
 
 		public void Save()
 		{			

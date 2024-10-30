@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Bam
 {
-    public interface IAssemblyGenerator: IWriteSource
+    public interface IAssemblyGenerator: ICodeWriter
     {
         GeneratedAssemblyInfo GenerateAssembly();
     }

@@ -18,6 +18,7 @@ namespace Bam
         /// <param name="key"></param>
         /// <param name="value"></param>
         /// <returns>true if the value was added because no value existed, false if a value with the same key is already in the dictionary.</returns>
+        [Obsolete("use TryAdd instead")]
         public static bool AddMissing<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TKey key, TValue value) where TKey : notnull
         {
             if (dictionary.TryAdd(key, value))

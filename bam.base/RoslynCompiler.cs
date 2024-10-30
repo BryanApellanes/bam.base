@@ -18,8 +18,10 @@ namespace Bam
 {
     public class RoslynCompiler : ICompiler
     {
+        private List<FileInfo> _embeddedResourceFiles;
         public RoslynCompiler()
         {
+            this._embeddedResourceFiles = new List<FileInfo>();
             OutputKind = OutputKind.DynamicallyLinkedLibrary;
             MetadataReferenceResolver = new AggregateMetadataReferenceResolver
                 (
@@ -37,6 +39,11 @@ namespace Bam
 
         public OutputKind OutputKind { get; set; }
 
+        public void AddEmbeddedResourceFile(FileInfo file)
+        {
+            this._embeddedResourceFiles.Add(file);
+        }
+        
         public void AddMetadataReferenceResolver(IMetadataReferenceResolver resolver)
         {
             this.MetadataReferenceResolver.Resolvers.Add(resolver);
@@ -104,7 +111,18 @@ namespace Bam
 
         public byte[] Compile(string assemblyName, Func<MetadataReference[]>? getMetaDataReferences, params SyntaxTree[] syntaxTrees)
         {
+            return Compile(
+                assemblyName,
+                getMetaDataReferences,
+                () => this._embeddedResourceFiles.Select(fileInfo => new ResourceDescription(fileInfo.Name, () => File.OpenRead(fileInfo.FullName), true)),
+                syntaxTrees);
+        }
+        
+        public byte[] Compile(string assemblyName, Func<MetadataReference[]>? getMetaDataReferences, Func<IEnumerable<ResourceDescription>?>? embeddedResourceProvider, params SyntaxTree[] syntaxTrees)
+        {
             getMetaDataReferences = getMetaDataReferences ?? GetMetadataReferences;
+            embeddedResourceProvider = embeddedResourceProvider ?? (() => null);
+            
             MetadataReference[] metaDataReferences = getMetaDataReferences();
             CSharpCompilation compilation = CSharpCompilation.Create(assemblyName)
                 .WithOptions(new CSharpCompilationOptions(this.OutputKind))
@@ -113,39 +131,12 @@ namespace Bam
             
             using(MemoryStream stream = new MemoryStream())
             {
-                EmitResult compileResult = compilation.Emit(stream); 
+                EmitResult compileResult = compilation.Emit(stream, manifestResources: embeddedResourceProvider()); 
                 if (!compileResult.Success)
                 {
                     throw new RoslynCompilationException(compileResult.Diagnostics);
                 }
                 return stream.GetBuffer();
-            }
-        }
-
-        static Assembly[] _defaultAssembliesToReference = new Assembly[] { };
-        public static Assembly[] DefaultAssembliesToReference
-        {
-            get
-            {
-                if (_defaultAssembliesToReference.Length == 0)
-                {
-                    HashSet<Assembly> defaultAssemblies = new HashSet<Assembly>
-                    {
-                        typeof(DynamicObject).Assembly,
-                        typeof(XmlDocument).Assembly,
-                        typeof(DataTable).Assembly,
-                        typeof(object).Assembly,
-                        typeof(JsonWriter).Assembly,
-                        typeof(Enumerable).Assembly,
-                        typeof(MarshalByValueComponent).Assembly,
-                        typeof(IComponent).Assembly,
-                        typeof(IServiceProvider).Assembly,
-                        Assembly.GetExecutingAssembly()
-                    };
-                    _defaultAssembliesToReference = defaultAssemblies.ToArray();
-                }
-                
-                return _defaultAssembliesToReference;
             }
         }
 

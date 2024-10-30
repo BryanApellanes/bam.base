@@ -14,33 +14,9 @@ namespace Bam
 {
     public static class RuntimeSettings
     {
-        static RuntimeConfig _runtimeConfig;
-        static object _runtimeConfigLock = new object();
-        public static RuntimeConfig GetRuntimeConfig()
-        {
-            return _runtimeConfigLock.DoubleCheckLock(ref _runtimeConfig, () =>
-            {
-                FileInfo runtimeConfigFile = new FileInfo(Path.Combine(BamDir, GetOsAlias(), RuntimeConfig.File));
-                if (runtimeConfigFile.Exists)
-                {
-                    return runtimeConfigFile.FromYamlFile<RuntimeConfig>();
-                }
-
-                RuntimeConfig config = new RuntimeConfig
-                {
-                    ReferenceAssemblies = GetReferenceAssembliesDirectory(),
-                    GenDir = GetGenDir(),
-                    BamProfileDir = BamProfileDir,
-                    BamDir = BamDir,
-                    ProcessProfileDir = ProcessProfileDir
-                };
-                config.ToYamlFile(runtimeConfigFile);
-                _runtimeConfig = config;
-
-                return _runtimeConfig;
-            }); 
-        }
-
+        static RuntimeConfig? _runtimeConfig;
+        static readonly object _runtimeConfigLock = new object();
+        
         static string _processDataFolder;
         static readonly object _processDataFolderLock = new object();
 
@@ -153,8 +129,13 @@ namespace Bam
             string version = GetLatestInstalledDotNetVersion(osName);
             string refRoot = Path.Join(root, version, "ref");
             DirectoryInfo refRootDirectory = new DirectoryInfo(refRoot);
-            string subFolder = refRootDirectory.GetDirectories().First().Name;
-            return Path.Join(refRoot, subFolder);
+            if (refRootDirectory.Exists)
+            {
+                string subFolder = refRootDirectory.GetDirectories().First().Name;
+                return Path.Join(refRoot, subFolder);
+            }
+
+            return string.Empty;
         }
 
         public static string GetLatestInstalledDotNetVersion()
@@ -170,15 +151,25 @@ namespace Bam
         private static string GetLatestInstalledDotNetVersion(OSNames osName)
         {
             string[] versions = GetInstalledDotNetVersions(osName);
-            return versions[versions.Length - 1];
+            if (versions.Length > 0)
+            {
+                return versions[versions.Length - 1];  
+            }
+
+            return string.Empty;
         }
 
         private static string[] GetInstalledDotNetVersions(OSNames osName)
         {
             DirectoryInfo root = new DirectoryInfo(_referenceAssemblyRootDirectories[osName]);
-            List<string> versions = root.GetDirectories().Select(d => d.Name).ToList();
-            versions.Sort();
-            return versions.ToArray();
+            if (root.Exists)
+            {
+                List<string> versions = root.GetDirectories().Select(d => d.Name).ToList();
+                versions.Sort();
+                return versions.ToArray();
+            }
+
+            return new string[] { };
         }
 
         /// <summary>

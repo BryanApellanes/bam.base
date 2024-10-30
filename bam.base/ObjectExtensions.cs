@@ -522,7 +522,7 @@ namespace Bam
         /// <param name="val"></param>
         /// <param name="conf"></param>
         /// <returns></returns>
-        public static string ToYaml(this object val)
+        public static string ToYaml(this object? val)
         {
             Serializer serializer = new Serializer();
             return serializer.Serialize(val);
@@ -533,7 +533,7 @@ namespace Bam
             val.ToYamlFile(new FileInfo(path));
         }
 
-        public static void ToYamlFile(this object val, FileInfo file)
+        public static void ToYamlFile(this object? val, FileInfo file)
         {
             if (!file.Directory.Exists)
             {

@@ -17,7 +17,7 @@ namespace Bam.Configuration
     /// <summary>
     /// A simple wrapper around the ConfigurationManager that simplifies
     /// configuration information access and enables programmatic
-    /// manipulation of configuration values
+    /// manipulation of configuration values.
     /// </summary>
     public static class DefaultConfiguration
     {

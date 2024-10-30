@@ -9,8 +9,8 @@ namespace Bam
 {
     public class OSInfo
     {
-        public const string DefaultTargetFrameworkVersion = "7.0.10";
-        public const string DefaultLibSubfolder = "net7";
+        public const string DefaultTargetFrameworkVersion = "8.0.5";
+        public const string DefaultLibSubfolder = "net8";
         
         static OSNames _current;
         public static OSNames Current

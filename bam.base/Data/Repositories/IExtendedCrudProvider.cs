@@ -10,7 +10,7 @@ namespace Bam.Data.Repositories
         bool Delete<T>(T toDelete) where T : new();
         IEnumerable<object> Query(Type type, IQueryFilter query);
         IEnumerable<T> Query<T>(IQueryFilter query) where T : class, new();
-        T Retrieve<T>(string uuid) where T : class, new();
+        T? Retrieve<T>(string uuid) where T : class, new();
         object? Retrieve(Type objectType, long id);
         object? Retrieve(Type objectType, ulong id);
         T? Retrieve<T>(long id) where T : class, new();

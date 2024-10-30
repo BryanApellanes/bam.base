@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace Bam
 {
-    public interface IWriteSource
+    public interface ICodeWriter
     {
         void WriteSource(string writeSourceToDir);
     }

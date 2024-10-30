@@ -61,7 +61,7 @@ namespace Bam
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public static string GetBamVariable(string name)
+        public static string? GetBamVariable(string name)
         {
             return Get($"BAM_{name}");
         }
@@ -76,7 +76,7 @@ namespace Bam
         /// </summary>
         /// <param name="name">The name of the en</param>
         /// <returns></returns>
-        public static string Get(string name)
+        public static string? Get(string name)
         {
             return Environment.GetEnvironmentVariable(name);
         }
