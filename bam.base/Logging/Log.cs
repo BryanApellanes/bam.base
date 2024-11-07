@@ -44,13 +44,13 @@ namespace Bam.Logging
             set => _trace = value;
         }
 
-        static ILogger _defaultLogger;
-		static readonly object _defaultLoggerLock = new object();
+        static ILogger? _defaultLogger;
+        private static readonly object _defaultLoggerLock = new object();
         /// <summary>
         /// Gets or sets the default logger.  Default is determined by the configuration 
         /// file.
         /// </summary>
-        public static ILogger Default
+        public static ILogger? Default
         {
             get => _defaultLoggerLock.DoubleCheckLock(ref _defaultLogger, GetDefaultLogger);
             set

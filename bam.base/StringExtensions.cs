@@ -274,6 +274,13 @@ namespace Bam
             }
         }
 
+        /// <summary>
+        /// Converts the string to pascal case using the specified separator then splits the
+        /// result at capital letters inserting an underscore as a separator.
+        /// </summary>
+        /// <param name="stringToSnakify"></param>
+        /// <param name="separator"></param>
+        /// <returns></returns>
         public static string SnakeCase(this string stringToSnakify, string separator = " ")
         {
             return PascalCase(stringToSnakify, true, separator).PascalSplit("_");
