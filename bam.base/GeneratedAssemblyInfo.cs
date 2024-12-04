@@ -37,19 +37,6 @@ namespace Bam
 			InfoFileName = infoFileName;
 		}
 
-        public GeneratedAssemblyInfo(string infoFileName, CompilerResults compilerResults)
-            : this(infoFileName)
-        {
-            if (compilerResults.Errors != null &&
-                compilerResults.Errors.Count > 0)
-            {
-                throw new CompilationException(compilerResults);
-            }
-
-            AssemblyFilePath = new FileInfo(compilerResults.PathToAssembly).FullName;
-            Assembly = compilerResults.CompiledAssembly;
-        }
-
         public GeneratedAssemblyInfo(string infoFileName, Assembly assembly, byte[]? bytes = null) : this()
         {
 	        InfoFileName = infoFileName;
@@ -146,7 +133,7 @@ namespace Bam
         
         /// <summary>
         /// Get the generated assembly for the specified fileName using the
-        /// specified generator to generate it if necessary
+        /// specified generator to generate it if necessary.
         /// </summary>
         /// <param name="infoFileName"></param>
         /// <param name="generator"></param>

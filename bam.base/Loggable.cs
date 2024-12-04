@@ -46,7 +46,7 @@ namespace Bam.Logging
         public Func<string> IdentifierTag { get; set; }
 
         /// <summary>
-        /// A value from 0 - 5, represented by the LogEventType enum.
+        /// A value from 0 to 5, represented by the LogEventType enum.
         /// The higher the value the more log entries are logged.
         /// </summary>
         public VerbosityLevel LogVerbosity { get; set; }
@@ -140,7 +140,7 @@ namespace Bam.Logging
                         {
                             // TODO: review this to determine how to properly handle generic EventHandler<TEventArgs>
                             if (eventInfo.EventHandlerType == typeof(EventHandler))
-                            {
+                            {       
                                 eventInfo.AddEventHandler(this, (EventHandler)((s, a) =>
                                 {
                                     if (a is MessageEventArgs messageEventArgs)

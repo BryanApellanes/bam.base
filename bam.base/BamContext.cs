@@ -21,10 +21,7 @@ namespace Bam
         readonly object _serviceRegistryLock = new object();
         public virtual ServiceRegistry ServiceRegistry
         {
-            get
-            {
-                return _serviceRegistryLock.DoubleCheckLock(ref _serviceRegistry, GetDefaultContextServiceRegistry);
-            }
+            get => _serviceRegistryLock.DoubleCheckLock(ref _serviceRegistry, GetDefaultContextServiceRegistry);
             set => _serviceRegistry = value;
         }
 
@@ -33,9 +30,9 @@ namespace Bam
             return GetServiceRegistry();
         }
 
-        static BamContext _current;
-        static object _currentLock = new object();
-        public static BamContext Current
+        static BamContext? _current;
+        static readonly object _currentLock = new object();
+        public static BamContext? Current
         {
             get
             {
@@ -43,38 +40,20 @@ namespace Bam
             }
         }
 
-        public virtual IApplicationNameProvider ApplicationNameProvider
-        {
-            get
-            {
-                return ServiceRegistry.Get<IApplicationNameProvider>();
-            }
-        }
+        public virtual IApplicationNameProvider ApplicationNameProvider => ServiceRegistry.Get<IApplicationNameProvider>();
 
-        public virtual IConfigurationProvider ConfigurationProvider
-        {
-            get
-            {
-                return ServiceRegistry.Get<IConfigurationProvider>();
-            }
-        }
+        public virtual IConfigurationProvider ConfigurationProvider => ServiceRegistry.Get<IConfigurationProvider>();
 
-        public virtual ILogger Logger
-        {
-            get
-            {
-                return ServiceRegistry.Get<ILogger>();
-            }
-        }
+        public virtual ILogger Logger => ServiceRegistry.Get<ILogger>();
 
-        public static ProcessModeServiceRegistry GetServiceRegistry()
+        public static ProcessModeServiceRegistry? GetServiceRegistry()
         {
             return GetServiceRegistry(ProcessMode.Current);
         }
 
-        public static ProcessModeServiceRegistry GetServiceRegistry(ProcessMode processMode)
+        public static ProcessModeServiceRegistry? GetServiceRegistry(ProcessMode processMode)
         {
-            return Current.registryConfigurers[processMode.Mode];
+            return Current?.registryConfigurers[processMode.Mode];
         }
 
         Dictionary<ProcessModes, ProcessModeServiceRegistry> registryConfigurers = new Dictionary<ProcessModes, ProcessModeServiceRegistry>

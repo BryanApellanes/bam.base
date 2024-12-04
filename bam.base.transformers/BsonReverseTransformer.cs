@@ -7,7 +7,7 @@ namespace Bam
 {
     public class BsonReverseTransformer<TData> : IValueReverseTransformer<byte[], TData>
     {
-        public TData ReverseTransform(byte[] encoded)
+        public TData? ReverseTransform(byte[] encoded)
         {
             return encoded.FromBson<TData>();
         }

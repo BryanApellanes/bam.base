@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -14,6 +15,19 @@ namespace Bam
             List<FileInfo> results = new List<FileInfo>();
             searchPatterns.Each(spattern => { results.AddRange(parent.GetFiles(spattern, option)); });
             return results.ToArray();
+        }
+
+        public static Assembly ToAssembly(this DirectoryInfo directory, string assemblyFileName, out byte[] bytes, params string[] referenceAssemblies)
+        {
+            RoslynCompiler compiler = new RoslynCompiler();
+            compiler.AddReferenceAssemblies(referenceAssemblies);
+            bytes = compiler.CompileDirectories(assemblyFileName, directory);
+            return Assembly.Load(bytes);
+        }
+        
+        public static Assembly ToAssembly(this DirectoryInfo directory, string assemblyFileName, params string[] referenceAssemblies)
+        {
+            return ToAssembly(directory, assemblyFileName, out _, referenceAssemblies);
         }
     }
 }

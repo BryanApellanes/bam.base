@@ -23,10 +23,12 @@ namespace Bam
         {
             this._embeddedResourceFiles = new List<FileInfo>();
             OutputKind = OutputKind.DynamicallyLinkedLibrary;
+            AssemblyPathMetadataReferenceResolver = new AssemblyPathMetadataReferenceResolver();
             MetadataReferenceResolver = new AggregateMetadataReferenceResolver
                 (
                     new DefaultMetadataReferenceResolver(),
-                    new ReferencedAssemblyMetadataReferenceResolver()
+                    new ReferencedAssemblyMetadataReferenceResolver(),
+                    AssemblyPathMetadataReferenceResolver
                 );
         }
 
@@ -35,6 +37,7 @@ namespace Bam
             MetadataReferenceResolver.Resolvers.Add(metadataReferenceResolver);
         }
 
+        protected AssemblyPathMetadataReferenceResolver AssemblyPathMetadataReferenceResolver { get; }
         public AggregateMetadataReferenceResolver MetadataReferenceResolver { get; set; }
 
         public OutputKind OutputKind { get; set; }
@@ -42,6 +45,19 @@ namespace Bam
         public void AddEmbeddedResourceFile(FileInfo file)
         {
             this._embeddedResourceFiles.Add(file);
+        }
+
+        public void AddReferenceAssembly(string path)
+        {
+            AssemblyPathMetadataReferenceResolver.AddAssembly(path);
+        }
+
+        public void AddReferenceAssemblies(params string[] paths)
+        {
+            foreach (string path in paths)
+            {
+                AddReferenceAssembly(path);
+            }
         }
         
         public void AddMetadataReferenceResolver(IMetadataReferenceResolver resolver)

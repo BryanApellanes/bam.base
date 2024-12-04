@@ -17,7 +17,7 @@ public static class ObjectExtensions
         return memoryStream.ToArray();
     }
     
-    public static T FromBson<T>(this byte[] data)
+    public static T? FromBson<T>(this byte[] data)
     {
         MemoryStream memoryStream = new MemoryStream(data);
         using(BsonDataReader reader = new BsonDataReader(memoryStream))

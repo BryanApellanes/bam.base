@@ -11,7 +11,7 @@ namespace Bam
     /// <summary>
     /// Determines whether generated JavaScript methods 
     /// will be camel case (camel has his head down; first letter lowercase)
-    /// or pascal case 
+    /// or pascal case. 
     /// </summary>
     public enum MethodCase
     {

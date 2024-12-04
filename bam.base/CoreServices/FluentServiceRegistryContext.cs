@@ -65,6 +65,10 @@ namespace Bam.CoreServices
 
         public ServiceRegistry UseSingleton<T>(T instance)
         {
+            if (instance == null)
+            {
+                throw new ArgumentNullException(nameof(instance));
+            }
             ServiceRegistry svcRegistry = ServiceRegistry ?? new ServiceRegistry();
             svcRegistry.Set(typeof(I), instance);
             return svcRegistry;
@@ -94,9 +98,10 @@ namespace Bam.CoreServices
 
         public ServiceRegistry Returns<T>(Func<ServiceRegistry, T> instanciator)
         {
-            ServiceRegistry inc = ServiceRegistry ?? new ServiceRegistry();
-            inc.Set(typeof(I), () => instanciator(inc));
-            return inc;
+            ServiceRegistry svcRegistry = ServiceRegistry ?? new ServiceRegistry();
+            T UseThis() => instanciator(svcRegistry); // local function
+            svcRegistry.Set(typeof(I), (Func<T>)UseThis);
+            return svcRegistry;
         }
 
         /// <summary>

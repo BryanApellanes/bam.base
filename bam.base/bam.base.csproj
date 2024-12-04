@@ -35,4 +35,10 @@
     <PackageReference Include="YUICompressor.NET" Version="3.1.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="_partial\AdHocCSharpCompiler.cs" />
+    <Compile Remove="AdHocCSharpCompiler.cs" />
+    <Compile Remove="CompilationException.cs" />
+  </ItemGroup>
+
 </Project>

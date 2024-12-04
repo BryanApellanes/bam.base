@@ -8,6 +8,6 @@ namespace Bam
     {
         IValueTransformer<TReversed, TTransformed> GetTransformer();
 
-        TReversed ReverseTransform(TTransformed transformed);
+        TReversed? ReverseTransform(TTransformed transformed);
     }
 }

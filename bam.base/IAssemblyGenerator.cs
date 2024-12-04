@@ -11,6 +11,6 @@ namespace Bam
 {
     public interface IAssemblyGenerator: ICodeWriter
     {
-        GeneratedAssemblyInfo GenerateAssembly();
+        GeneratedAssemblyInfo? GenerateAssembly();
     }
 }

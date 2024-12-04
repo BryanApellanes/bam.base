@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Bam
 {
-    public static partial class HashExtensions
+    public static class HashExtensions
     {
         static Dictionary<HashAlgorithms, Func<byte[], HMAC>> _hmacs;
         static readonly object _hmacsLock = new object();
@@ -23,11 +23,11 @@ namespace Bam
             {
                 return _hmacsLock.DoubleCheckLock(ref _hmacs, () => new Dictionary<HashAlgorithms, Func<byte[], HMAC>>
                 {
-                    {Bam.HashAlgorithms.MD5, (byte[] key) => new HMACMD5(key) },
-                    {Bam.HashAlgorithms.SHA1, (byte[] key) => new HMACSHA1(key) },
-                    {Bam.HashAlgorithms.SHA256, (byte[] key) => new HMACSHA256(key) },
-                    {Bam.HashAlgorithms.SHA384, (byte[] key) => new HMACSHA384(key) },
-                    {Bam.HashAlgorithms.SHA512, (byte[] key) => new HMACSHA512(key) }
+                    {Bam.HashAlgorithms.MD5, key => new HMACMD5(key) },
+                    {Bam.HashAlgorithms.SHA1, key => new HMACSHA1(key) },
+                    {Bam.HashAlgorithms.SHA256, key => new HMACSHA256(key) },
+                    {Bam.HashAlgorithms.SHA384, key => new HMACSHA384(key) },
+                    {Bam.HashAlgorithms.SHA512, key => new HMACSHA512(key) }
                 });
             }
         }
@@ -40,11 +40,11 @@ namespace Bam
             {
                 return _hashAlgorithmLock.DoubleCheckLock(ref _hashAlgorithms, () => new Dictionary<HashAlgorithms, Func<HashAlgorithm>>
                 {
-                    { Bam.HashAlgorithms.MD5, () => MD5.Create() },
-                    { Bam.HashAlgorithms.SHA1, () => SHA1.Create() },
-                    { Bam.HashAlgorithms.SHA256, () => SHA256.Create() },
-                    { Bam.HashAlgorithms.SHA384, () => SHA384.Create() },
-                    { Bam.HashAlgorithms.SHA512, () => SHA512.Create() }
+                    { Bam.HashAlgorithms.MD5, MD5.Create },
+                    { Bam.HashAlgorithms.SHA1, SHA1.Create },
+                    { Bam.HashAlgorithms.SHA256, SHA256.Create },
+                    { Bam.HashAlgorithms.SHA384, SHA384.Create },
+                    { Bam.HashAlgorithms.SHA512, SHA512.Create }
                 });
             }
         }
@@ -193,9 +193,9 @@ namespace Bam
             return HmacBytes(toValidate, key, algorithm, encoding).ToBase64UrlEncoded();
         }
         
-        public static byte[] HmacBytes(string toValidate, string key, HashAlgorithms algorithm, Encoding encoding)
+        public static byte[] HmacBytes(string toValidate, string key, HashAlgorithms algorithm, Encoding? encoding)
         {
-            encoding = encoding ?? Encoding.UTF8;
+            encoding ??= Encoding.UTF8;
             HMAC hmac = Hmacs[algorithm](encoding.GetBytes(key));
             byte[] bytes = hmac.ComputeHash(encoding.GetBytes(toValidate));
             return bytes;
@@ -203,7 +203,7 @@ namespace Bam
 
         public static string HashHexString(this string toBeHashed, HashAlgorithms algorithm, Encoding? encoding = null)
         {
-            encoding = encoding ?? Encoding.UTF8;
+            encoding ??= Encoding.UTF8;
             byte[] bytes = encoding.GetBytes(toBeHashed);
 
             return HashHexString(bytes, algorithm);

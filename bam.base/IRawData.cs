@@ -14,4 +14,5 @@ public interface IRawData
     string HashHexString { get; }
     byte[] Hash { get; }
     byte[] Value { get; }
+    
 }

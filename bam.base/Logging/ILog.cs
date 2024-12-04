@@ -11,6 +11,6 @@ namespace Bam.Logging
         void Info(string messageSignature, params object[] args);
         void Warning(string messageSignature, params object[] args);
         void Error(string messageSignature, params object[] args);
-        void Error(string messageSignature, Exception ex, params object[] args);
+        void Error(string messageSignature, Exception? ex, params object[] args);
     }
 }

@@ -68,8 +68,8 @@ namespace Bam.Incubation
         /// </summary>
         /// <param name="dependencyProvider">The dependencyProvider to copy from</param>
         /// <param name="overwrite">If true, values in the current dependencyProvider
-        /// will be over written by values of the same types from the specified
-        /// dependencyProvider otherwise the current value will be kept</param>
+        /// will be overwritten by values of the same types from the specified
+        /// dependencyProvider otherwise the current value is kept.</param>
         public void CombineWith(DependencyProvider dependencyProvider, bool overwrite = true)
         {
             CopyFrom(dependencyProvider, overwrite);

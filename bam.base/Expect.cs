@@ -407,8 +407,7 @@ namespace Bam
             {
                 if (string.IsNullOrEmpty(failureMessage))
                     throw new ExpectationFailedException(typeof(T), objectToCheck, ShouldHtmlEncodeExceptions);
-                else
-                    throw new ExpectationFailedException(failureMessage);
+                throw new ExpectationFailedException(failureMessage);
             }
         }
 
@@ -426,10 +425,8 @@ namespace Bam
                 {
                     throw new ExpectationFailedException(typeof(T), objectToCheck, ShouldHtmlEncodeExceptions);
                 }
-                else
-                {
-                    throw new ExpectationFailedException(failureMessage);
-                }
+
+                throw new ExpectationFailedException(failureMessage);
             }
         }
 
@@ -459,8 +456,7 @@ namespace Bam
             {
                 if (string.IsNullOrEmpty(failureMessage))
                     throw new ExpectationFailedException("null or empty string", stringToCheck);
-                else
-                    throw new ExpectationFailedException(failureMessage);
+                throw new ExpectationFailedException(failureMessage);
             }
         }
 
@@ -475,8 +471,7 @@ namespace Bam
             {
                 if (string.IsNullOrEmpty(failureMessage))
                     throw new ExpectationFailedException("string with value", "null or empty string");
-                else
-                    throw new ExpectationFailedException(failureMessage);
+                throw new ExpectationFailedException(failureMessage);
             }
         }
 
@@ -509,10 +504,8 @@ namespace Bam
                 {
                     throw new ExpectationFailedException(message);
                 }
-                else
-                {
-                    throw new ExpectationFailedException($"value ({valueToCheck}) is not greater than ({valueToCompareTo})");
-                }
+
+                throw new ExpectationFailedException($"value ({valueToCheck}) is not greater than ({valueToCompareTo})");
             }            
         }
 
@@ -524,10 +517,8 @@ namespace Bam
                 {
                     throw new ExpectationFailedException(message);
                 }
-                else
-                {
-                    throw new ExpectationFailedException($"value ({valueToCheck}) is not greater than ({valueToCompareTo})");
-                }
+
+                throw new ExpectationFailedException($"value ({valueToCheck}) is not greater than ({valueToCompareTo})");
             }
         }
 
@@ -539,10 +530,8 @@ namespace Bam
                 {
                     throw new ExpectationFailedException(message);
                 }
-                else
-                {
-                    throw new ExpectationFailedException($"value ({valueToCheck}) is not greater than ({valueToCompareTo})");
-                }
+
+                throw new ExpectationFailedException($"value ({valueToCheck}) is not greater than ({valueToCompareTo})");
             }
         }
 
@@ -554,10 +543,8 @@ namespace Bam
                 {
                     throw new ExpectationFailedException(message);
                 }
-                else
-                {
-                    throw new ExpectationFailedException($"value ({valueToCheck}) is not greater than ({valueToCompareTo})");
-                }
+
+                throw new ExpectationFailedException($"value ({valueToCheck}) is not greater than ({valueToCompareTo})");
             }
         }
 
@@ -569,10 +556,8 @@ namespace Bam
                 {
                     throw new ExpectationFailedException(message);
                 }
-                else
-                {
-                    throw new ExpectationFailedException($"value ({valueToCheck}) is not greater than ({valueToCompareTo})");
-                }
+
+                throw new ExpectationFailedException($"value ({valueToCheck}) is not greater than ({valueToCompareTo})");
             }
         }
 
@@ -584,10 +569,8 @@ namespace Bam
                 {
                     throw new ExpectationFailedException(message);
                 }
-                else
-                {
-                    throw new ExpectationFailedException($"value ({valueToCheck}) is not greater than ({valueToCompareTo})");
-                }
+
+                throw new ExpectationFailedException($"value ({valueToCheck}) is not greater than ({valueToCompareTo})");
             }
         }
 
@@ -599,10 +582,8 @@ namespace Bam
                 {
                     throw new ExpectationFailedException(message);
                 }
-                else
-                {
-                    throw new ExpectationFailedException($"value ({valueToCheck}) is not greater than ({valueToCompareTo})");
-                }
+
+                throw new ExpectationFailedException($"value ({valueToCheck}) is not greater than ({valueToCompareTo})");
             }
         }
 
@@ -614,10 +595,8 @@ namespace Bam
                 {
                     throw new ExpectationFailedException(message);
                 }
-                else
-                {
-                    throw new ExpectationFailedException($"value ({valueToCheck}) is not greater than ({valueToCompareTo})");
-                }
+
+                throw new ExpectationFailedException($"value ({valueToCheck}) is not greater than ({valueToCompareTo})");
             }
         }
         
@@ -647,10 +626,8 @@ namespace Bam
                 {
                     throw new ExpectationFailedException(failureMessage);
                 }
-                else
-                {
-                    throw new ExpectationFailedException($"Expected \r\n\r\n{objectToCheck?.ToString()}\r\n\r\n to equal\r\n\r\n{compareTo?.ToString()}");
-                }
+
+                throw new ExpectationFailedException($"Expected \r\n\r\n{objectToCheck?.ToString()}\r\n\r\n to equal\r\n\r\n{compareTo?.ToString()}");
             }
         }
 
@@ -667,10 +644,8 @@ namespace Bam
                 {
                     throw new ExpectationFailedException(failureMessage);
                 }
-                else
-                {
-                    throw new ExpectationFailedException($"Expected {objectToCheck?.ToString()}.Equals({compareTo?.ToString()}) to be false");
-                }
+
+                throw new ExpectationFailedException($"Expected {objectToCheck?.ToString()}.Equals({compareTo?.ToString()}) to be false");
             }
         }
 
@@ -715,10 +690,8 @@ namespace Bam
                 {
                     throw new ExpectationFailedException(failureMessage);
                 }
-                else
-                {
-                    throw new ExpectationFailedException($"Expected {objectToCheck?.ToString()} == {compareTo?.ToString()}");
-                }
+
+                throw new ExpectationFailedException($"Expected {objectToCheck?.ToString()} == {compareTo?.ToString()}");
             }
         }
 
@@ -730,10 +703,8 @@ namespace Bam
                 {
                     throw new ExpectationFailedException(failureMessage);
                 }
-                else
-                {
-                    throw new ExpectationFailedException($"Expected {objectToCheck?.ToString()} != {compareTo?.ToString()}");
-                }
+
+                throw new ExpectationFailedException($"Expected {objectToCheck?.ToString()} != {compareTo?.ToString()}");
             }
         }
 
@@ -750,10 +721,8 @@ namespace Bam
                 {
                     throw new ExpectationFailedException(failureMessage);
                 }
-                else
-                {
-                    throw new ExpectationFailedException("true", "false");
-                }
+
+                throw new ExpectationFailedException("true", "false");
             }
         }
         
@@ -781,11 +750,9 @@ namespace Bam
                 {
                     throw new ExpectationFailedException(failureMessage);
                 }
-                else
-                {
-                    throw new ExpectationFailedException("null", objectToCheck.GetType().Name,
-                        ShouldHtmlEncodeExceptions);
-                }
+
+                throw new ExpectationFailedException("null", objectToCheck.GetType().Name,
+                    ShouldHtmlEncodeExceptions);
             }
         }
 
@@ -807,10 +774,8 @@ namespace Bam
                 {
                     throw new ExpectationFailedException(failureMessage);
                 }
-                else
-                {
-                    throw new ExpectationFailedException("object", "null", ShouldHtmlEncodeExceptions);
-                }
+
+                throw new ExpectationFailedException("object", "null", ShouldHtmlEncodeExceptions);
             }
         }
 
@@ -827,10 +792,8 @@ namespace Bam
                 {
                     throw new ExpectationFailedException(failureMessage);
                 }
-                else
-                {
-                    throw new ExpectationFailedException("any value", "[blank]");
-                }
+
+                throw new ExpectationFailedException("any value", "[blank]");
             }
         }
         

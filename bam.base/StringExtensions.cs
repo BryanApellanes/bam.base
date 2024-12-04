@@ -294,6 +294,11 @@ namespace Bam
             return PascalSplit(stringToKabobify, "-");
         }
 
+        public static string PascalSplit(this string stringToPascalSplit, char separator)
+        {
+            return PascalSplit(stringToPascalSplit, separator.ToString());
+        }
+        
         /// <summary>
         /// Splits the specified text at capital letters inserting the specified separator.
         /// </summary>
@@ -533,6 +538,7 @@ namespace Bam
         /// <typeparam name="T">The type of objects in the specified array</typeparam>
         /// <param name="objectsToStringify">The objects</param>
         /// <param name="toDelimiteder">The ToDelimitedDelegate used to represent each object</param>
+        /// <param name="delimiter"></param>
         /// <returns>string</returns>
         public static string ToDelimited<T>(this T[] objectsToStringify, ToDelimitedDelegate<T> toDelimiteder, string delimiter)
         {

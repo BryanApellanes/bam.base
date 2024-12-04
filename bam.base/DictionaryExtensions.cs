@@ -21,12 +21,7 @@ namespace Bam
         [Obsolete("use TryAdd instead")]
         public static bool AddMissing<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TKey key, TValue value) where TKey : notnull
         {
-            if (dictionary.TryAdd(key, value))
-            {
-                return true;
-            }
-
-            return false;
+            return dictionary.TryAdd(key, value);
         }
 
 

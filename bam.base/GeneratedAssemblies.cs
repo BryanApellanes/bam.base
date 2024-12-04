@@ -14,8 +14,8 @@ namespace Bam
 {
 	public static class GeneratedAssemblies
 	{
-		static Dictionary<string, GeneratedAssemblyInfo> _generatedAssemblies = new Dictionary<string, GeneratedAssemblyInfo>();
-		public static GeneratedAssemblyInfo GetGeneratedAssemblyInfo(string name)
+		static readonly Dictionary<string, GeneratedAssemblyInfo> _generatedAssemblies = new Dictionary<string, GeneratedAssemblyInfo>();
+		public static GeneratedAssemblyInfo? GetGeneratedAssemblyInfo(string name)
 		{
 			if (_generatedAssemblies.ContainsKey(name))
 			{

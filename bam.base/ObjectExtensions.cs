@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
+using YamlDotNet.Core;
 using YamlDotNet.Serialization;
 
 namespace Bam
@@ -343,13 +344,14 @@ namespace Bam
         /// <param name="file"></param>
         public static void ToJsonFile(this object value, FileInfo file)
         {
-            if (!file.Directory.Exists)
+            if (file.Directory != null && !file.Directory.Exists)
             {
                 file.Directory.Create();
             }
 
             value.ToJson(Newtonsoft.Json.Formatting.Indented).SafeWriteToFile(file.FullName, true);
         }
+        
         public static string ToJson(this object value, Newtonsoft.Json.Formatting formatting)
         {
             return JsonConvert.SerializeObject(value, formatting);
@@ -525,7 +527,10 @@ namespace Bam
         public static string ToYaml(this object? val)
         {
             Serializer serializer = new Serializer();
-            return serializer.Serialize(val);
+            StringWriter sw = new StringWriter();
+            EmitterSettings emitterSettings = new EmitterSettings(2, int.MaxValue, false, 1024, false, true);
+            serializer.Serialize(new Emitter(sw, emitterSettings), val);
+            return sw.ToString();
         }
 
         public static void ToYamlFile(this object val, string path)

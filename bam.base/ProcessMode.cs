@@ -50,7 +50,7 @@ namespace Bam
                 if (_current == null)
                 {
                     string processModeArg = Environment.GetCommandLineArgs()
-                        .FirstOrDefault(a => a.StartsWith("/ProcessMode"));
+                        .FirstOrDefault(a => a.StartsWith("--ProcessMode"));
                     if (!string.IsNullOrEmpty(processModeArg))
                     {
                         string[] split = processModeArg.DelimitSplit(":");

@@ -18,7 +18,7 @@ namespace Bam.CoreServices
             Default = new ServiceRegistry { Name = "Default" };
         }
 
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         public FluentCtorContext<I> ForCtor<I>(string parameterName)
         {
@@ -36,6 +36,11 @@ namespace Bam.CoreServices
             return this;
         }
 
+        /// <summary>
+        /// Include the configuration from the specified registry into the current, overwriting existing values in the current registry.
+        /// </summary>
+        /// <param name="registry">The registry to include.</param>
+        /// <returns>ServiceRegistry.</returns>
         public ServiceRegistry Include(ServiceRegistry registry)
         {
             CombineWith(registry, true);
@@ -71,9 +76,9 @@ namespace Bam.CoreServices
             }
         }
 
-        public new static ServiceRegistry Default { get; set; }
+        public new static ServiceRegistry? Default { get; set; }
 
-        public static Func<object> GetServiceLoader(Type type, object? orDefault = null)
+        public static Func<ServiceRegistry> GetServiceLoader(Type type, ServiceRegistry? orDefault = null)
         {
             return GetServiceLoader(type, type.Assembly, orDefault);
         }
@@ -87,14 +92,17 @@ namespace Bam.CoreServices
         /// <param name="type">The type whose assembly is searched.</param>
         /// <param name="orDefault"></param>
         /// <returns></returns>
-        public static Func<object> GetServiceLoader(Type type, Assembly assembly, object? orDefault = null)
+        public static Func<ServiceRegistry> GetServiceLoader(Type type, Assembly assembly, ServiceRegistry? orDefault = null)
         {
             if (Default == null)
             {
-                Type coreRegistryContainer = assembly.GetTypes().FirstOrDefault(t => t.HasCustomAttributeOfType<ServiceRegistryContainerAttribute>());
+                Type? coreRegistryContainer = assembly.GetTypes().FirstOrDefault(t => t.HasCustomAttributeOfType<ServiceRegistryContainerAttribute>());
                 if (coreRegistryContainer != null)
                 {
-                    MethodInfo provider = coreRegistryContainer.GetMethods().FirstOrDefault(mi => CustomAttributeExtension.HasCustomAttributeOfType<ServiceRegistryLoaderAttribute>(mi) || mi.Name.Equals("Get"));
+                    MethodInfo? provider = coreRegistryContainer.GetMethods().FirstOrDefault(mi => 
+                        (mi.HasCustomAttributeOfType(out ServiceRegistryLoaderAttribute attr) &&
+                        attr.ProcessModes.Contains(ProcessMode.Current.Mode)) || mi.Name.Equals("Get"));
+                    
                     if (provider != null)
                     {
                         object instance = provider.IsStatic ? null : provider.DeclaringType.Construct();
@@ -102,14 +110,14 @@ namespace Bam.CoreServices
                     }
                 }
             }
-            return Default == null ? (() => type.Construct()) : (Func<object>)(() =>
+            return Default == null ? (() => type.Construct<ServiceRegistry>()) : () =>
             {
-                if (!Default.TryGet(type, out object result))
+                if (!Default.TryGet(out ServiceRegistry result))
                 {
                     result = orDefault;
                 }
                 return result;
-            });
+            };
         }
     }
 }

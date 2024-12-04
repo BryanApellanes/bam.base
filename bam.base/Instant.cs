@@ -299,7 +299,13 @@ namespace Bam
             {
                 return false;
             }
-            return this.ToString().Equals(obj.ToString());
+
+            if (obj is Instant instant)
+            {
+                return ToString().Equals(instant.ToString());
+            }
+
+            return false;
         }
     }
 }

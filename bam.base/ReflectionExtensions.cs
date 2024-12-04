@@ -852,7 +852,7 @@ namespace Bam
 
         /// <summary>
         /// Returns true if the specified toCheck type has 
-        /// an enumerable property that is of the current type
+        /// an enumerable property that is of the current type.
         /// </summary>
         /// <param name="self"></param>
         /// <param name="toCheck"></param>
