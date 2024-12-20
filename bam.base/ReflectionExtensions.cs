@@ -46,7 +46,7 @@ namespace Bam
         /// <param name="algorithm"></param>
         /// <param name="encoding"></param>
         /// <returns></returns>
-        public static string ToInfoHash(this IEnumerable<Type> types, HashAlgorithms algorithm = HashAlgorithms.SHA1, Encoding? encoding = null)
+        public static string ToInfoHash(this IEnumerable<Type> types, HashAlgorithms algorithm = HashAlgorithms.SHA256, Encoding? encoding = null)
         {
             return types.ToInfoString().HashHexString(algorithm, encoding);
         }
@@ -772,11 +772,13 @@ namespace Bam
                 }
             };
         }
+
         /// <summary>
         /// Return the Type as the string that can be used to 
         /// declare it in code
         /// </summary>
         /// <param name="type"></param>
+        /// <param name="includeNamespace"></param>
         /// <returns></returns>
         public static string ToTypeString(this Type type, bool includeNamespace = true)
         {
