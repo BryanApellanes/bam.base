@@ -445,15 +445,16 @@ namespace Bam
         /// <returns></returns>
         public static T Or<T>(this T instance, T instead)
         {
-            if(instance == null)
-            {
-                return instead;
-            }
             if(instance as string == string.Empty)
             {
                 return instead;
             }
-            return instance;
+            if (instance != null)
+            {
+                return instance;
+            }            
+
+            return instead;
         }
 
         /// <summary>
