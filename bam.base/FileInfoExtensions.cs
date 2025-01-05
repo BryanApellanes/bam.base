@@ -10,27 +10,6 @@ namespace Bam
 {
     public static class FileInfoExtensions
     {
-        public static T Read<T>(this FileInfo file)
-        {
-            if(!file.Exists)
-            {
-                throw new ArgumentException($"The specified dao repo generation config file was not found: {file.FullName}");
-            }
-
-            string ext = file.Extension;
-            if (ext.ToLowerInvariant().Equals(".json"))
-            {
-                return file.FullName.SafeReadFile().FromJson<T>();
-            }
-            if(ext.ToLowerInvariant().Equals(".yml") || ext.ToLowerInvariant().Equals(".yaml"))
-            {
-
-                return file.FullName.SafeReadFile().FromYaml<T>();
-            }
-
-            throw new ArgumentException($"Unsupported file extension, must be one of (.json, .yml or .yaml) but was: {ext}");
-        }
-        
         public static string ReadAllText(this FileInfo file)
         {
             using (StreamReader reader = new StreamReader(file.FullName))
