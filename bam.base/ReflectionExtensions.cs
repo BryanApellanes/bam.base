@@ -466,11 +466,11 @@ namespace Bam
         /// <param name="propertyName">Name of the property.</param>
         /// <param name="ifPropertyNotFound">If property not found.</param>
         /// <param name="value">The value.</param>
-        public static bool TryGetPropertyValue<T>(this object instance, string propertyName, T ifPropertyNotFound, out T value)
+        public static bool TryGetPropertyValue<T>(this object instance, string propertyName, T ifPropertyNotFound, out T? value)
         {
             Args.ThrowIfNull(instance, "instance");
             Type type = instance.GetType();
-            PropertyInfo property = type.GetProperties().FirstOrDefault(pi => pi.Name.Equals(propertyName, StringComparison.InvariantCultureIgnoreCase));
+            PropertyInfo? property = type.GetProperties().FirstOrDefault(pi => pi.Name.Equals(propertyName, StringComparison.InvariantCultureIgnoreCase));
             if(property == null)
             {
                 value = ifPropertyNotFound;
@@ -478,7 +478,7 @@ namespace Bam
             }
             else
             {
-                value = (T)property.GetValue(instance);
+                value = (T)property.GetValue(instance)!;
                 if(typeof(T) == typeof(string) && string.IsNullOrEmpty(value as string))
                 {
                     value = ifPropertyNotFound;
@@ -494,10 +494,11 @@ namespace Bam
         /// <typeparam name="T"></typeparam>
         /// <param name="instance"></param>
         /// <param name="propertyName">The name of the property value to retrieve</param>
+        /// <param name="throwIfPropertyNotFound"></param>
         /// <returns></returns>
-        public static T Property<T>(this object instance, string propertyName, bool throwIfPropertyNotFound = true)
+        public static T? Property<T>(this object instance, string propertyName, bool throwIfPropertyNotFound = true)
         {
-            object value = Property(instance, propertyName, throwIfPropertyNotFound);
+            object? value = Property(instance, propertyName, throwIfPropertyNotFound);
             return value == null ? default(T) : (T)value;
         }
 
@@ -506,12 +507,13 @@ namespace Bam
         /// </summary>
         /// <param name="instance"></param>
         /// <param name="propertyName"></param>
+        /// <param name="throwIfPropertyNotFound"></param>
         /// <returns></returns>
-        public static object Property(this object instance, string propertyName, bool throwIfPropertyNotFound = true)
+        public static object? Property(this object instance, string propertyName, bool throwIfPropertyNotFound = true)
         {
             Args.ThrowIfNull(instance, "instance");
             Type type = instance.GetType();
-            PropertyInfo property = type.GetProperties().FirstOrDefault(pi => pi.Name.Equals(propertyName, StringComparison.InvariantCultureIgnoreCase));
+            PropertyInfo? property = type.GetProperties().FirstOrDefault(pi => pi.Name.Equals(propertyName, StringComparison.InvariantCultureIgnoreCase));
             if (property == null)
             {
                 if (throwIfPropertyNotFound)
@@ -523,7 +525,7 @@ namespace Bam
                     return null;
                 }
             }
-            return property.GetValue(instance);
+            return property!.GetValue(instance);
         }
 
         /// <summary>

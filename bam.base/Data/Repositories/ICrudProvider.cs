@@ -9,6 +9,6 @@ namespace Bam.Data.Repositories
         object Save(object toSave);
         IEnumerable SaveCollection(IEnumerable values);
         object Update(object toUpdate);
-        object Retrieve(string typeIdentifier, string instanceId);
+        object? Retrieve(string typeIdentifier, string instanceId);
     }
 }

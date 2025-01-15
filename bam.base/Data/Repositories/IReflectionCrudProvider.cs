@@ -7,6 +7,6 @@ namespace Bam.Data.Repositories
     public interface IReflectionCrudProvider: ICrudProvider
     {
         IEnumerable<object> Query(Type type, Dictionary<string, object> queryParameters);
-        object Retrieve(Type objectType, string identifier);
+        object? Retrieve(Type objectType, string identifier);
     }
 }

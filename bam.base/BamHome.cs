@@ -26,13 +26,7 @@ namespace Bam
         /// <summary>
         /// The path segments for BamHome, on Windows c:/opt/bam, otherwise /opt/bam
         /// </summary>
-        public static string[] PathSegments
-        {
-            get
-            {
-                return new string[] {SystemRoot, "opt", "bam"};
-            }
-        }
+        public static string[] PathSegments => [SystemRoot, "opt", "bam"];
 
         public static string Public => System.IO.Path.Combine(Path, "public");
         
