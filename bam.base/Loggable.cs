@@ -98,7 +98,7 @@ namespace Bam.Logging
         
         [Exclude]
         [DebuggerStepThrough]
-        public virtual void Subscribe(ILogger logger)
+        public virtual void Subscribe(ILogger? logger)
         {
             Subscribe(logger, LogVerbosity);
         }
@@ -107,7 +107,7 @@ namespace Bam.Logging
         /// Subscribe the specified logger to
         /// all the events of the current instance.
         /// </summary>
-        ///
+        /// 
         /// <remarks>
         /// Considers the 
         /// current value of LogVerbosity if
@@ -115,13 +115,18 @@ namespace Bam.Logging
         /// Verbosity attribute.
         /// </remarks>
         /// <param name="logger"></param>
+        /// <param name="levelToSubscribe"></param>
         [Exclude]
         [DebuggerStepThrough]
-        public virtual void Subscribe(ILogger logger, VerbosityLevel levelToSubscribe)
+        public virtual void Subscribe(ILogger? logger, VerbosityLevel levelToSubscribe)
         {
+            if (logger == null)
+            {
+                return;
+            }
             lock (_subscriberLock)
             {
-                if (logger != null && !IsSubscribed(logger))
+                if (!IsSubscribed(logger))
                 {
                     _subscribers.Add(logger);
                     Type emittingType = this.GetType();
