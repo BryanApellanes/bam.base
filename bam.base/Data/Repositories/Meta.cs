@@ -3,6 +3,7 @@
 */
 
 using System.Reflection;
+using Bam.DependencyInjection;
 using Bam.Logging;
 using Bam.Services;
 

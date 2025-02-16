@@ -6,6 +6,7 @@ using Bam.Logging;
 using System.Data;
 using System.Data.Common;
 using System.Reflection;
+using Bam.DependencyInjection;
 using Bam.Services;
 
 namespace Bam.Data

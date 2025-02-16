@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using Bam.DependencyInjection;
 using Bam.Services;
 
 namespace Bam

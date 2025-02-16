@@ -5,8 +5,9 @@
 using System.Reflection;
 using Bam.Incubation;
 using Bam.Logging;
+using Bam.Services;
 
-namespace Bam.Services
+namespace Bam.DependencyInjection
 {
     /// <summary>
     /// A simple dependency injection container.

@@ -2,7 +2,7 @@
 	Copyright © Bryan Apellanes 2015  
 */
 
-namespace Bam.Services
+namespace Bam.DependencyInjection
 {
     public interface IDependencyProvider
     {

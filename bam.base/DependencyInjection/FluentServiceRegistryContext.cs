@@ -1,4 +1,6 @@
-﻿namespace Bam.Services
+﻿using Bam.Services;
+
+namespace Bam.DependencyInjection
 {
     public class FluentServiceRegistryContext<I>
     {

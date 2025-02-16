@@ -1,4 +1,5 @@
 using System.Text;
+using Bam.DependencyInjection;
 using Bam.Encryption;
 using Bam.Services;
 using Bam.Test;

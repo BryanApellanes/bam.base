@@ -3,6 +3,7 @@
 */
 
 using System.Data;
+using Bam.DependencyInjection;
 using Bam.Services;
 
 namespace Bam.Data

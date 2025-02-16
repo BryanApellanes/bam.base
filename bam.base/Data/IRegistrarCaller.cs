@@ -2,6 +2,7 @@
 	Copyright © Bryan Apellanes 2015  
 */
 
+using Bam.DependencyInjection;
 using Bam.Services;
 
 namespace Bam.Data

@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
+using Bam.Services;
 
-namespace Bam.Services
+namespace Bam.DependencyInjection
 {
     public class ServiceRegistry: DependencyProvider
     {

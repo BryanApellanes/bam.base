@@ -4,6 +4,7 @@
 
 using System.Reflection;
 using System.Text;
+using Bam.DependencyInjection;
 using Bam.Services;
 
 namespace Bam.Data

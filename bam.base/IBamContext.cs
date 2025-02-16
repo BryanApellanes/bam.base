@@ -1,4 +1,5 @@
 ﻿using Bam.Configuration;
+using Bam.DependencyInjection;
 using Bam.Logging;
 using Bam.Services;
 

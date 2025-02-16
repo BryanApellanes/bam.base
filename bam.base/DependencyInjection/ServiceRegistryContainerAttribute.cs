@@ -1,4 +1,4 @@
-﻿namespace Bam.Services
+﻿namespace Bam.DependencyInjection
 {
     /// <summary>
     /// Attribute used to decorate a class that contains a 
