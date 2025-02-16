@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-
-namespace Bam.Data.Repositories
+﻿namespace Bam.Data.Repositories
 {
     public interface IExtendedCrudProvider: IReflectionCrudProvider
     {

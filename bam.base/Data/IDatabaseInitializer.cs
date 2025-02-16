@@ -1,8 +1,6 @@
 /*
 	Copyright © Bryan Apellanes 2015  
 */
-using System;
-using Bam.Incubation;
 
 namespace Bam.Data
 {

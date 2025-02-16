@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace NCuid
+﻿namespace NCuid
 {
     internal static class Base36Converter
     {

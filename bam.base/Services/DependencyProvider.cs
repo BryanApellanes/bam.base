@@ -2,14 +2,11 @@
 	Copyright © Bryan Apellanes 2015  
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
+using Bam.Incubation;
 using Bam.Logging;
-using Bam.Services;
 
-namespace Bam.Incubation
+namespace Bam.Services
 {
     /// <summary>
     /// A simple dependency injection container.
@@ -825,9 +822,29 @@ namespace Bam.Incubation
         {
             return GetCtorParams(type, out _);
         }
+
+        protected List<object> GetCtorParams(Type type, HashSet<Type> constructingTypes)
+        {
+            return GetCtorParams(type, constructingTypes, out _);
+        }
         
         public List<object> GetCtorParams(Type type, out ConstructorInfo ctorInfo)
         {
+            HashSet<Type> constructingTypes = new HashSet<Type>();
+            return GetCtorParams(type, constructingTypes, out ctorInfo);
+        }
+        
+        protected List<object> GetCtorParams(Type type, HashSet<Type> constructingTypes, out ConstructorInfo ctorInfo)
+        {
+            if (!constructingTypes.Contains(type))
+            {
+                constructingTypes.Add(type);
+            }
+            else
+            {
+                throw new DependencyLoopException(constructingTypes);
+            }
+            
             ctorInfo = null;
             ConstructorInfo[] ctors = type.GetConstructors();
             List<object> ctorParams = new List<object>();
@@ -851,8 +868,7 @@ namespace Bam.Incubation
                         {
                             try
                             {
-                                object existing = this[paramInfo.ParameterType] ?? Get(paramInfo.ParameterType,
-                                    GetCtorParams(paramInfo.ParameterType).ToArray());
+                                object existing = this[paramInfo.ParameterType] ?? Get(paramInfo.ParameterType, GetCtorParams(paramInfo.ParameterType, constructingTypes).ToArray());
                                 if (existing != null)
                                 {
                                     if (existing is Delegate d)

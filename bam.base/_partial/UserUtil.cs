@@ -1,12 +1,6 @@
 ﻿/*
 	Copyright © Bryan Apellanes 2015  
 */
-using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Text;
-using System.Web;
-using System.Security.Principal;
 
 namespace Bam
 {

@@ -6,7 +6,7 @@ namespace Bam.Data.Repositories
     {
         object Create(object toCreate);
         bool Delete(object toDelete);
-        object Save(object toSave);
+        object? Save(object toSave);
         IEnumerable SaveCollection(IEnumerable values);
         object Update(object toUpdate);
         object? Retrieve(string typeIdentifier, string instanceId);

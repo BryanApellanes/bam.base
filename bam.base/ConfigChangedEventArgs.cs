@@ -1,6 +1,3 @@
-using System;
-using System.IO;
-
 namespace Bam
 {
     public class ConfigChangedEventArgs: EventArgs

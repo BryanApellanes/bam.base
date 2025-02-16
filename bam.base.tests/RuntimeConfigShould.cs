@@ -1,5 +1,5 @@
 using Bam.Console;
-using Bam.CoreServices;
+using Bam.Services;
 using Bam.Test;
 
 namespace Bam.Tests;

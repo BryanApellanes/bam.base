@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace Bam.Base.Transformers
 {
     public class Base64Transformer : ValueTransformer<byte[], string>

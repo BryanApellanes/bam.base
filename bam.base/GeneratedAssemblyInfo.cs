@@ -1,16 +1,9 @@
 /*
 	Copyright © Bryan Apellanes 2015  
 */
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO;
+
 using System.Reflection;
-using System.CodeDom.Compiler;
 using System.Xml.Serialization;
-using Bam.Logging;
 using Newtonsoft.Json;
 using YamlDotNet.Serialization;
 

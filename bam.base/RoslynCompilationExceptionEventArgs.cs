@@ -1,5 +1,3 @@
-using System;
-
 namespace Bam
 {
     public class RoslynCompilationExceptionEventArgs : EventArgs

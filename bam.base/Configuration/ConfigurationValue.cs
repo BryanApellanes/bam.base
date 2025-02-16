@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Bam.Configuration
+﻿namespace Bam.Configuration
 {
     /// <summary>
     /// Represents the settings used to resolve a configuration value and 

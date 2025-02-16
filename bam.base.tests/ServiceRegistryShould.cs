@@ -1,12 +1,6 @@
-﻿using Bam;
-using Bam.CoreServices;
-using Bam.Shell;
-using Bam.Test;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Bam.Test;
+using Bam.Console;
+using Bam.Services;
 
 namespace Bam.Tests
 {
@@ -85,6 +79,22 @@ namespace Bam.Tests
             DependentClass instance = svcRegistry.Get<DependentClass>();
             instance.TestClass.ShouldNotBeNull();
             instance.TestClass.GetType().ShouldEqual(typeof(DifferentTestClass));
+        }
+
+        [UnitTest]
+        public void DetectDependencyLoop()
+        {
+            Action action = () =>
+            {
+                ServiceRegistry svcRegistry = new ServiceRegistry();
+            
+                FirstClass firstClass = svcRegistry.Get<FirstClass>();
+            };
+            
+            action.Throws(out Exception? ex).ShouldBeTrue("Didn't throw an exception as expected");
+            ex.ShouldNotBeNull();
+            ex?.GetType().ShouldEqual(typeof(DependencyLoopException));
+            Message.PrintLine("Loop successfully detected: {0}", ex.Message);
         }
     }
 }

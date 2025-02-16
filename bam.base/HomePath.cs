@@ -1,11 +1,4 @@
-﻿using Bam;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Bam
+﻿namespace Bam
 {
     /// <summary>
     /// If the specified path starts with tilde (~), resolves ~ to the user's home directory.

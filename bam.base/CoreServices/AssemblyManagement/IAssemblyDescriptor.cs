@@ -1,5 +1,4 @@
 ﻿using Bam.Data.Repositories;
-using System.Collections.Generic;
 
 namespace Bam.CoreServices.AssemblyManagement.Data
 {

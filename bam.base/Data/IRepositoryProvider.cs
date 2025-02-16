@@ -1,6 +1,3 @@
-using Bam.Data.Repositories;
-using Bam.Logging;
-
 namespace Bam.Data
 {
 /*    public interface IRepositoryProvider

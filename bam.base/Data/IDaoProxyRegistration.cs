@@ -1,9 +1,10 @@
 ﻿/*
 	Copyright © Bryan Apellanes 2015  
 */
-using Bam.Incubation;
+
 using System.Reflection;
 using System.Text;
+using Bam.Services;
 
 namespace Bam.Data
 {

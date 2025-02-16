@@ -1,9 +1,4 @@
-﻿using System;
-using System.IO;
-using Bam.Data.Repositories;
-using Bam.Logging;
-
-namespace Bam.Data
+﻿namespace Bam.Data
 {
     public interface IDataDirectoryProvider
     {

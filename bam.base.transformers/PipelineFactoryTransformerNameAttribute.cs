@@ -1,7 +1,4 @@
 ﻿//using Newtonsoft.Json.Schema.Generation;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Bam
 {

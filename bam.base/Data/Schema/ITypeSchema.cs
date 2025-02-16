@@ -2,8 +2,6 @@
 	Copyright © Bryan Apellanes 2015  
 */
 using Bam.Data.Schema;
-using System;
-using System.Collections.Generic;
 
 namespace Bam.Data.Repositories
 {

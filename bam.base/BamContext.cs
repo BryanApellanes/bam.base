@@ -1,13 +1,6 @@
-﻿using Bam;
-using Bam.Configuration;
-using Bam.CoreServices;
+﻿using Bam.Configuration;
 using Bam.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
+using Bam.Services;
 
 namespace Bam
 {

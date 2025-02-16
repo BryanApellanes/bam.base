@@ -1,5 +1,3 @@
-using System;
-
 namespace Bam.Data.Schema
 {
     public class TypeSchemaWarningEventArgs : EventArgs

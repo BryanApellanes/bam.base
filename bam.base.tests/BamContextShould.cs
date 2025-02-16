@@ -1,13 +1,7 @@
 ﻿using Bam.Console;
-using Bam;
-using Bam.CoreServices;
 using Bam.Logging;
 using Bam.Test;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Bam.Services;
 
 namespace Bam.Tests
 {

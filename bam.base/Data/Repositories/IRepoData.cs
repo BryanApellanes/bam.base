@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Bam.Data.Repositories
+﻿namespace Bam.Data.Repositories
 {
     public interface IRepoData
     {

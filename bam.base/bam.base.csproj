@@ -41,4 +41,8 @@
     <Compile Remove="CompilationException.cs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Incubation\" />
+  </ItemGroup>
+
 </Project>

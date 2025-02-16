@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Bam.Data.Schema
+﻿namespace Bam.Data.Schema
 {
     public interface ITypeSchemaWarning
     {

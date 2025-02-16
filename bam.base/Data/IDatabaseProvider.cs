@@ -1,5 +1,4 @@
 ﻿using Bam.Logging;
-using System;
 
 namespace Bam.Data
 {

@@ -1,14 +1,12 @@
 ﻿/*
 	Copyright © Bryan Apellanes 2015  
 */
-using Bam.Incubation;
+
 using Bam.Logging;
-using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Reflection;
-using Bam.Data;
+using Bam.Services;
 
 namespace Bam.Data
 {

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Bam.CoreServices
+﻿namespace Bam.Services
 {
     /// <summary>
     /// Attribute used to decorate a class that contains a 

@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Bam
+﻿namespace Bam
 {
     public class ByteReverseTransformerPipeline : IValueReverseTransformer<byte[], byte[]>
     {

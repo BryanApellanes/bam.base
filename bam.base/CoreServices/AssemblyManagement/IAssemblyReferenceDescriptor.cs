@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Bam.CoreServices.AssemblyManagement.Data
+﻿namespace Bam.CoreServices.AssemblyManagement.Data
 {
     public interface IAssemblyReferenceDescriptor
     {

@@ -1,5 +1,3 @@
-using System;
-
 namespace Bam.Logging
 {
     public class LoggableEventArgs: EventArgs

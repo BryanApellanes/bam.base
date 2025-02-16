@@ -1,15 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using Bam.Incubation;
-using Bam.Data.Repositories;
-using YamlDotNet.Serialization;
-using Bam.Services;
+﻿using System.Reflection;
 
-namespace Bam.CoreServices
+namespace Bam.Services
 {
     public class ServiceRegistry: DependencyProvider
     {

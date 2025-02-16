@@ -1,5 +1,4 @@
-﻿using System;
-using Bam.ServiceProxy;
+﻿using Bam.ServiceProxy;
 using Bam.Messaging;
 using Bam.UserAccounts.Data;
 

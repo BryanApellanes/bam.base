@@ -1,7 +1,6 @@
 ﻿/*
 	Copyright © Bryan Apellanes 2015  
 */
-using System.IO;
 
 namespace Bam.Data.Schema
 {

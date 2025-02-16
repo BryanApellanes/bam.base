@@ -1,5 +1,4 @@
 using Bam.Data.Dynamic.Objects;
-using Bam;
 
 namespace Bam;
 

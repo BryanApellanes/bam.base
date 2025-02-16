@@ -1,11 +1,5 @@
-﻿using Bam;
-using Microsoft.CodeAnalysis;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Microsoft.CodeAnalysis;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Bam.CoreServices.AssemblyManagement
 {

@@ -1,16 +1,10 @@
 /*
 	Copyright © Bryan Apellanes 2015  
 */
-using System;
-using System.Collections.Generic;
+
 using System.Collections.Specialized;
-using System.Text;
 using System.Configuration;
 using System.Reflection;
-using System.Xml;
-using System.Xml.Serialization;
-using System.IO;
-using System.Data;
 
 namespace Bam.Configuration
 {

@@ -1,10 +1,6 @@
 /*
 	Copyright © Bryan Apellanes 2015  
 */
-using System;
-using System.IO;
-using System.Reflection;
-using Bam.Data.Repositories;
 
 namespace Bam.Data.Repositories
 {

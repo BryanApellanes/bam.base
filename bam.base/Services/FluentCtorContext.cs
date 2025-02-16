@@ -1,11 +1,4 @@
-﻿using Bam.Incubation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Bam.Services
+﻿namespace Bam.Services
 {
     public class FluentCtorContext<I>
     {

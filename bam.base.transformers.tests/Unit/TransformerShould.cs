@@ -1,12 +1,6 @@
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
 using System.Text;
-using System.Threading.Tasks;
-using Bam.CoreServices;
 using Bam.Encryption;
+using Bam.Services;
 using Bam.Test;
 using Org.BouncyCastle.Security;
 

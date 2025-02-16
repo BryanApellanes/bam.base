@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace NCuid
+﻿namespace NCuid
 {
     internal static class DateTimeExtensions
     {

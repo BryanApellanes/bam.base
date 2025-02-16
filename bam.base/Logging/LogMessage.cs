@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Bam.Logging
+﻿namespace Bam.Logging
 {
     public class LogMessage
     {

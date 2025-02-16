@@ -2,7 +2,6 @@
 	Copyright © Bryan Apellanes 2015  
 */
 using Bam.Logging;
-using System;
 
 namespace Bam
 {

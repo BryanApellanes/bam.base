@@ -1,7 +1,5 @@
 ﻿using Bam.Logging;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 
 namespace Bam.Configuration

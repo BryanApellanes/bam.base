@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Bam.Base.Transformers;
 
 namespace Bam

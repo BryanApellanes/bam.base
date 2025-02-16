@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Bam.Services
+﻿namespace Bam.Services
 {
     /// <summary>
     /// Used to denote a property that is set by injection after

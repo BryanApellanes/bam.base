@@ -1,4 +1,3 @@
-using System;
 using Bam.Application;
 
 namespace Bam
