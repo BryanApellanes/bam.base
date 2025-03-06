@@ -2,6 +2,7 @@
 using Bam.Console;
 using Bam.DependencyInjection;
 using Bam.Services;
+using Bam.Tests.TestClasses;
 
 namespace Bam.Tests
 {
@@ -83,19 +84,41 @@ namespace Bam.Tests
         }
 
         [UnitTest]
-        public void DetectDependencyLoop()
+        public void DetectWideDependencyLoop()
         {
-            Action action = () =>
+            When.A<ServiceRegistry>("Tries to construct a class with a dependency loop", svcRegistry =>
             {
-                ServiceRegistry svcRegistry = new ServiceRegistry();
-            
-                FirstClass firstClass = svcRegistry.Get<FirstClass>();
-            };
-            
-            action.Throws(out Exception? ex).ShouldBeTrue("Didn't throw an exception as expected");
-            ex.ShouldNotBeNull();
-            ex?.GetType().ShouldEqual(typeof(DependencyLoopException));
-            Message.PrintLine("Loop successfully detected: {0}", ex.Message);
+                svcRegistry.Get<FirstClass>();
+            })
+            .ExpectException(true)
+            .TheTest
+            .ShouldPass(because =>
+            {
+                because.TheTestCase("threw an exception", (testCase) => testCase.Exception != null);
+                because.TheTestCase($"threw an exception of type {nameof(DependencyLoopException)}", (testCase) => testCase.Exception?.GetType() == typeof(DependencyLoopException));
+                because.AdditionalInformation($"loop was successfully detected: {because.TestCase?.Exception?.Message}");
+            })
+            .SoBeHappy()
+            .UnlessItFailed();
+        }
+        
+        [UnitTest]
+        public void DetectTightDependencyLoop()
+        {
+            When.A<ServiceRegistry>("Tries to construct a class with a dependency loop", svcRegistry =>
+                {
+                    svcRegistry.Get<ClassA>();
+                })
+                .ExpectException(true)
+                .TheTest
+                .ShouldPass(because =>
+                {
+                    because.TheTestCase("threw an exception", (testCase) => testCase.Exception != null);
+                    because.TheTestCase($"threw an exception of type {nameof(DependencyLoopException)}", (testCase) => testCase.Exception?.GetType() == typeof(DependencyLoopException));
+                    because.AdditionalInformation($"loop was successfully detected: {because.TestCase?.Exception?.Message}");
+                })
+                .SoBeHappy()
+                .UnlessItFailed();
         }
     }
 }

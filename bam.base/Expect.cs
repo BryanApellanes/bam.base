@@ -601,6 +601,7 @@ namespace Bam
         /// <param name="objectToCheck"></param>
         /// <param name="compareTo"></param>
         /// <param name="failureMessage"></param>
+        /// <exception cref="ExpectationFailedException"></exception>
         public static void ShouldEqual(this object objectToCheck, object compareTo, string? failureMessage = null)
         {
             ShouldBeEqualTo(objectToCheck, compareTo, failureMessage);

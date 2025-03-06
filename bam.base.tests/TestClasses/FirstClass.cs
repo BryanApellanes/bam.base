@@ -1,4 +1,4 @@
-namespace Bam.Tests;
+namespace Bam.Tests.TestClasses;
 
 public class FirstClass
 {

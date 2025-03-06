@@ -843,7 +843,7 @@ namespace Bam.DependencyInjection
             }
             else
             {
-                throw new DependencyLoopException(constructingTypes);
+                throw new DependencyLoopException(type, constructingTypes);
             }
             
             ctorInfo = null;
