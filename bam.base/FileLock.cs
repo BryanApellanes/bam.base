@@ -3,7 +3,6 @@
     internal static class FileLock
     {
         static readonly Dictionary<string, object> _locks = new Dictionary<string, object>();
-        public static Dictionary<string, object> Locks => _locks;
 
         public static object Named(string name)
         {
