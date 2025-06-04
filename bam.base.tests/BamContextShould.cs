@@ -6,7 +6,7 @@ using Bam.Services;
 
 namespace Bam.Tests
 {
-    [UnitTestMenu("DaoRepository Should", Selector = "drs")]
+    [UnitTestMenu("BamContext Should", Selector = "bcs")]
     public class BamContextShould : UnitTestMenuContainer
     {
         public BamContextShould(ServiceRegistry serviceRegistry) : base(serviceRegistry)
