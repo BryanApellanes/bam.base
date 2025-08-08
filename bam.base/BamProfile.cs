@@ -52,7 +52,12 @@ namespace Bam
                 }
             }
         }
-                
+
+        public static string DotSys(string rootPath)
+        {
+            return System.IO.Path.Combine(rootPath, ".sys");
+        }
+        
         public static string ToolkitPath => System.IO.Path.Combine(ToolkitSegments);
         public static string[] ToolkitSegments => new string[] {Path, "toolkit"};
         public static string NugetPackagePath => System.IO.Path.Combine(NugetPackageSegments);
@@ -79,6 +84,7 @@ namespace Bam
         public static string GeneratedPath => System.IO.Path.Combine(DataPath, "generated");
         public static string ProxiesPath => System.IO.Path.Combine(DataPath, "proxies");
 
+        public static string DataDotSys => DotSys(DataPath);
         public static string DataPath => System.IO.Path.Combine(DataSegments);
 
         public static string[] DataSegments => new string[] {Path, "data"};
@@ -88,6 +94,7 @@ namespace Bam
 
         public static string LogsPath => System.IO.Path.Combine(Path, "logs");
 
+        public static string VaultsDotSys => DotSys(VaultsPath);
         public static string VaultsPath => System.IO.Path.Combine(VaultsSegments);
         public static string[] VaultsSegments => new string[] {Path, "vaults"};
         

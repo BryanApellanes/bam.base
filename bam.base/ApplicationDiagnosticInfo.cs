@@ -14,7 +14,7 @@ namespace Bam
     [Serializable]
     public partial class ApplicationDiagnosticInfo
     {
-        public const string DefaultMessageFormat = "Thread=#{ThreadHashCode}({ThreadId})~~App={ApplicationName}~~PID={ProcessId}~~Utc={UtcShortDate}::{UtcShortTime}~~{Message}";        
+        public const string DefaultMessageFormat = "Thread=#{ThreadHashCode}({ThreadId})~~App={ApplicationName}~~PID={ProcessId}~~Utc={UtcShortDate}::{UtcShortTime}~~Local={LocalShortDate}::{LocalShortTime}~~{Message}";        
         public const string UnknownApplication = "UNKNOWN-APPLICATION";
         public const string PublicOrganization = "PUBLIC-ORGANIZATION";
 
@@ -65,37 +65,13 @@ namespace Bam
             }
         }
 
-        public DateTime Local
-        {
-            get
-            {
-                return Utc.ToLocalTime();
-            }
-        }
+        public DateTime Local => Utc.ToLocalTime();
 
-        public string LocalShortTime
-        {
-            get
-            {
-                return this.Local.ToShortTimeString();
-            }
-        }
+        public string LocalShortTime => this.Local.ToShortTimeString();
 
-        public string LocalShortDate
-        {
-            get
-            {
-                return this.Local.ToShortDateString();
-            }
-        }
+        public string LocalShortDate => this.Local.ToShortDateString();
 
-        public string UtcShortTime
-        {
-            get
-            {
-                return this.Utc.ToShortTimeString();
-            }
-        }
+        public string UtcShortTime => this.Utc.ToShortTimeString();
 
         public int ThreadHashCode
         {

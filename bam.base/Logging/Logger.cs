@@ -128,11 +128,6 @@ namespace Bam.Logging
 
         private void LoggingThread()
         {
-            if (IsNull)
-            {
-                return;
-            }
-
             while (_keepLogging)
             {
                 try

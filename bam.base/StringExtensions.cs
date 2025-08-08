@@ -10,6 +10,13 @@ namespace Bam
 {
     public static class StringExtensions
     {
+        public static byte[] HexToByteArray(this string hex) {
+            return Enumerable.Range(0, hex.Length)
+                .Where(x => x % 2 == 0)
+                .Select(x => Convert.ToByte(hex.Substring(x, 2), 16))
+                .ToArray();
+        }
+        
         public static string YamlToJson(this string yaml)
         {
             Deserializer deserializer = new Deserializer();
@@ -653,6 +660,12 @@ namespace Bam
             return deserializer.Deserialize<T>(yaml);
         }
 
+        public static object FromYaml(this string yaml, Type type)
+        {
+            Deserializer deserializer = new Deserializer();
+            return deserializer.Deserialize(yaml, type);
+        }
+        
         public static T FromYaml<T>(this string yaml, bool ignoreUnmatchedProperties)
         {
             if (ignoreUnmatchedProperties)

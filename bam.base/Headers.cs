@@ -20,9 +20,9 @@
 
         public static string ApplicationName => "X-Bam-AppName";
 
-        public static string SecureChannelSessionId => "X-Bam-Secure-Channel-Session-Id";
+        public static string SessionId => "X-Bam-Session-Id";
 
-        [Obsolete("Use SecureChannelSessionId instead")]
+        [Obsolete("Use SessionId instead")]
         public static string SecureSessionId => "X-Bam-Sps-Session-Id";
 
         public static string Hash => "X-Bam-Hash";

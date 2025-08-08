@@ -30,6 +30,7 @@
         {
             return count.RandomString();
         }
+        
         /// <summary>
         /// Return a random string of the specified
         /// length

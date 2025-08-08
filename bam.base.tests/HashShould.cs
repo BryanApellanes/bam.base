@@ -17,7 +17,7 @@ public class HashShould : UnitTestMenuContainer
         string value = 256.RandomLetters();
         byte[] hashBytes = value.ToHashBytes(HashAlgorithms.SHA256);
         string hashHex = hashBytes.ToHexString();
-        byte[] backAgain = hashHex.HashToByteArray();
+        byte[] backAgain = hashHex.HexToByteArray();
         
         backAgain.SequenceEqual(hashBytes).ShouldBeTrue("byte arrays didn't match");
     }

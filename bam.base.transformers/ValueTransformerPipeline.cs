@@ -39,6 +39,11 @@ namespace Bam
             return ByteTransformerPipeline.Transform(utf8);
         }
 
+        /// <summary>
+        /// By Default returns the json representation of the specified value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public virtual string ConvertDataToString(TData value)
         {
             if (value == null)

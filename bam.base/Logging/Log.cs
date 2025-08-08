@@ -17,7 +17,7 @@ namespace Bam.Logging
             {
                 if (_debug == null)
                 {
-                    _debug = Environment.GetCommandLineArgs().Count(arg => arg.Equals("/debug") || arg.Equals("-debug") || arg.Equals("--debug")) > 0;
+                    _debug = Environment.GetCommandLineArgs().Count(arg => arg.Equals("--debug") || arg.Equals("-debug") || arg.Equals("--debug")) > 0;
                 }
                 return _debug.Value;
             }
@@ -31,7 +31,7 @@ namespace Bam.Logging
             {
                 if (_trace == null)
                 {
-                    _trace = Environment.GetCommandLineArgs().Count(arg => arg.Equals("/trace")) > 0;
+                    _trace = Environment.GetCommandLineArgs().Count(arg => arg.Equals($"--trace")) > 0;
                 }
                 return _trace.Value;
             }
@@ -158,7 +158,7 @@ namespace Bam.Logging
             {
                 // create a logger of the type specified by the config
                 // if no value is in the config create a null logger
-                _currentLogger = CreateLogger(DefaultConfiguration.GetAppSetting("LogType", "Null"));
+                _currentLogger = CreateLogger(DefaultConfiguration.GetAppSetting("LogType", "Console"));
                 _currentLogger.RestartLoggingThread();
             }
 
@@ -170,7 +170,7 @@ namespace Bam.Logging
         /// Creates a logger of the specified type.  If the containing assembly is already loaded 
         /// the type should be the namespace qualified name of the ILogger implementation to 
         /// instantiate.  If the containing assembly is not already loaded the type should be
-        /// the AssemblyQualified name.  If the type is not found an InvalidOperationException is thrown.
+        /// the AssemblyQualified name.  If the type is not found ConsoleLogger is returned.
         /// </summary>
         /// <param name="logType">Type of the log.</param>
         /// <returns></returns>
@@ -229,7 +229,7 @@ namespace Bam.Logging
         /// </summary>
         /// <param name="loggerType">Type of logger to instantiate.</param>
         /// <returns></returns>
-        /// <exception cref="InvalidOperationException"></exception>
+        /// <exception cref="InvalidOperationException"></exception>-
         public static ILogger CreateLogger(Type loggerType)
         {
             try
@@ -237,7 +237,7 @@ namespace Bam.Logging
                 ConstructorInfo ctor = loggerType.GetConstructor(Type.EmptyTypes);
                 if (ctor == null)
                 {
-                    throw new InvalidOperationException(string.Format("The specified logType ({0}) doesn't have a parameterless constructor.", loggerType.FullName));
+                    throw new InvalidOperationException($"The specified logType ({loggerType.FullName}) doesn't have a parameterless constructor.");
                 }
 
                 return ((ILogger)ctor.Invoke(null)).StartLoggingThread();

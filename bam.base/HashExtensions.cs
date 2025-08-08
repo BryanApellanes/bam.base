@@ -244,7 +244,7 @@ namespace Bam
 
             return BitConverter.ToInt64(hashBytes, 0);
         }
-
+        
         public static ulong ToHashULong(this string toBeHashed, HashAlgorithms algorithm, Encoding? encoding = null)
         {
             byte[] hashBytes = ToHashBytes(toBeHashed, algorithm, encoding);

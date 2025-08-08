@@ -546,6 +546,11 @@ namespace Bam
         public static string ToJson(this object value, params JsonConverter[] converters)
         {
             JsonSerializerSettings settings = new JsonSerializerSettings();
+            return ToJson(value, settings, converters);
+        }
+        
+        public static string ToJson(this object value, JsonSerializerSettings settings, params JsonConverter[] converters)
+        {
             if (converters != null && converters.Length > 0)
             {
                 settings.Converters = new List<JsonConverter>(converters);

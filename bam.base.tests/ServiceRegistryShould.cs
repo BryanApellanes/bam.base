@@ -106,19 +106,19 @@ namespace Bam.Tests
         public void DetectTightDependencyLoop()
         {
             When.A<ServiceRegistry>("Tries to construct a class with a dependency loop", svcRegistry =>
-                {
-                    svcRegistry.Get<ClassA>();
-                })
-                .ExpectException(true)
-                .TheTest
-                .ShouldPass(because =>
-                {
-                    because.TheTestCase("threw an exception", (testCase) => testCase.Exception != null);
-                    because.TheTestCase($"threw an exception of type {nameof(DependencyLoopException)}", (testCase) => testCase.Exception?.GetType() == typeof(DependencyLoopException));
-                    because.AdditionalInformation($"loop was successfully detected: {because.TestCase?.Exception?.Message}");
-                })
-                .SoBeHappy()
-                .UnlessItFailed();
+            {
+                svcRegistry.Get<ClassA>();
+            })
+            .ExpectException(true)
+            .TheTest
+            .ShouldPass(because =>
+            {
+                because.TheTestCase("threw an exception", (testCase) => testCase.Exception != null);
+                because.TheTestCase($"threw an exception of type {nameof(DependencyLoopException)}", (testCase) => testCase.Exception?.GetType() == typeof(DependencyLoopException));
+                because.AdditionalInformation($"loop was successfully detected: {because.TestCase?.Exception?.Message}");
+            })
+            .SoBeHappy()
+            .UnlessItFailed();
         }
     }
 }

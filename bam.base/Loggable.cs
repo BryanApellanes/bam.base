@@ -256,7 +256,7 @@ namespace Bam.Logging
             FireEvent<T>(eventHandler, new T());
         }
         
-        protected void FireEvent<T>(EventHandler<T> eventHandler, T eventArgs) where T: EventArgs, new()
+        protected void FireEvent<T>(EventHandler<T> eventHandler, T eventArgs) where T: EventArgs
         {
             try
             {
