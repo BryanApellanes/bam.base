@@ -103,6 +103,32 @@ namespace Bam
 
         public static string ScreenshotsPath => System.IO.Path.Combine(ScreenshotsSegments);
         public static string[] ScreenshotsSegments => new string[] {Path, "screenshots"};
+
+        public static FileInfo WriteVaultDotSysFile(string fileName, string content)
+        {
+            FileInfo fileInfo = new FileInfo(System.IO.Path.Combine(VaultsDotSys, fileName));
+            fileInfo.FullName.SafeWriteFile(content, true);
+            return fileInfo;
+        }
+
+        public static bool TryReadVaultDotSysFile(string fileName, out string content)
+        {
+            try
+            {
+                content = ReadVaultDotSysFile(fileName);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                content = null;
+                return false;
+            }
+        }
+        
+        public static string ReadVaultDotSysFile(string fileName)
+        {
+            return File.ReadAllText(System.IO.Path.Combine(VaultsDotSys, fileName));
+        }
         
         public static string ReadDataFile(string relativeFilePath)
         {
