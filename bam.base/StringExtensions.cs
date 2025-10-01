@@ -1,5 +1,5 @@
 ﻿using Bam.CommandLine;
-using Microsoft.AspNetCore.WebUtilities;
+//using Microsoft.AspNetCore.WebUtilities;
 using Newtonsoft.Json;
 using System.Diagnostics;
 using System.Text;
@@ -78,7 +78,7 @@ namespace Bam
 
         public static byte[] FromBase64UrlEncoded(this string data)
         {
-            return WebEncoders.Base64UrlDecode(data);
+            return Base64UrlEncoder.Default.Decode(data);//WebEncoders.Base64UrlDecode(data);
         }
         public static string[] SemiColonSplit(this string semicolonSeparatedValues)
         {

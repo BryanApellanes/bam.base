@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.WebUtilities;
+﻿//using Microsoft.AspNetCore.WebUtilities;
 using System.Text;
 
 namespace Bam
@@ -19,7 +19,8 @@ namespace Bam
         
         public static string ToBase64UrlEncoded(this byte[] data)
         {
-            return WebEncoders.Base64UrlEncode(data);
+            //return WebEncoders.Base64UrlEncode(data);
+            return Base64UrlEncoder.Default.Encode(data);
         }
 
         public static string ToBase64(this byte[] data)
