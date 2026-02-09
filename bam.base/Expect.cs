@@ -388,7 +388,7 @@ namespace Bam
         /// <param name="objectToCheck"></param>
         public static void IsObjectOfType<T>(this object objectToCheck)
         {
-            IsObjectOfType<T>(objectToCheck, string.Empty);
+            IsObjectOfType<T>(objectToCheck, $"{objectToCheck?.GetType()?.Name ?? "null"} is not of type {typeof(T).Name}");
         }
 
         /// <summary>
@@ -398,10 +398,13 @@ namespace Bam
         /// <param name="objectToCheck"></param>
         public static void IsObjectOfType<T>(this object objectToCheck, string failureMessage)
         {
-            if (objectToCheck.GetType() != typeof(T))
+            if (objectToCheck?.GetType() != typeof(T))
             {
                 if (string.IsNullOrEmpty(failureMessage))
+                {
                     throw new ExpectationFailedException(typeof(T), objectToCheck, ShouldHtmlEncodeExceptions);
+                }
+
                 throw new ExpectationFailedException(failureMessage);
             }
         }
@@ -727,9 +730,13 @@ namespace Bam
             IsNull(objectToCheck, failureMessage);
         }
         
+        /// <summary>
+        /// Throws an exception if the specified object is not null.
+        /// </summary>
+        /// <param name="objectToCheck">The object to verify for null. If this value is not null, an exception is thrown.</param>
         public static void IsNull(this object? objectToCheck)
         {
-            IsNull(objectToCheck, "objectToCheck was not null as expected");
+            IsNull(objectToCheck, $"{nameof(objectToCheck)} was not null as expected");
         }
         
         /// <summary>

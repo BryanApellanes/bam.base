@@ -514,6 +514,12 @@ namespace Bam.DependencyInjection
             }
         }
 
+        /// <summary>
+        /// Gets an object of the specified type if it has been instantiated otherwise constructs a new instance.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="ctorParams"></param>
+        /// <returns></returns>
         public object Get(Type type, params object[] ctorParams)
         {
             if (this[type] == null)
@@ -525,7 +531,11 @@ namespace Bam.DependencyInjection
                 return this[type];
             }
         }
-        
+
+        /// <summary>
+        /// Adds an instance of type T by constructing it with the default constructor.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
         public void Add<T>() where T: new()
         {
             Set<T>(new T());

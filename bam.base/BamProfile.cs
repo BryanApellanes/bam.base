@@ -104,6 +104,29 @@ namespace Bam
         public static string ScreenshotsPath => System.IO.Path.Combine(ScreenshotsSegments);
         public static string[] ScreenshotsSegments => new string[] {Path, "screenshots"};
 
+        /// <summary>
+        /// Creates or overwrites a file named <paramref name="fileName"/> in the VaultsDotSys directory with the
+        /// specified content.
+        /// </summary>
+        /// <remarks>If a file with the specified name already exists in the VaultsDotSys directory, it
+        /// will be overwritten. The method writes the entire content to the file in a single operation.</remarks>
+        /// <param name="fileName">The name of the file to create or overwrite within the VaultsDotSys directory. Cannot be null or empty.</param>
+        /// <param name="content">The byte array containing the data to write to the file. Cannot be null.</param>
+        /// <returns>A <see cref="FileInfo"/> object representing the file that was written.</returns>
+        public static FileInfo WriteVaultDotSysFile(string fileName, byte[] content)
+        {
+            FileInfo fileInfo = new FileInfo(System.IO.Path.Combine(VaultsDotSys, fileName));
+            fileInfo.FullName.SafeWriteFile(content, true);
+            return fileInfo;
+        }
+
+        /// <summary>
+        /// Creates or overwrites a file with the specified name in the VaultsDotSys directory and writes the provided
+        /// content to it.
+        /// </summary>
+        /// <param name="fileName">The name of the file to create or overwrite within the VaultsDotSys directory. Cannot be null or empty.</param>
+        /// <param name="content">The text content to write to the file. If the file already exists, its contents are replaced.</param>
+        /// <returns>A FileInfo object representing the file that was created or overwritten.</returns>
         public static FileInfo WriteVaultDotSysFile(string fileName, string content)
         {
             FileInfo fileInfo = new FileInfo(System.IO.Path.Combine(VaultsDotSys, fileName));
@@ -111,25 +134,73 @@ namespace Bam
             return fileInfo;
         }
 
-        public static bool TryReadVaultDotSysFile(string fileName, out string content)
+        /// <summary>
+        /// Attempts to read the contents of a Vault.sys file as a string.
+        /// </summary>
+        /// <remarks>This method does not throw exceptions if the file cannot be read. Instead, it returns
+        /// false and sets the out parameter to null.</remarks>
+        /// <param name="fileName">The full path to the Vault.sys file to read. Cannot be null or empty.</param>
+        /// <param name="content">When this method returns, contains the contents of the file as a string if the operation succeeded;
+        /// otherwise, null.</param>
+        /// <returns>true if the file was read successfully; otherwise, false.</returns>
+        public static bool TryReadVaultDotSysFileString(string fileName, out string? content)
         {
             try
             {
-                content = ReadVaultDotSysFile(fileName);
+                content = ReadVaultDotSysFileString(fileName);
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not StackOverflowException && ex is not OutOfMemoryException)
             {
                 content = null;
                 return false;
             }
         }
-        
-        public static string ReadVaultDotSysFile(string fileName)
+
+        /// <summary>
+        /// Attempts to read the contents of a Vault.sys file and returns the result as a byte array.
+        /// </summary>
+        /// <remarks>This method does not throw exceptions if the file cannot be read. Instead, it returns
+        /// false and sets the out parameter to null. Use this method when you want to handle file read failures without
+        /// exceptions.</remarks>
+        /// <param name="fileName">The full path to the Vault.sys file to read. Cannot be null or empty.</param>
+        /// <param name="content">When this method returns, contains the file contents as a byte array if the operation succeeds; otherwise,
+        /// null.</param>
+        /// <returns>true if the file was read successfully; otherwise, false.</returns>
+        public static bool TryReadVaultDotSysFileBytes(string fileName, out byte[]? content)
+        {
+            try
+            {
+                content = ReadVaultDotSysFileBytes(fileName);
+                return true;
+            }
+            catch (Exception ex) when (ex is not StackOverflowException && ex is not OutOfMemoryException)
+            {
+                content = null;
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Reads the contents of a file with the specified name from the VaultsDotSys directory as a string.
+        /// </summary>
+        /// <param name="fileName">The name of the file to read from the VaultsDotSys directory. Cannot be null or empty.</param>
+        /// <returns>A string containing the entire contents of the specified file.</returns>
+        public static string ReadVaultDotSysFileString(string fileName)
         {
             return File.ReadAllText(System.IO.Path.Combine(VaultsDotSys, fileName));
         }
-        
+
+        /// <summary>
+        /// Reads all bytes from the specified file located in the VaultsDotSys directory.
+        /// </summary>
+        /// <param name="fileName">The name of the file to read from the VaultsDotSys directory. Cannot be null or empty.</param>
+        /// <returns>A byte array containing the contents of the specified file.</returns>
+        public static byte[] ReadVaultDotSysFileBytes(string fileName)
+        {
+            return File.ReadAllBytes(System.IO.Path.Combine(VaultsDotSys, fileName));
+        }
+
         public static string ReadDataFile(string relativeFilePath)
         {
             FileInfo file = new FileInfo(System.IO.Path.Combine(DataPath, relativeFilePath));

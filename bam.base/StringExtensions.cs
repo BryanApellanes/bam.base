@@ -496,11 +496,46 @@ namespace Bam
         }
 
         /// <summary>
-        /// Write the specified text to the specified file in a thread safe way.
+        /// Writes the specified byte array to a file at the given path, optionally overwriting any existing file, and
+        /// invokes an optional action after the write completes.
         /// </summary>
-        /// <param name="filePath">The path to the file to write.</param>
-        /// <param name="textToWrite">The text to write.</param>
-        /// <param name="overwrite">True to overwrite.  If false and the file exists an InvalidOperationException will be thrown.</param>
+        /// <remarks>The write operation is performed in a thread-safe manner using a named lock based on
+        /// the file path. The file is always written with exclusive access. If the file exists and <paramref
+        /// name="overwrite"/> is <see langword="false"/>, the method will not overwrite the file and may throw an
+        /// exception.</remarks>
+        /// <param name="filePath">The path of the file to write to. Cannot be null or empty.</param>
+        /// <param name="data">The byte array containing the data to write to the file. Cannot be null.</param>
+        /// <param name="overwrite">A value indicating whether to overwrite the file if it already exists. If <see langword="true"/>, the
+        /// existing file will be replaced; otherwise, an exception is thrown if the file exists.</param>
+        /// <param name="postWriteAction">An optional action to invoke after the file has been written. The action receives the written file's <see
+        /// cref="FileInfo"/> as its argument. If null, no action is performed.</param>
+        public static void SafeWriteFile(this string filePath, byte[] data, bool overwrite, Action<object>? postWriteAction = null)
+        {
+            FileInfo fileInfo = HandleExisting(filePath, overwrite);
+
+            lock (FileLock.Named(fileInfo.FullName))
+            {
+                using (FileStream fs = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None))
+                {
+                    fs.Write(data, 0, data.Length);
+                }
+            }
+            postWriteAction?.Invoke(fileInfo);
+        }
+
+        /// <summary>
+        /// Writes the specified text to a file at the given path, optionally overwriting any existing file, and
+        /// executes an optional action after writing completes.
+        /// </summary>
+        /// <remarks>This method ensures thread-safe file writing by locking on a named file lock. The
+        /// file is always overwritten if <paramref name="overwrite"/> is <see langword="true"/>. If <paramref
+        /// name="overwrite"/> is <see langword="false"/> and the file exists, an exception is thrown.</remarks>
+        /// <param name="filePath">The path of the file to write to. Cannot be null or empty.</param>
+        /// <param name="textToWrite">The text content to write to the file.</param>
+        /// <param name="overwrite">A value indicating whether to overwrite the file if it already exists. If <see langword="true"/>, the
+        /// existing file is replaced; otherwise, an exception is thrown if the file exists.</param>
+        /// <param name="postWriteAction">An optional action to execute after the file has been written. The action receives the written file's <see
+        /// cref="FileInfo"/> as its argument. If null, no action is performed.</param>
         public static void SafeWriteFile(this string filePath, string textToWrite, bool overwrite,
             Action<object>? postWriteAction = null)
         {
@@ -561,7 +596,7 @@ namespace Bam
         {
             FileInfo fileInfo = new FileInfo(filePath);
 
-            if (!(bool)(fileInfo.Directory?.Exists))
+            if (fileInfo.Directory != null && !fileInfo.Directory.Exists)
             {
                 Directory.CreateDirectory(fileInfo.Directory.FullName);
             }
