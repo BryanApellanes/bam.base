@@ -15,6 +15,15 @@ public class RuntimeConfigShould : UnitTestMenuContainer
     [UnitTest]
     public async Task WriteDefault()
     {
-        Message.PrintLine(RuntimeConfig.WriteDefault());
+        When.A<string>("writes default runtime config",
+            () => RuntimeConfig.WriteDefault(),
+            (result) => result)
+        .TheTest
+        .ShouldPass(because =>
+        {
+            because.TheResult.IsNotNull();
+        })
+        .SoBeHappy()
+        .UnlessItFailed();
     }
 }

@@ -15,10 +15,25 @@ public class HashShould : UnitTestMenuContainer
     public void RoundTrip()
     {
         string value = 256.RandomLetters();
-        byte[] hashBytes = value.ToHashBytes(HashAlgorithms.SHA256);
-        string hashHex = hashBytes.ToHexString();
-        byte[] backAgain = hashHex.HexToByteArray();
-        
-        backAgain.SequenceEqual(hashBytes).ShouldBeTrue("byte arrays didn't match");
+
+        When.A<string>("round-trips hash bytes through hex string",
+            value,
+            (v) =>
+            {
+                byte[] hashBytes = v.ToHashBytes(HashAlgorithms.SHA256);
+                string hashHex = hashBytes.ToHexString();
+                byte[] backAgain = hashHex.HexToByteArray();
+                return new object[] { hashBytes, backAgain };
+            })
+        .TheTest
+        .ShouldPass(because =>
+        {
+            object[] results = (object[])because.Result;
+            byte[] hashBytes = (byte[])results[0];
+            byte[] backAgain = (byte[])results[1];
+            because.ItsTrue("byte arrays match", backAgain.SequenceEqual(hashBytes));
+        })
+        .SoBeHappy()
+        .UnlessItFailed();
     }
 }

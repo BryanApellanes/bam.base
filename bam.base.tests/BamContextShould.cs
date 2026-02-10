@@ -1,4 +1,4 @@
-﻿using Bam.Console;
+using Bam.Console;
 using Bam.DependencyInjection;
 using Bam.Logging;
 using Bam.Test;
@@ -17,61 +17,95 @@ namespace Bam.Tests
         public void GetServiceRegistryForCurrentProcessMode()
         {
             ProcessMode currentMode = ProcessMode.Current;
-            ProcessModeServiceRegistry processModeServiceRegistry = BamContext.GetServiceRegistry();
 
-            processModeServiceRegistry.ProcessMode.ShouldBeEqualTo(currentMode.Mode, "ProcessMode didn't match");
-
-            Message.PrintLine("Current ProcessMode is {0}", currentMode.Mode);
+            When.A<ProcessModeServiceRegistry>("gets service registry for current process mode",
+                () => BamContext.GetServiceRegistry(),
+                (registry) => registry)
+            .TheTest
+            .ShouldPass(because =>
+            {
+                because.TheResult.IsNotNull()
+                    .As<ProcessModeServiceRegistry>("ProcessMode matches current", r => currentMode.Mode.Equals(r?.ProcessMode));
+            })
+            .SoBeHappy()
+            .UnlessItFailed();
         }
 
         [UnitTest]
         public void ConfigureByProcessMode()
         {
-            BamContext.Configure(ProcessModes.Dev, (svcRegistry) =>
+            When.A<ProcessModeServiceRegistry>("configures loggers by process mode",
+                () =>
+                {
+                    BamContext.Configure(ProcessModes.Dev, (svcRegistry) =>
+                        svcRegistry.For<ILogger>().Use<ConsoleLogger>());
+                    BamContext.Configure(ProcessModes.Test, (svcRegistry) =>
+                        svcRegistry.For<ILogger>().Use<TextFileLogger>());
+                    return BamContext.GetServiceRegistry(ProcessMode.Dev);
+                },
+                (devRegistry) =>
+                {
+                    ILogger devLogger = devRegistry.ServiceRegistry.Get<ILogger>();
+                    ProcessModeServiceRegistry testRegistry = BamContext.GetServiceRegistry(ProcessMode.Test);
+                    ILogger testLogger = testRegistry.ServiceRegistry.Get<ILogger>();
+                    return new object[] { devLogger, testLogger };
+                })
+            .TheTest
+            .ShouldPass(because =>
             {
-                return svcRegistry
-                .For<ILogger>().Use<ConsoleLogger>();
-            });
-
-            BamContext.Configure(ProcessModes.Test, (svcRegistry) =>
-            {
-                return svcRegistry
-                .For<ILogger>().Use<TextFileLogger>();
-            });
-
-            ProcessModeServiceRegistry devServiceRegistry = BamContext.GetServiceRegistry(ProcessMode.Dev);
-
-            ILogger devLogger = devServiceRegistry.ServiceRegistry.Get<ILogger>();
-            devLogger.ShouldBeOfType<ConsoleLogger>();
-
-            ProcessModeServiceRegistry testServiceRegistry = BamContext.GetServiceRegistry(ProcessMode.Test);
-
-            ILogger testLogger = testServiceRegistry.ServiceRegistry.Get<ILogger>();
-            testLogger.ShouldBeOfType<TextFileLogger>();
+                object[] results = (object[])because.Result;
+                because.ItsTrue("dev logger is ConsoleLogger", results[0] is ConsoleLogger);
+                because.ItsTrue("test logger is TextFileLogger", results[1] is TextFileLogger);
+            })
+            .SoBeHappy()
+            .UnlessItFailed();
         }
 
         [UnitTest(DisplayName = "configure current mode")]
         public void ConfigureCurrentMode()
         {
             ProcessMode currentMode = ProcessMode.Current;
-            currentMode.Mode.ShouldNotBeEqualTo(ProcessModes.Prod);
 
-            BamContext.Configure(svcRegistry =>
+            When.A<ProcessModeServiceRegistry>("configures current mode",
+                () =>
+                {
+                    BamContext.Configure(svcRegistry =>
+                    {
+                        return svcRegistry
+                         .For<ITestClass>().Use<TestClass>();
+                    });
+                    return BamContext.GetServiceRegistry();
+                },
+                (registry) =>
+                {
+                    bool prodThrew = false;
+                    try
+                    {
+                        BamContext.GetServiceRegistry(ProcessMode.Prod).ServiceRegistry.Get<ITestClass>();
+                    }
+                    catch
+                    {
+                        prodThrew = true;
+                    }
+                    ITestClass testClass = registry.ServiceRegistry.Get<ITestClass>();
+                    return new object[] { registry, prodThrew, testClass };
+                })
+            .TheTest
+            .ShouldPass(because =>
             {
-                return svcRegistry
-                 .For<ITestClass>().Use<TestClass>();
-            });
-
-            Expect.Throws(() =>
-            {
-                BamContext.GetServiceRegistry(ProcessMode.Prod).ServiceRegistry.Get<ITestClass>();
-            }, "No exception was thrown but it should have been");
-
-            ProcessModeServiceRegistry processModeServiceRegistry = BamContext.GetServiceRegistry();
-            processModeServiceRegistry.ProcessMode.ShouldNotBeNull();
-            processModeServiceRegistry.ProcessMode.ShouldNotBeEqualTo(ProcessModes.Prod);
-            processModeServiceRegistry.ProcessMode.ShouldBeEqualTo(currentMode.Mode);
-            processModeServiceRegistry.ServiceRegistry.Get<ITestClass>().ShouldBeOfType<TestClass>();
+                object[] results = (object[])because.Result;
+                ProcessModeServiceRegistry registry = (ProcessModeServiceRegistry)results[0];
+                bool prodThrew = (bool)results[1];
+                ITestClass testClass = (ITestClass)results[2];
+                because.ItsTrue("current mode is not Prod", !currentMode.Mode.Equals(ProcessModes.Prod));
+                because.ItsTrue("getting ITestClass from Prod throws", prodThrew);
+                because.ItsTrue("ProcessMode is not null", registry.ProcessMode != null);
+                because.ItsTrue("ProcessMode is not Prod", !registry.ProcessMode.Equals(ProcessModes.Prod));
+                because.ItsTrue("ProcessMode equals current mode", registry.ProcessMode.Equals(currentMode.Mode));
+                because.ItsTrue("ITestClass is TestClass", testClass is TestClass);
+            })
+            .SoBeHappy()
+            .UnlessItFailed();
         }
     }
 }

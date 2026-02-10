@@ -1,4 +1,4 @@
-﻿using Bam.Test;
+using Bam.Test;
 using Bam.Console;
 using Bam.DependencyInjection;
 using Bam.Services;
@@ -12,75 +12,105 @@ namespace Bam.Tests
         [UnitTest]
         public void UseSingleton()
         {
-            ServiceRegistry svcRegistry = ServiceRegistry
-                .Create()
-                .For<ITestClass>().UseSingleton<TestClass>();
-
-            ITestClass refOne = svcRegistry.Get<ITestClass>();
-            ITestClass refTwo = svcRegistry.Get<ITestClass>();
-
-            refOne.ShouldBe(refTwo);
-            refOne.Name.ShouldBeEqualTo(refTwo.Name);
+            When.A<ServiceRegistry>("uses singleton registration",
+                () => ServiceRegistry.Create().For<ITestClass>().UseSingleton<TestClass>(),
+                (svcRegistry) =>
+                {
+                    ITestClass refOne = svcRegistry.Get<ITestClass>();
+                    ITestClass refTwo = svcRegistry.Get<ITestClass>();
+                    return new object[] { refOne, refTwo };
+                })
+            .TheTest
+            .ShouldPass(because =>
+            {
+                object[] results = (object[])because.Result;
+                ITestClass refOne = (ITestClass)results[0];
+                ITestClass refTwo = (ITestClass)results[1];
+                because.ItsTrue("references are the same", ReferenceEquals(refOne, refTwo));
+                because.ItsTrue("names are equal", refOne.Name.Equals(refTwo.Name));
+            })
+            .SoBeHappy()
+            .UnlessItFailed();
         }
 
         [UnitTest]
         public void UseTransient()
         {
-            ServiceRegistry svcRegistry = ServiceRegistry
-                .Create()
-                .For<ITestClass>().UseTransient<TestClass>();
-
-            ITestClass refOne = svcRegistry.Get<ITestClass>();
-            ITestClass refTwo = svcRegistry.Get<ITestClass>();
-
-            refOne.ShouldNotBe(refTwo);
-            refOne.Name.ShouldNotBeEqualTo(refTwo.Name);
+            When.A<ServiceRegistry>("uses transient registration",
+                () => ServiceRegistry.Create().For<ITestClass>().UseTransient<TestClass>(),
+                (svcRegistry) =>
+                {
+                    ITestClass refOne = svcRegistry.Get<ITestClass>();
+                    ITestClass refTwo = svcRegistry.Get<ITestClass>();
+                    return new object[] { refOne, refTwo };
+                })
+            .TheTest
+            .ShouldPass(because =>
+            {
+                object[] results = (object[])because.Result;
+                ITestClass refOne = (ITestClass)results[0];
+                ITestClass refTwo = (ITestClass)results[1];
+                because.ItsTrue("references are different", !ReferenceEquals(refOne, refTwo));
+                because.ItsTrue("names are different", !refOne.Name.Equals(refTwo.Name));
+            })
+            .SoBeHappy()
+            .UnlessItFailed();
         }
 
         [UnitTest]
         public void ReplaceAType()
         {
-            ServiceRegistry svcRegistry = ServiceRegistry
-                .Create()
-                .For<ITestClass>().Use<TestClass>()
-                .For<ITestClass>().Use<DifferentTestClass>();
-
-            ITestClass testClass = svcRegistry.Get<ITestClass>();
-            testClass.GetType().ShouldEqual(typeof(DifferentTestClass));
+            When.A<ServiceRegistry>("replaces a type registration",
+                () => ServiceRegistry.Create()
+                    .For<ITestClass>().Use<TestClass>()
+                    .For<ITestClass>().Use<DifferentTestClass>(),
+                (svcRegistry) => svcRegistry.Get<ITestClass>())
+            .TheTest
+            .ShouldPass(because =>
+            {
+                because.ItsTrue("resolved type is DifferentTestClass", because.Result?.GetType() == typeof(DifferentTestClass));
+            })
+            .SoBeHappy()
+            .UnlessItFailed();
         }
 
         [UnitTest]
         public void UseTheReplacedType()
         {
-            // Test to ensure that specifying the same interface
-            // multiple times causes the latest to be used 
-            // when constructing a class
-            ServiceRegistry svcRegistry = ServiceRegistry
-                .Create()
-                .For<DependentClass>().Use<DependentClass>()
-                .For<ITestClass>().Use<TestClass>()
-                .For<ITestClass>().Use<DifferentTestClass>();
-
-            DependentClass instance = svcRegistry.Get<DependentClass>();
-            instance.TestClass.ShouldNotBeNull();
-            instance.TestClass.GetType().ShouldEqual(typeof(DifferentTestClass));
+            When.A<ServiceRegistry>("uses the replaced type when constructing",
+                () => ServiceRegistry.Create()
+                    .For<DependentClass>().Use<DependentClass>()
+                    .For<ITestClass>().Use<TestClass>()
+                    .For<ITestClass>().Use<DifferentTestClass>(),
+                (svcRegistry) => svcRegistry.Get<DependentClass>())
+            .TheTest
+            .ShouldPass(because =>
+            {
+                because.TheResult.IsNotNull()
+                    .As<DependentClass>("TestClass is not null", d => d?.TestClass != null)
+                    .As<DependentClass>("TestClass is DifferentTestClass", d => d?.TestClass?.GetType() == typeof(DifferentTestClass));
+            })
+            .SoBeHappy()
+            .UnlessItFailed();
         }
 
         [UnitTest]
         public void ConstructTheRequestedClass()
         {
-            // Test to ensure that it isn't necessary to 
-            // specify a type in the registry as long as
-            // the required constructor parameters are
-            // in the registry.
-            ServiceRegistry svcRegistry = ServiceRegistry
-                .Create()
-                .For<ITestClass>().Use<TestClass>()
-                .For<ITestClass>().Use<DifferentTestClass>();
-
-            DependentClass instance = svcRegistry.Get<DependentClass>();
-            instance.TestClass.ShouldNotBeNull();
-            instance.TestClass.GetType().ShouldEqual(typeof(DifferentTestClass));
+            When.A<ServiceRegistry>("constructs the requested class without explicit registration",
+                () => ServiceRegistry.Create()
+                    .For<ITestClass>().Use<TestClass>()
+                    .For<ITestClass>().Use<DifferentTestClass>(),
+                (svcRegistry) => svcRegistry.Get<DependentClass>())
+            .TheTest
+            .ShouldPass(because =>
+            {
+                because.TheResult.IsNotNull()
+                    .As<DependentClass>("TestClass is not null", d => d?.TestClass != null)
+                    .As<DependentClass>("TestClass is DifferentTestClass", d => d?.TestClass?.GetType() == typeof(DifferentTestClass));
+            })
+            .SoBeHappy()
+            .UnlessItFailed();
         }
 
         [UnitTest]
@@ -101,7 +131,7 @@ namespace Bam.Tests
             .SoBeHappy()
             .UnlessItFailed();
         }
-        
+
         [UnitTest]
         public void DetectTightDependencyLoop()
         {
