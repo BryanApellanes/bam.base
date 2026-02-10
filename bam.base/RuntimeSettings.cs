@@ -157,9 +157,11 @@ namespace Bam
             DirectoryInfo root = new DirectoryInfo(_referenceAssemblyRootDirectories[osName]);
             if (root.Exists)
             {
-                List<string> versions = root.GetDirectories().Select(d => d.Name).ToList();
-                versions.Sort();
-                return versions.ToArray();
+                return root.GetDirectories()
+                    .Select(d => d.Name)
+                    .Where(name => Version.TryParse(name, out _))
+                    .OrderBy(name => Version.Parse(name))
+                    .ToArray();
             }
 
             return new string[] { };
