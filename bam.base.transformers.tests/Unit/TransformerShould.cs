@@ -1,4 +1,3 @@
-using System.Text;
 using Bam.DependencyInjection;
 using Bam.Encryption;
 using Bam.Services;
@@ -9,55 +8,79 @@ namespace Bam.Base.Transformers.Tests
 {
     public class TransformerShould : UnitTestMenuContainer
     {
-        
+
         public TransformerShould(ServiceRegistry serviceRegistry) : base(serviceRegistry)
         {
         }
-        
+
         [UnitTest]
         public void TransformBson()
         {
-            BsonTransformer<TestMonkey> transformer = new BsonTransformer<TestMonkey>();
-            TestMonkey testMonkey = new TestMonkey()
+            TestMonkey testMonkey = new TestMonkey { Name = "Bson Fred" };
+
+            When.A<BsonTransformer<TestMonkey>>("round-trips a TestMonkey through BSON",
+                (transformer) =>
+                {
+                    byte[] bson = transformer.Transform(testMonkey);
+                    TestMonkey decoded = transformer.GetReverseTransformer().ReverseTransform(bson);
+                    return decoded;
+                })
+            .TheTest
+            .ShouldPass(because =>
             {
-                Name = "Bson Fred"
-            };
-
-            byte[] bson = transformer.Transform(testMonkey);
-
-            TestMonkey decoded = transformer.GetReverseTransformer().ReverseTransform(bson);
-
-            Expect.AreEqual(testMonkey.Name, decoded.Name);
+                because.TheResult.IsNotNull()
+                    .As<TestMonkey>("Name equals original", m => testMonkey.Name.Equals(m?.Name));
+            })
+            .SoBeHappy()
+            .UnlessItFailed();
         }
 
         [UnitTest]
         public void TransformJson()
         {
-            JsonTransformer<TestMonkey> transformer = new JsonTransformer<TestMonkey>();
-            TestMonkey testMonkey = new TestMonkey()
+            TestMonkey testMonkey = new TestMonkey { Name = "Fred" };
+
+            When.A<JsonTransformer<TestMonkey>>("round-trips a TestMonkey through JSON",
+                (transformer) =>
+                {
+                    string json = transformer.Transform(testMonkey);
+                    TestMonkey decoded = transformer.GetReverseTransformer().ReverseTransform(json);
+                    return decoded;
+                })
+            .TheTest
+            .ShouldPass(because =>
             {
-                Name = "Fred"
-            };
-
-            string json = transformer.Transform(testMonkey);
-
-            TestMonkey decoded = transformer.GetReverseTransformer().ReverseTransform(json);
-
-            Expect.AreEqual(testMonkey.Name, decoded.Name);
+                because.TheResult.IsNotNull()
+                    .As<TestMonkey>("Name equals original", m => testMonkey.Name.Equals(m?.Name));
+            })
+            .SoBeHappy()
+            .UnlessItFailed();
         }
 
         [UnitTest]
         public void TransformBase64()
         {
-            Base64Transformer base64Transformer = new Base64Transformer();
             SecureRandom secureRandom = new SecureRandom();
             byte[] randomBytes = secureRandom.GenerateSeed(64);
 
-            string encoded = base64Transformer.Transform(randomBytes);
-
-            IValueReverseTransformer<string, byte[]> base64Untransformer = base64Transformer.GetReverseTransformer();
-            byte[] decoded = base64Untransformer.ReverseTransform(encoded);
-            Expect.AreEqual(randomBytes, decoded);
+            When.A<Base64Transformer>("round-trips random bytes through Base64",
+                (transformer) =>
+                {
+                    string encoded = transformer.Transform(randomBytes);
+                    IValueReverseTransformer<string, byte[]> untransformer = transformer.GetReverseTransformer();
+                    byte[] decoded = untransformer.ReverseTransform(encoded);
+                    return new object[] { randomBytes, decoded };
+                })
+            .TheTest
+            .ShouldPass(because =>
+            {
+                object[] results = (object[])because.Result;
+                byte[] original = (byte[])results[0];
+                byte[] decoded = (byte[])results[1];
+                because.ItsTrue("decoded bytes equal original", original.SequenceEqual(decoded));
+            })
+            .SoBeHappy()
+            .UnlessItFailed();
         }
 
     }
