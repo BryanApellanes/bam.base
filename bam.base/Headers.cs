@@ -40,5 +40,11 @@
         /// handle a given request.
         /// </summary>
         public static string Responder => "X-Bam-Responder";
+
+        public static string Authorization => "Authorization";
+        public static string BodySignature => "X-Bam-Body-Signature";
+        public static string BodySignatureAlgorithm => "X-Bam-Body-Signature-Algorithm";
+        public static string Nonce => "X-Bam-Nonce";
+        public static string NonceHash => "X-Bam-Nonce-Hash";
     }
 }

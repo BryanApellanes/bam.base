@@ -225,6 +225,18 @@ namespace Bam
             return BitConverter.ToUInt32(hashBytes, 0);
         }
         
+        /// <summary>
+        /// Computes a hash of the specified string using the given algorithm and returns an integer within the
+        /// specified range.
+        /// </summary>
+        /// <param name="toBeHashed">The string to hash. Cannot be null.</param>
+        /// <param name="algorithm">The hash algorithm to use when computing the hash.</param>
+        /// <param name="lowerBound">The inclusive lower bound of the range for the resulting integer.</param>
+        /// <param name="upperBound">The exclusive upper bound of the range for the resulting integer. Must be greater than <paramref
+        /// name="lowerBound"/>.</param>
+        /// <param name="encoding">The text encoding to use when converting the string to bytes. If null, UTF-8 encoding is used.</param>
+        /// <returns>An integer greater than or equal to <paramref name="lowerBound"/> and less than <paramref
+        /// name="upperBound"/> representing the hash of the input string.</returns>
         public static int ToHashIntBetween(this string toBeHashed, HashAlgorithms algorithm, int lowerBound, int upperBound, Encoding? encoding = null)
         {
             int mod = upperBound - lowerBound;
