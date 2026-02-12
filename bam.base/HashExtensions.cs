@@ -240,7 +240,9 @@ namespace Bam
         public static int ToHashIntBetween(this string toBeHashed, HashAlgorithms algorithm, int lowerBound, int upperBound, Encoding? encoding = null)
         {
             int mod = upperBound - lowerBound;
-            return (ToHashInt(toBeHashed, algorithm, encoding) % mod) + lowerBound;
+            int remainder = ToHashInt(toBeHashed, algorithm, encoding) % mod;
+            if (remainder < 0) remainder += mod;
+            return remainder + lowerBound;
         }
 
         public static int ToHashInt(this string toBeHashed, HashAlgorithms algorithm, Encoding? encoding = null)
