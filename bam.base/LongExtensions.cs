@@ -2,12 +2,7 @@
 {
     public static class LongExtensions
     { 
-        public static ulong MapToUlong(this long longValue)
-        {
-            return unchecked((ulong)(longValue - long.MinValue));
-        }
-
-        public static long Largest(this long[] longs)
+public static long Largest(this long[] longs)
         {
             if (longs.Length == 0)
             {

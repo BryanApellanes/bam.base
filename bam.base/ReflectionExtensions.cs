@@ -658,7 +658,7 @@ namespace Bam
                 else if (value is long l &&
                          (property.PropertyType == typeof(ulong) || property.PropertyType == typeof(ulong?)))
                 {
-                    value = l.MapToUlong();//Dao.MapLongToUlong(l);
+                    value = Convert.ToUInt64(l);
                 }
                 else if ((value is int || value is decimal) &&
                    (property.PropertyType == typeof(ulong) ||
