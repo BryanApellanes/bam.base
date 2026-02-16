@@ -5,10 +5,16 @@
 namespace Bam.Analytics
 {
 
+    /// <summary>
+    /// Represents the result of comparing two text strings, containing tokens for unchanged, inserted, and deleted lines.
+    /// </summary>
     [Serializable]
     public class DiffReport : IDiffReport
     {
         Dictionary<string, Action<string>> _savers;
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DiffReport"/> class with empty token collections and default save support for JSON.
+        /// </summary>
         public DiffReport()
         {
             tokens = new List<DiffReportToken>();
@@ -23,6 +29,9 @@ namespace Bam.Analytics
         }
 
         List<DiffReportToken> tokens;
+        /// <summary>
+        /// Gets or sets all diff tokens (unchanged, inserted, and deleted lines) in order.
+        /// </summary>
         public DiffReportToken[] Tokens
         {
             get => tokens.ToArray();
@@ -34,15 +43,22 @@ namespace Bam.Analytics
         }
 
         List<InsertedDiffReportToken> inserted;
+        /// <summary>
+        /// Gets the tokens representing lines that were inserted in the modified text.
+        /// </summary>
         public InsertedDiffReportToken[] Inserted => inserted.ToArray();
 
         List<DeletedDiffReportToken> deleted;
+        /// <summary>
+        /// Gets the tokens representing lines that were deleted from the original text.
+        /// </summary>
         public DeletedDiffReportToken[] Deleted => deleted.ToArray();
 
         /// <summary>
-        /// Saves this Report to the specified file overwriting if the file exists.
+        /// Saves this report to the specified file, overwriting it if it already exists.
+        /// Uses the file extension to determine the format; defaults to JSON.
         /// </summary>
-        /// <param name="filePath"></param>
+        /// <param name="filePath">The file path to save the report to.</param>
         public void Save(string filePath)
         {
             string ext = System.IO.Path.GetExtension(filePath);
@@ -74,23 +90,23 @@ namespace Bam.Analytics
         }
                 
         /// <summary>
-        /// Create report of differences between the two strings specified.
+        /// Creates a diff report comparing two strings line by line, using newline as the separator.
         /// </summary>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        /// <returns></returns>
+        /// <param name="a">The original text.</param>
+        /// <param name="b">The modified text.</param>
+        /// <returns>A <see cref="DiffReport"/> containing tokens for unchanged, inserted, and deleted lines.</returns>
         public static DiffReport Create(string a, string b)
         {
             return Create(a, b, '\n');
         }
 
         /// <summary>
-        /// Create report of differences between the two strings specified. 
+        /// Creates a diff report comparing two strings, splitting on the specified separator characters.
         /// </summary>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        /// <param name="separators"></param>
-        /// <returns></returns>
+        /// <param name="a">The original text.</param>
+        /// <param name="b">The modified text.</param>
+        /// <param name="separators">Characters used to split the text into comparable segments.</param>
+        /// <returns>A <see cref="DiffReport"/> containing tokens for unchanged, inserted, and deleted lines.</returns>
         public static DiffReport Create(string a, string b, params char[] separators)
         {
             DiffReport report = new DiffReport();

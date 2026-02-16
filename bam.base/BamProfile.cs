@@ -1,7 +1,7 @@
 namespace Bam
 {
     /// <summary>
-    /// Paths rooted in the current process' user profile.
+    /// Paths rooted in the .bam direcotry of the owner of the current process' user profile.
     /// </summary>
     public static class BamProfile
     {

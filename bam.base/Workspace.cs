@@ -7,9 +7,22 @@ namespace Bam
     /// </summary>
     public class Workspace
     {
+        /// <summary>
+        /// Gets or sets the application name provider associated with this workspace.
+        /// </summary>
         public IApplicationNameProvider ApplicationNameProvider { get; set; }
+
+        /// <summary>
+        /// Gets or sets the root directory of this workspace.
+        /// </summary>
         public DirectoryInfo Root { get; set; }
-        
+
+        /// <summary>
+        /// Creates a directory at the path formed by joining the specified segments relative to the workspace root.
+        /// Returns the existing directory if it already exists.
+        /// </summary>
+        /// <param name="pathSegments">Path segments relative to the workspace root.</param>
+        /// <returns>The created or existing <see cref="DirectoryInfo"/>.</returns>
         public DirectoryInfo CreateDirectory(params string[] pathSegments)
         {
             DirectoryInfo directoryInfo = new DirectoryInfo(Path(pathSegments));
@@ -100,6 +113,11 @@ namespace Bam
             return file;
         }
 
+        /// <summary>
+        /// Loads an instance of type T from a YAML file in the workspace, named by the type's namespace and name.
+        /// </summary>
+        /// <typeparam name="T">The type to deserialize from the YAML file.</typeparam>
+        /// <returns>The deserialized instance of T.</returns>
         public T Load<T>()
         {
             Type type = typeof(T);
@@ -129,11 +147,23 @@ namespace Bam
             get { return _currentLock.DoubleCheckLock(ref _current, () => ForApplication()); }
         }
         
+        /// <summary>
+        /// Creates a workspace scoped to type T, located under the application workspace in a process-mode-specific subdirectory.
+        /// </summary>
+        /// <typeparam name="T">The type to scope the workspace to.</typeparam>
+        /// <param name="applicationNameProvider">Optional application name provider. Defaults to the current process.</param>
+        /// <returns>A <see cref="Workspace"/> rooted at the type-specific directory.</returns>
         public static Workspace ForType<T>(IApplicationNameProvider? applicationNameProvider = null)
         {
             return ForType(typeof(T), applicationNameProvider);
         }
-        
+
+        /// <summary>
+        /// Creates a workspace scoped to the specified type, located under the application workspace in a process-mode-specific subdirectory.
+        /// </summary>
+        /// <param name="type">The type to scope the workspace to.</param>
+        /// <param name="applicationNameProvider">Optional application name provider. Defaults to the current process.</param>
+        /// <returns>A <see cref="Workspace"/> rooted at the type-specific directory.</returns>
         public static Workspace ForType(Type type, IApplicationNameProvider? applicationNameProvider = null)
         {
             applicationNameProvider = applicationNameProvider ?? ProcessApplicationNameProvider.Current;
@@ -143,11 +173,20 @@ namespace Bam
             return new Workspace() {ApplicationNameProvider = applicationNameProvider, Root = new DirectoryInfo(directoryPath)};
         }
 
+        /// <summary>
+        /// Creates a workspace for the current process using <see cref="ProcessApplicationNameProvider.Current"/>.
+        /// </summary>
+        /// <returns>A <see cref="Workspace"/> rooted at the current process application directory.</returns>
         public static Workspace ForProcess()
         {
             return ForApplication(ProcessApplicationNameProvider.Current);
         }
-        
+
+        /// <summary>
+        /// Creates a workspace for the specified application name provider under the BAM home apps directory.
+        /// </summary>
+        /// <param name="applicationNameProvider">Optional application name provider. Defaults to the current process.</param>
+        /// <returns>A <see cref="Workspace"/> rooted at the application directory.</returns>
         public static Workspace ForApplication(IApplicationNameProvider? applicationNameProvider = null)
         {
             applicationNameProvider = applicationNameProvider ?? ProcessApplicationNameProvider.Current;
@@ -156,6 +195,11 @@ namespace Bam
             return new Workspace() {ApplicationNameProvider = applicationNameProvider, Root = new DirectoryInfo(directoryPath)};
         }
 
+        /// <summary>
+        /// Creates a workspace for the specified application name under the BAM home apps directory.
+        /// </summary>
+        /// <param name="applicationName">The application name to create the workspace for.</param>
+        /// <returns>A <see cref="Workspace"/> rooted at the application directory.</returns>
         public static Workspace ForApplication(string applicationName)
         {
             return new Workspace()

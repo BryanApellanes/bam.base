@@ -12,18 +12,22 @@ namespace Bam.Analytics
   using System.Text.RegularExpressions;
 
 	
+  /// <summary>
+  /// Implements a line-by-line text diff algorithm based on the longest common subsequence (LCS) approach.
+  /// Compares two text documents or integer arrays and produces an array of <see cref="Item"/> records describing the differences.
+  /// </summary>
   public class Diff {
 
-    /// <summary>details of one difference.</summary>
+    /// <summary>Describes a single contiguous difference between two sequences.</summary>
     public struct Item {
-      /// <summary>Start Line number in Data A.</summary>
+      /// <summary>Start line number in Data A (the original).</summary>
       public int StartA;
-      /// <summary>Start Line number in Data B.</summary>
+      /// <summary>Start line number in Data B (the modified).</summary>
       public int StartB;
 
-      /// <summary>Number of changes in Data A.</summary>
+      /// <summary>Number of lines deleted from Data A.</summary>
       public int deletedA;
-      /// <summary>Number of changes in Data A.</summary>
+      /// <summary>Number of lines inserted into Data B.</summary>
       public int insertedB;
     } // Item
 
@@ -138,6 +142,15 @@ namespace Bam.Analytics
     } // DiffText
 
 
+    /// <summary>
+    /// Finds the differences between two texts, comparing by text lines separated by newline characters.
+    /// </summary>
+    /// <param name="TextA">The original version of the text.</param>
+    /// <param name="TextB">The modified version of the text.</param>
+    /// <param name="trimSpace">When true, leading and trailing whitespace is stripped before comparison.</param>
+    /// <param name="ignoreSpace">When true, all whitespace sequences are normalized to a single space before comparison.</param>
+    /// <param name="ignoreCase">When true, text is compared case-insensitively.</param>
+    /// <returns>An array of <see cref="Item"/> records describing the differences.</returns>
     public static Item[] DiffText(string TextA, string TextB, bool trimSpace, bool ignoreSpace, bool ignoreCase)
     {
         return DiffText(TextA, TextA, trimSpace, ignoreSpace, ignoreCase, '\n');

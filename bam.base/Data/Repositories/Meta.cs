@@ -10,9 +10,9 @@ using Bam.Services;
 namespace Bam.Data.Repositories
 {
 	/// <summary>
-	/// Provides meta data about persisted or persistable objects. 
+	/// Provides typed meta data about persisted or persistable objects.
 	/// </summary>
-	/// <typeparam name="T"></typeparam>
+	/// <typeparam name="T">The type of the wrapped data object.</typeparam>
 	/// <seealso cref="Bam.Data.Repositories.Meta" />
 	[Serializable]
 	public class Meta<T>: Meta
@@ -26,21 +26,18 @@ namespace Bam.Data.Repositories
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Meta{T}"/> class.
+        /// Initializes a new instance of the <see cref="Meta{T}"/> class with the specified data and object persister.
         /// </summary>
-        /// <param name="data">The data.</param>
-        /// <param name="objectPersister">The object reader writer.</param>
+        /// <param name="data">The typed data object to wrap.</param>
+        /// <param name="objectPersister">The object persister used for reading and writing.</param>
         public Meta(T data, IObjectPersister objectPersister) : base(data, objectPersister)
         {
             Type = typeof(T);
         }
 
         /// <summary>
-        /// Gets or sets the typed data.
+        /// Gets or sets the wrapped data object cast to type <typeparamref name="T"/>.
         /// </summary>
-        /// <value>
-        /// The typed data.
-        /// </value>
         public T TypedData
 		{
 			get
@@ -54,12 +51,10 @@ namespace Bam.Data.Repositories
 		}
 
         /// <summary>
-        /// Performs an implicit conversion from <see cref="Meta{T}"/> to T.
+        /// Implicitly converts a <see cref="Meta{T}"/> to its underlying typed data.
         /// </summary>
-        /// <param name="meta">The meta.</param>
-        /// <returns>
-        /// The result of the conversion.
-        /// </returns>
+        /// <param name="meta">The meta instance to unwrap.</param>
+        /// <returns>The underlying <typeparamref name="T"/> data object.</returns>
         public static implicit operator T(Meta<T> meta)
 		{
 			return meta.TypedData;
@@ -67,20 +62,17 @@ namespace Bam.Data.Repositories
 	}
 
     /// <summary>
-    /// Provides meta data about persisted or persistable objects.
+    /// Provides meta data (Id, Uuid, Cuid, hash values) about persisted or persistable objects,
+    /// and encapsulates reading and writing object properties through an <see cref="IObjectPersister"/>.
     /// </summary>
-    /// <seealso cref="Bam.Data.Repositories.Meta" />
     [Serializable]
 	public class Meta
 	{
 		IObjectPersister _objectPersister;
 		object _objectPersisterLock = new object();
 		/// <summary>
-		/// Gets or sets the object reader writer.
+		/// Gets or sets the object persister used for reading and writing data. Resolved from the service registry if not explicitly set.
 		/// </summary>
-		/// <value>
-		/// The object reader writer.
-		/// </value>
 		public IObjectPersister ObjectPersister
 		{
 			get
@@ -129,11 +121,11 @@ namespace Bam.Data.Repositories
 		}
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Meta"/> class.
+        /// Initializes a new instance of the <see cref="Meta"/> class with the specified data and object persister.
         /// </summary>
-        /// <param name="data">The data.</param>
-        /// <param name="objectPersister">The object reader writer.</param>
-        /// <param name="setMeta">if set to <c>true</c> [set meta].</param>
+        /// <param name="data">The data object to wrap.</param>
+        /// <param name="objectPersister">The object persister used for reading and writing.</param>
+        /// <param name="setMeta">If true, initializes the Id, Uuid, and Cuid on the data object.</param>
         public Meta(object data, IObjectPersister objectPersister, bool setMeta = true)
 		{
 			RequireIdProperty = true;
@@ -146,6 +138,9 @@ namespace Bam.Data.Repositories
 
 
         Type _type;
+        /// <summary>
+        /// Gets or sets the type of the wrapped data object. If not explicitly set, returns the runtime type of <see cref="Data"/>.
+        /// </summary>
 		public Type Type
 		{
 			get
@@ -158,8 +153,14 @@ namespace Bam.Data.Repositories
             }
 		}
 
+        /// <summary>
+        /// Gets the wrapped data object.
+        /// </summary>
 		public object Data { get; internal set; }
 
+        /// <summary>
+        /// Gets a value indicating whether the wrapped data object has the <see cref="SerializableAttribute"/>.
+        /// </summary>
 		public bool IsSerializable
 		{
 			get
@@ -173,12 +174,21 @@ namespace Bam.Data.Repositories
 			}
 		}
 
+        /// <summary>
+        /// Gets the hash algorithm used for computing hashes. Set internally during meta initialization.
+        /// </summary>
         public HashAlgorithms HashAlgorithm
         {
             get;
             private set;
         }
 
+        /// <summary>
+        /// Reads the value of the specified property from persisted storage using the object persister.
+        /// </summary>
+        /// <typeparam name="T">The expected type of the property value.</typeparam>
+        /// <param name="propInfo">The property to read.</param>
+        /// <returns>The persisted property value, or default if the property info is null.</returns>
         public T? ReadProperty<T>(PropertyInfo propInfo)
 		{
 			if (propInfo != null)
@@ -190,6 +200,13 @@ namespace Bam.Data.Repositories
 			return default;
 		}
 
+        /// <summary>
+        /// Reads a specific version of the specified property value from persisted storage.
+        /// </summary>
+        /// <typeparam name="T">The expected type of the property value.</typeparam>
+        /// <param name="propInfo">The property to read.</param>
+        /// <param name="version">The version number to retrieve.</param>
+        /// <returns>The versioned property value, or default if the property info is null.</returns>
 		public T ReadPropertyVersion<T>(PropertyInfo propInfo, int version)
 		{
 			if (propInfo != null)
@@ -201,6 +218,11 @@ namespace Bam.Data.Repositories
 			return default(T);
 		}
 
+        /// <summary>
+        /// Sets the specified property on the data object and persists the object asynchronously.
+        /// </summary>
+        /// <param name="propInfo">The property to write.</param>
+        /// <param name="propertyValue">The value to set on the property.</param>
 		public void WriteProperty(PropertyInfo propInfo, object? propertyValue)
 		{
 			if (propInfo != null)
@@ -210,6 +232,9 @@ namespace Bam.Data.Repositories
 			}
 		}
 
+        /// <summary>
+        /// Gets or sets whether an Id property is required on the data object. Defaults to true.
+        /// </summary>
 		public bool RequireIdProperty
 		{
 			get;
@@ -217,7 +242,7 @@ namespace Bam.Data.Repositories
 		}
 
 		/// <summary>
-		/// Returns UuidHash
+		/// Gets the hash for this meta instance, preferring <see cref="UuidHash"/> and falling back to <see cref="IdHash"/>.
 		/// </summary>
 		public string Hash
 		{
@@ -227,6 +252,9 @@ namespace Bam.Data.Repositories
 			}
 		}
 
+        /// <summary>
+        /// Gets the numeric Id of the wrapped data object, or 0 if the data is null.
+        /// </summary>
 		public ulong Id
 		{
 			get
@@ -239,6 +267,9 @@ namespace Bam.Data.Repositories
 			}
 		}
 
+        /// <summary>
+        /// Gets or sets the UUID of the wrapped data object, read from or written to the object's Uuid property via reflection.
+        /// </summary>
 		public string Uuid
 		{
 			get
@@ -251,6 +282,9 @@ namespace Bam.Data.Repositories
 			}
 		}
 
+        /// <summary>
+        /// Gets the MD5 hash computed from the Id and the full type name.
+        /// </summary>
 		public string IdHash
 		{
 			get
@@ -259,6 +293,9 @@ namespace Bam.Data.Repositories
 			}
 		}
 
+        /// <summary>
+        /// Gets the MD5 hash computed from the Uuid and the full type name.
+        /// </summary>
 		public string UuidHash
 		{
 			get
@@ -267,6 +304,11 @@ namespace Bam.Data.Repositories
 			}
 		}
 
+        /// <summary>
+        /// Gets an <see cref="IMetaProperty"/> wrapper for the specified property on the data object.
+        /// </summary>
+        /// <param name="propertyName">The name of the property to retrieve.</param>
+        /// <returns>An <see cref="IMetaProperty"/> for the named property, or null if the property does not exist.</returns>
 		public IMetaProperty Property(string propertyName)
 		{
 			PropertyInfo? prop = Data.GetType().GetProperty(propertyName);
@@ -279,12 +321,23 @@ namespace Bam.Data.Repositories
 			return null;
 		}
 
+        /// <summary>
+        /// Sets the value of the specified property on the data object.
+        /// </summary>
+        /// <param name="propertyName">The name of the property to set.</param>
+        /// <param name="value">The value to assign.</param>
+        /// <returns>This <see cref="Meta"/> instance for method chaining.</returns>
 		public Meta Property(string propertyName, object value)
 		{
 			Property(propertyName).SetValue(value);
 			return this;
 		}
 
+        /// <summary>
+        /// Initializes the meta data (Id, Uuid, Cuid) for the specified data object.
+        /// If the data is itself a <see cref="Meta"/> instance, the inner data is unwrapped.
+        /// </summary>
+        /// <param name="data">The data object to initialize meta data for.</param>
 		public void SetMeta(object data)
 		{
 			Meta meta = data as Meta;
@@ -296,31 +349,61 @@ namespace Bam.Data.Repositories
 			SetMeta();
 		}
 
+        /// <summary>
+        /// Determines whether two objects are equal by comparing their Uuid properties.
+        /// </summary>
+        /// <param name="one">The first object to compare.</param>
+        /// <param name="two">The second object to compare.</param>
+        /// <returns>True if the Uuid values of both objects are equal.</returns>
 		public static bool AreEqual(object? one, object? two)
 		{
 			return UuidsAreEqual(one, two);
 		}
 
+        /// <summary>
+        /// Determines whether two objects have the same Id property value.
+        /// </summary>
+        /// <param name="one">The first object to compare.</param>
+        /// <param name="two">The second object to compare.</param>
+        /// <returns>True if the Id values of both objects are equal.</returns>
 		public static bool IdsAreEqual(object one, object two)
 		{
 			return Meta.GetId(one) == Meta.GetId(two);
 		}
 
+        /// <summary>
+        /// Determines whether two objects have the same Uuid property value.
+        /// </summary>
+        /// <param name="one">The first object to compare.</param>
+        /// <param name="two">The second object to compare.</param>
+        /// <returns>True if the Uuid values of both objects are equal.</returns>
 		public static bool UuidsAreEqual(object? one, object? two)
 		{
 			return Meta.GetUuid(one).Equals(Meta.GetUuid(two));
 		}
 
+        /// <summary>
+        /// Determines whether this Meta is equal to the specified object by comparing Uuid values.
+        /// </summary>
+        /// <param name="obj">The object to compare with.</param>
+        /// <returns>True if the Uuid values are equal.</returns>
 		public override bool Equals(object? obj)
 		{
 			return AreEqual(this, obj);
 		}
 
+        /// <summary>
+        /// Returns the hash code of the Uuid string.
+        /// </summary>
+        /// <returns>The hash code of the Uuid.</returns>
 		public override int GetHashCode()
 		{
 			return Uuid.GetHashCode();
 		}
 
+        /// <summary>
+        /// Initializes Id, Uuid, and Cuid on the wrapped data object if they are not already set.
+        /// </summary>
 		public virtual void SetMeta()
 		{
 			if (Data != null)
@@ -337,6 +420,10 @@ namespace Bam.Data.Repositories
 			}
 		}
 
+        /// <summary>
+        /// Sets the Created (if null) and Modified audit fields on the specified object to the current UTC time.
+        /// </summary>
+        /// <param name="value">The object whose audit fields should be set.</param>
 		public static void SetAuditFields(object value)
 		{
 			Args.ThrowIfNull(value, "value");
@@ -382,11 +469,23 @@ namespace Bam.Data.Repositories
             return GetUuidHash(Uuid, type);
 		}
     
+        /// <summary>
+        /// Computes an MD5 hash from the specified UUID and type full name.
+        /// </summary>
+        /// <param name="uuid">The UUID string.</param>
+        /// <param name="type">The type whose full name is included in the hash input.</param>
+        /// <returns>An MD5 hash string.</returns>
         public static string GetUuidHash(string uuid, Type type)
         {
 			return $"{uuid}::{type.FullName}".Md5(); // TODO: make the algorithm configurable
         }
 
+        /// <summary>
+        /// Computes an MD5 hash from the Uuid property of the specified object and the given type full name.
+        /// </summary>
+        /// <param name="value">The object whose Uuid property is read via reflection. If null, an empty UUID is used.</param>
+        /// <param name="type">The type whose full name is included in the hash input.</param>
+        /// <returns>An MD5 hash string.</returns>
         public static string GetUuidHash(object? value, Type type)
         {
             string result = GetUuidHash("", Type.Missing.GetType());
@@ -406,6 +505,12 @@ namespace Bam.Data.Repositories
             return result;
         }
 
+        /// <summary>
+        /// Computes an MD5 hash from the Id property of the specified object and its type full name.
+        /// </summary>
+        /// <param name="value">The object whose Id property is read via reflection.</param>
+        /// <param name="type">The type to use for the hash. If null, the runtime type of <paramref name="value"/> is used.</param>
+        /// <returns>An MD5 hash string.</returns>
         public static string GetIdHash(object value, Type? type = null)
         {
             type = type ?? value.GetType();
@@ -413,11 +518,24 @@ namespace Bam.Data.Repositories
             return GetIdHash(id, type);
         }
 
+        /// <summary>
+        /// Computes an MD5 hash from the specified Id and type full name.
+        /// </summary>
+        /// <param name="id">The numeric Id.</param>
+        /// <param name="type">The type whose full name is included in the hash input.</param>
+        /// <returns>An MD5 hash string.</returns>
         public static string GetIdHash(long id, Type type)
         {
             return "{0}::{1}".Format(id, type.FullName).Md5();
         }
 
+        /// <summary>
+        /// Computes an MD5 hash from the specified nullable Id and type full name.
+        /// Returns an empty string if either parameter is null.
+        /// </summary>
+        /// <param name="id">The nullable numeric Id.</param>
+        /// <param name="type">The type whose full name is included in the hash input.</param>
+        /// <returns>An MD5 hash string, or an empty string if <paramref name="id"/> or <paramref name="type"/> is null.</returns>
         public static string GetIdHash(ulong? id, Type type)
         {
 			if(id == null)

@@ -9,14 +9,27 @@ namespace Bam
     /// </summary>
     public static class Expect
     {
+        /// <summary>
+        /// Gets or sets whether exception messages should be HTML-encoded.
+        /// </summary>
         public static bool ShouldHtmlEncodeExceptions { get; set; }
 
+        /// <summary>
+        /// Asserts that the boolean value is true. Throws an <see cref="ExpectationFailedException"/> if false.
+        /// </summary>
+        /// <param name="boolToCheck">The boolean value to check.</param>
+        /// <param name="failureMessage">Optional message to include in the exception.</param>
         public static void ShouldBeTrue(this bool boolToCheck, string? failureMessage = null)
         {
             IsTrue(boolToCheck, failureMessage ?? "Expected <true>, Actual <false>");
         }
 
-        public static void IsTrue(this bool boolToCheck, string failureMessage = "Expected <true>, Actual <false>") 
+        /// <summary>
+        /// Asserts that the boolean value is true. Throws an <see cref="ExpectationFailedException"/> if false.
+        /// </summary>
+        /// <param name="boolToCheck">The boolean value to check.</param>
+        /// <param name="failureMessage">The message to include in the exception if the assertion fails.</param>
+        public static void IsTrue(this bool boolToCheck, string failureMessage = "Expected <true>, Actual <false>")
         {
             if (!boolToCheck)
             {
@@ -31,21 +44,40 @@ namespace Bam
             }
         }
 
+        /// <summary>
+        /// Asserts that a file exists at the specified path. Throws an <see cref="ExpectationFailedException"/> if the file does not exist.
+        /// </summary>
+        /// <param name="filePath">The file path to check.</param>
+        /// <param name="failureMessage">The message to include in the exception if the file does not exist.</param>
         public static void FileExists(string filePath, string failureMessage = "File not found.")
         {
             Expect.IsTrue(File.Exists(filePath), failureMessage);
         }
 
+        /// <summary>
+        /// Asserts that the boolean value is false. Throws an <see cref="ExpectationFailedException"/> if true.
+        /// </summary>
+        /// <param name="boolToCheck">The boolean value to check.</param>
+        /// <param name="failureMessage">Optional message to include in the exception.</param>
         public static void ShouldBeFalse(this bool boolToCheck, string? failureMessage = null)
         {
             IsFalse(boolToCheck, failureMessage);
         }
-        
+
+        /// <summary>
+        /// Asserts that the boolean value is false. Throws an <see cref="ExpectationFailedException"/> if true.
+        /// </summary>
+        /// <param name="boolToCheck">The boolean value to check.</param>
         public static void IsFalse(this bool boolToCheck)
         {
             IsFalse(boolToCheck, string.Empty);
         }
 
+        /// <summary>
+        /// Asserts that the boolean value is false. Throws an <see cref="ExpectationFailedException"/> if true.
+        /// </summary>
+        /// <param name="boolToCheck">The boolean value to check.</param>
+        /// <param name="failureMessage">The message to include in the exception if the assertion fails.</param>
         public static void IsFalse(this bool boolToCheck, string failureMessage)
         {
             if (boolToCheck)
@@ -61,6 +93,14 @@ namespace Bam
             }
         }
 
+        /// <summary>
+        /// Asserts that the specified instance can be cast to type T and returns the cast result.
+        /// Throws an <see cref="ExpectationFailedException"/> if the cast fails.
+        /// </summary>
+        /// <typeparam name="T">The target type to cast to.</typeparam>
+        /// <param name="instance">The object to cast.</param>
+        /// <param name="failureMessage">Optional message to include in the exception if the cast fails.</param>
+        /// <returns>The instance cast to type T.</returns>
         public static T CanCast<T>(object instance, string? failureMessage = null)
         {
             try
@@ -172,6 +212,11 @@ namespace Bam
                 throw new ExpectationFailedException(failureMessage);
         }
 
+        /// <summary>
+        /// Checks if the specified "left" value is greater than or equal to the specified "right" value.
+        /// </summary>
+        /// <param name="left">The value on the left side of the comparison.</param>
+        /// <param name="right">The value on the right side of the comparison.</param>
         public static void IsGreaterThanOrEqualTo(int left, int right)
         {
             IsGreaterThanOrEqualTo(left, right, string.Format("{0} is not greater than or equal to {1}", left, right));
@@ -187,6 +232,12 @@ namespace Bam
                 throw new ExpectationFailedException(failureMessage);
         }
 
+        /// <summary>
+        /// Checks if the specified "left" value is less than or equal to the specified "right" value.
+        /// </summary>
+        /// <param name="left">The value on the left side of the comparison.</param>
+        /// <param name="right">The value on the right side of the comparison.</param>
+        /// <param name="failureMessage">Optional message to include in the exception if the assertion fails.</param>
         public static void IsLessThanOrEqualTo(int left, int right, string? failureMessage = null)
         {
             if (!(left <= right))
@@ -221,11 +272,23 @@ namespace Bam
             }
         }
         
+        /// <summary>
+        /// Asserts that the actual integer equals the expected value. Extension method form of <see cref="AreEqual(int, int, string)"/>.
+        /// </summary>
+        /// <param name="actual">The actual value.</param>
+        /// <param name="expected">The expected value.</param>
+        /// <param name="failureMessage">Optional message to include in the exception if values are not equal.</param>
         public static void IsEqualTo(this int actual, int expected, string failureMessage = "")
         {
             AreEqual(expected, actual, failureMessage);
         }
 
+        /// <summary>
+        /// Asserts that two integer values are equal. Throws an <see cref="ExpectationFailedException"/> if they are not.
+        /// </summary>
+        /// <param name="expected">The expected value.</param>
+        /// <param name="actual">The actual value.</param>
+        /// <param name="failureMessage">Optional message to include in the exception if values are not equal.</param>
         public static void AreEqual(int expected, int actual, string failureMessage = "")
         {
             if (expected != actual)
@@ -241,16 +304,32 @@ namespace Bam
             }
         }
                         
+        /// <summary>
+        /// Asserts that the actual long equals the expected value. Extension method form of <see cref="AreEqual(long, long)"/>.
+        /// </summary>
+        /// <param name="actual">The actual value.</param>
+        /// <param name="expected">The expected value.</param>
         public static void IsEqualTo(this long actual, long expected)
         {
             AreEqual(expected, actual);
         }
-        
+
+        /// <summary>
+        /// Asserts that two long values are equal. Throws an <see cref="ExpectationFailedException"/> if they are not.
+        /// </summary>
+        /// <param name="expected">The expected value.</param>
+        /// <param name="actual">The actual value.</param>
         public static void AreEqual(long expected, long actual)
         {
             AreEqual(expected, actual, "");
         }
 
+        /// <summary>
+        /// Asserts that two long values are equal. Throws an <see cref="ExpectationFailedException"/> if they are not.
+        /// </summary>
+        /// <param name="expected">The expected value.</param>
+        /// <param name="actual">The actual value.</param>
+        /// <param name="failureMessage">The message to include in the exception if values are not equal.</param>
         public static void AreEqual(long expected, long actual, string failureMessage)
         {
             if (expected != actual)
@@ -266,6 +345,11 @@ namespace Bam
             }
         }
 
+        /// <summary>
+        /// Asserts that two byte arrays are equal in length and content. Throws an <see cref="ExpectationFailedException"/> if they differ.
+        /// </summary>
+        /// <param name="x">The first byte array.</param>
+        /// <param name="y">The second byte array.</param>
         public static void AreEqual(byte[] x, byte[] y)
         {
             if (x.Length != y.Length)
@@ -302,6 +386,12 @@ namespace Bam
             AreEqual(expected, actual, "");
         }
 
+        /// <summary>
+        /// Asserts that the actual string equals the expected string. Extension method form of <see cref="AreEqual(string, string, string)"/>.
+        /// </summary>
+        /// <param name="actual">The actual string value.</param>
+        /// <param name="expected">The expected string value.</param>
+        /// <param name="failureMessage">Optional message to include in the exception if values are not equal.</param>
         public static void IsEqualTo(this string actual, string expected, string failureMessage = "")
         {
             AreEqual(expected, actual, failureMessage);
@@ -364,6 +454,12 @@ namespace Bam
             DerivesFromType<T>(objectToCheck, string.Empty);
         }
 
+        /// <summary>
+        /// Throws an <see cref="ExpectationFailedException"/> if the object's type does not derive from type T.
+        /// </summary>
+        /// <typeparam name="T">The expected base type.</typeparam>
+        /// <param name="objectToCheck">The object to check.</param>
+        /// <param name="failureMessage">The message to include in the exception if the check fails.</param>
         public static void DerivesFromType<T>(this object objectToCheck, string failureMessage)
         {
             Type checkType = objectToCheck.GetType();
@@ -428,6 +524,10 @@ namespace Bam
             }
         }
 
+        /// <summary>
+        /// Asserts that the string is null or empty. Throws an <see cref="ExpectationFailedException"/> if it has a value.
+        /// </summary>
+        /// <param name="value">The string to check.</param>
         public static void ShouldBeNullOrEmpty(this string value)
         {
             IsNullOrEmpty(value);
@@ -458,11 +558,20 @@ namespace Bam
             }
         }
 
+        /// <summary>
+        /// Asserts that the specified string is not null or empty. Throws an <see cref="ExpectationFailedException"/> if it is.
+        /// </summary>
+        /// <param name="stringToCheck">The string to check.</param>
         public static void IsNotNullOrEmpty(string stringToCheck)
         {
             IsNotNullOrEmpty(stringToCheck, "");
         }
 
+        /// <summary>
+        /// Asserts that the specified string is not null or empty. Throws an <see cref="ExpectationFailedException"/> if it is.
+        /// </summary>
+        /// <param name="stringToCheck">The string to check.</param>
+        /// <param name="failureMessage">The message to include in the exception if the assertion fails.</param>
         public static void IsNotNullOrEmpty(string stringToCheck, string failureMessage)
         {
             if (string.IsNullOrEmpty(stringToCheck))
@@ -494,6 +603,12 @@ namespace Bam
                 throw new ExpectationFailedException($"{objectToCheck.GetType().Name} doesn't extend {typeof(T).Name}", ShouldHtmlEncodeExceptions);
         }
 
+        /// <summary>
+        /// Asserts that the int value is greater than the comparison value.
+        /// </summary>
+        /// <param name="valueToCheck">The value to check.</param>
+        /// <param name="valueToCompareTo">The value to compare against.</param>
+        /// <param name="message">Optional message to include in the exception if the assertion fails.</param>
         public static void ShouldBeGreaterThan(this int valueToCheck, int valueToCompareTo, string? message = null)
         {
             if (!(valueToCheck > valueToCompareTo))
@@ -504,9 +619,15 @@ namespace Bam
                 }
 
                 throw new ExpectationFailedException($"value ({valueToCheck}) is not greater than ({valueToCompareTo})");
-            }            
+            }
         }
 
+        /// <summary>
+        /// Asserts that the long value is greater than the comparison value.
+        /// </summary>
+        /// <param name="valueToCheck">The value to check.</param>
+        /// <param name="valueToCompareTo">The value to compare against.</param>
+        /// <param name="message">Optional message to include in the exception if the assertion fails.</param>
         public static void ShouldBeGreaterThan(this long valueToCheck, long valueToCompareTo, string? message = null)
         {
             if (!(valueToCheck > valueToCompareTo))
@@ -520,6 +641,12 @@ namespace Bam
             }
         }
 
+        /// <summary>
+        /// Asserts that the ulong value is greater than the comparison value.
+        /// </summary>
+        /// <param name="valueToCheck">The value to check.</param>
+        /// <param name="valueToCompareTo">The value to compare against.</param>
+        /// <param name="message">Optional message to include in the exception if the assertion fails.</param>
         public static void ShouldBeGreaterThan(this ulong valueToCheck, ulong valueToCompareTo, string? message = null)
         {
             if (!(valueToCheck > valueToCompareTo))
@@ -533,6 +660,12 @@ namespace Bam
             }
         }
 
+        /// <summary>
+        /// Asserts that the uint value is greater than the comparison value.
+        /// </summary>
+        /// <param name="valueToCheck">The value to check.</param>
+        /// <param name="valueToCompareTo">The value to compare against.</param>
+        /// <param name="message">Optional message to include in the exception if the assertion fails.</param>
         public static void ShouldBeGreaterThan(this uint valueToCheck, uint valueToCompareTo, string? message = null)
         {
             if (!(valueToCheck > valueToCompareTo))
@@ -546,6 +679,12 @@ namespace Bam
             }
         }
 
+        /// <summary>
+        /// Asserts that the long value is greater than or equal to the comparison value.
+        /// </summary>
+        /// <param name="valueToCheck">The value to check.</param>
+        /// <param name="valueToCompareTo">The value to compare against.</param>
+        /// <param name="message">Optional message to include in the exception if the assertion fails.</param>
         public static void ShouldBeGreaterThanOrEqualTo(this long valueToCheck, long valueToCompareTo, string? message = null)
         {
             if (!(valueToCheck >= valueToCompareTo))
@@ -559,6 +698,12 @@ namespace Bam
             }
         }
 
+        /// <summary>
+        /// Asserts that the ulong value is greater than or equal to the comparison value.
+        /// </summary>
+        /// <param name="valueToCheck">The value to check.</param>
+        /// <param name="valueToCompareTo">The value to compare against.</param>
+        /// <param name="message">Optional message to include in the exception if the assertion fails.</param>
         public static void ShouldBeGreaterThanOrEqualTo(this ulong valueToCheck, ulong valueToCompareTo, string? message = null)
         {
             if (!(valueToCheck >= valueToCompareTo))
@@ -572,6 +717,12 @@ namespace Bam
             }
         }
 
+        /// <summary>
+        /// Asserts that the int value is greater than or equal to the comparison value.
+        /// </summary>
+        /// <param name="valueToCheck">The value to check.</param>
+        /// <param name="valueToCompareTo">The value to compare against.</param>
+        /// <param name="message">Optional message to include in the exception if the assertion fails.</param>
         public static void ShouldBeGreaterThanOrEqualTo(this int valueToCheck, int valueToCompareTo, string? message = null)
         {
             if (!(valueToCheck >= valueToCompareTo))
@@ -585,6 +736,12 @@ namespace Bam
             }
         }
 
+        /// <summary>
+        /// Asserts that the uint value is greater than or equal to the comparison value.
+        /// </summary>
+        /// <param name="valueToCheck">The value to check.</param>
+        /// <param name="valueToCompareTo">The value to compare against.</param>
+        /// <param name="message">Optional message to include in the exception if the assertion fails.</param>
         public static void ShouldBeGreaterThanOrEqualTo(this uint valueToCheck, uint valueToCompareTo, string? message = null)
         {
             if (!(valueToCheck >= valueToCompareTo))
@@ -599,7 +756,7 @@ namespace Bam
         }
         
         /// <summary>
-        /// Does a vlaue equality check.
+        /// Does a value equality check using <see cref="object.Equals(object)"/>.
         /// </summary>
         /// <param name="objectToCheck"></param>
         /// <param name="compareTo"></param>
@@ -630,11 +787,24 @@ namespace Bam
             }
         }
 
-        public static void ShouldNotEqual(this object objectToCheck,  object compareTo, string? failureMessage = null)
+        /// <summary>
+        /// Asserts that the object is not equal to the comparison object using <see cref="object.Equals(object)"/>.
+        /// Alias for <see cref="ShouldNotBeEqualTo"/>.
+        /// </summary>
+        /// <param name="objectToCheck">The object to check.</param>
+        /// <param name="compareTo">The object to compare against.</param>
+        /// <param name="failureMessage">Optional message to include in the exception if the assertion fails.</param>
+        public static void ShouldNotEqual(this object objectToCheck, object compareTo, string? failureMessage = null)
         {
             ShouldNotBeEqualTo(objectToCheck, compareTo, failureMessage);
         }
 
+        /// <summary>
+        /// Asserts that the object is not equal to the comparison object using <see cref="object.Equals(object)"/>.
+        /// </summary>
+        /// <param name="objectToCheck">The object to check.</param>
+        /// <param name="compareTo">The object to compare against.</param>
+        /// <param name="failureMessage">Optional message to include in the exception if the assertion fails.</param>
         public static void ShouldNotBeEqualTo(this object objectToCheck, object compareTo, string? failureMessage = null)
         {
             if (objectToCheck.Equals(compareTo))
@@ -648,6 +818,12 @@ namespace Bam
             }
         }
 
+        /// <summary>
+        /// Asserts that the instance is exactly of type T (not a subclass). Throws an <see cref="ExpectationFailedException"/> otherwise.
+        /// </summary>
+        /// <typeparam name="T">The expected exact type.</typeparam>
+        /// <param name="instance">The object to check.</param>
+        /// <param name="failureMessage">Optional message to include in the exception if the assertion fails.</param>
         public static void ShouldBeOfType<T>(this object instance, string? failureMessage = null)
         {
             if (instance == null)
@@ -661,6 +837,12 @@ namespace Bam
             }
         }
 
+        /// <summary>
+        /// Asserts that the instance is exactly of the specified type (not a subclass). Throws an <see cref="ExpectationFailedException"/> otherwise.
+        /// </summary>
+        /// <param name="instance">The object to check.</param>
+        /// <param name="shouldBe">The expected exact type.</param>
+        /// <param name="failureMessage">Optional message to include in the exception if the assertion fails.</param>
         public static void ShouldBeOfType(this object instance, Type shouldBe, string? failureMessage = null)
         {
             if (instance == null)
@@ -694,6 +876,12 @@ namespace Bam
             }
         }
 
+        /// <summary>
+        /// Asserts that the two objects are not the same reference using the == operator.
+        /// </summary>
+        /// <param name="objectToCheck">The object to check.</param>
+        /// <param name="compareTo">The object to compare against.</param>
+        /// <param name="failureMessage">Optional message to include in the exception if the assertion fails.</param>
         public static void ShouldNotBe(this object objectToCheck, object compareTo, string? failureMessage = null)
         {
             if (objectToCheck == compareTo)
@@ -707,11 +895,21 @@ namespace Bam
             }
         }
 
+        /// <summary>
+        /// Asserts that the nullable boolean value is true. Throws an <see cref="ExpectationFailedException"/> if false or null.
+        /// </summary>
+        /// <param name="valueToCheck">The nullable boolean value to check.</param>
+        /// <param name="failureMessage">Optional message to include in the exception if the assertion fails.</param>
         public static void ShouldBeTrue(this bool? valueToCheck, string? failureMessage = null)
         {
             IsTrue(valueToCheck, failureMessage);
         }
         
+        /// <summary>
+        /// Asserts that the nullable boolean value is true. Throws an <see cref="ExpectationFailedException"/> if false or null.
+        /// </summary>
+        /// <param name="valueToCheck">The nullable boolean value to check.</param>
+        /// <param name="failureMessage">Optional message to include in the exception if the assertion fails.</param>
         public static void IsTrue(this bool? valueToCheck, string? failureMessage = null)
         {
             if (valueToCheck != true)
@@ -725,6 +923,11 @@ namespace Bam
             }
         }
         
+        /// <summary>
+        /// Asserts that the object is null. Throws an <see cref="ExpectationFailedException"/> if it is not null.
+        /// </summary>
+        /// <param name="objectToCheck">The object to check.</param>
+        /// <param name="failureMessage">Optional message to include in the exception if the assertion fails.</param>
         public static void ShouldBeNull(this object? objectToCheck, string? failureMessage = null)
         {
             IsNull(objectToCheck, failureMessage);
@@ -759,17 +962,31 @@ namespace Bam
             }
         }
 
+        /// <summary>
+        /// Asserts that the object is not null. Throws an <see cref="ExpectationFailedException"/> if it is null.
+        /// </summary>
+        /// <param name="objectToCheck">The object to check.</param>
+        /// <param name="failureMessage">Optional message to include in the exception if the assertion fails.</param>
         public static void ShouldNotBeNull(this object objectToCheck, string? failureMessage = null)
         {
             IsNotNull(objectToCheck, failureMessage);
         }
-        
+
+        /// <summary>
+        /// Asserts that the object is not null. Throws an <see cref="ExpectationFailedException"/> if it is null.
+        /// </summary>
+        /// <param name="objectToCheck">The object to check.</param>
         public static void IsNotNull(this object objectToCheck)
         {
             IsNotNull(objectToCheck, string.Empty);
         }
 
-        public static void IsNotNull(this object objectToCheck, string failureMessage) 
+        /// <summary>
+        /// Asserts that the object is not null. Throws an <see cref="ExpectationFailedException"/> if it is null.
+        /// </summary>
+        /// <param name="objectToCheck">The object to check.</param>
+        /// <param name="failureMessage">The message to include in the exception if the assertion fails.</param>
+        public static void IsNotNull(this object objectToCheck, string failureMessage)
         {
             if (objectToCheck == null)
             {
@@ -782,11 +999,21 @@ namespace Bam
             }
         }
 
+        /// <summary>
+        /// Asserts that the string is not null or empty. Throws an <see cref="ExpectationFailedException"/> if blank.
+        /// </summary>
+        /// <param name="value">The string to check.</param>
+        /// <param name="failureMessage">Optional message to include in the exception if the assertion fails.</param>
         public static void ShouldNotBeBlank(this string value, string? failureMessage = null)
         {
             IsNotBlank(value, failureMessage);
         }
-        
+
+        /// <summary>
+        /// Asserts that the string is not null or empty. Throws an <see cref="ExpectationFailedException"/> if blank.
+        /// </summary>
+        /// <param name="value">The string to check.</param>
+        /// <param name="failureMessage">Optional message to include in the exception if the assertion fails.</param>
         public static void IsNotBlank(this string value, string? failureMessage = null)
         {
             if (string.IsNullOrEmpty(value))

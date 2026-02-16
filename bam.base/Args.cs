@@ -7,8 +7,17 @@ using System.Reflection;
 
 namespace Bam
 {
+    /// <summary>
+    /// Provides utility methods for argument validation, exception creation, and exception message formatting.
+    /// </summary>
     public static class Args
     {
+        /// <summary>
+        /// Throws an <see cref="Exception"/> if the specified condition is true.
+        /// </summary>
+        /// <param name="condition">The condition to evaluate.</param>
+        /// <param name="messageFormat">The format string for the exception message.</param>
+        /// <param name="args">The arguments to format into the message.</param>
 		public static void ThrowIf(bool condition, string messageFormat, params object[] args)
 		{
 			ThrowIf<Exception>(condition, messageFormat, args);
@@ -28,6 +37,12 @@ namespace Bam
             }
         }
 
+        /// <summary>
+        /// Throws an <see cref="ArgumentNullException"/> with the specified message if the parameter is null.
+        /// </summary>
+        /// <param name="param">The parameter to check for null.</param>
+        /// <param name="message">The error message for the exception.</param>
+        /// <param name="paramName">The name of the parameter.</param>
         public static void ThrowIfNull(object? param, string message, string paramName)
         {
             if(param == null)
@@ -123,6 +138,11 @@ namespace Bam
             return (E)ctor.Invoke(new object[] { string.Format(msgFormat, values), innerException });
         }
 
+        /// <summary>
+        /// Gets the stack trace from the exception and its inner exception as a single string.
+        /// </summary>
+        /// <param name="ex">The exception to extract the stack trace from.</param>
+        /// <returns>A string containing the stack trace.</returns>
 		public static string GetStackTrace(this Exception ex)
 		{
 			StringBuilder message = new StringBuilder();
@@ -131,6 +151,11 @@ namespace Bam
 			return stackTrace.ToString();
 		}
 
+        /// <summary>
+        /// Gets the message and stack trace from the exception and its inner exception as a single string.
+        /// </summary>
+        /// <param name="ex">The exception to extract the message and stack trace from.</param>
+        /// <returns>A string containing both the message and stack trace.</returns>
 		public static string GetMessageAndStackTrace(this Exception ex)
 		{
 			PopMessageAndStackTrace(ex, out StringBuilder message, out StringBuilder stackTrace);
@@ -151,6 +176,13 @@ namespace Bam
 			SetMessageAndStackTrace(ex, message, stackTrace);
 		}
 
+        /// <summary>
+        /// Appends the message and stack trace from the exception and its inner exception to the provided StringBuilders.
+        /// If the exception or its stack trace is null, the current stack trace is captured instead.
+        /// </summary>
+        /// <param name="ex">The exception to extract information from, or null to capture the current stack trace.</param>
+        /// <param name="message">The StringBuilder to append message text to.</param>
+        /// <param name="stack">The StringBuilder to append stack trace text to.</param>
 		public static void SetMessageAndStackTrace(Exception ex, StringBuilder message, StringBuilder stack)
 		{
 			if (ex != null)

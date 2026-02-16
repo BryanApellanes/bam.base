@@ -8,8 +8,14 @@ using Bam.Logging;
 namespace Bam.Console
 {
     // TODO: break this up into ConsoleLogger and DetailConsoleLogger
+    /// <summary>
+    /// A logger implementation that writes color-coded log events to the console, with optional timestamps and diagnostic details.
+    /// </summary>
     public class ConsoleLogger : Logger
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ConsoleLogger"/> class with colors, details, and timestamps enabled by default.
+        /// </summary>
         public ConsoleLogger()
             : base()
         {
@@ -18,7 +24,14 @@ namespace Bam.Console
             ShowTime = true;
         }
 
+        /// <summary>
+        /// Gets or sets whether console output colors are applied based on log event severity.
+        /// </summary>
         public bool UseColors { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether diagnostic detail information is included in log output.
+        /// </summary>
         public bool AddDetails { get; set; }
 
         /// <summary>
@@ -38,6 +51,10 @@ namespace Bam.Console
             }
         }
 
+        /// <summary>
+        /// Writes the specified log event to the console, applying color coding based on severity and optionally prefixing with a timestamp.
+        /// </summary>
+        /// <param name="logEvent">The log event to write to the console.</param>
         public override void CommitLogEvent(LogEvent logEvent)
         {
             if (UseColors)

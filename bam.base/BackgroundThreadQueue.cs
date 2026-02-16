@@ -6,14 +6,17 @@ namespace Bam
     /// A queue processing facility that processes
     /// enqueued items in a background thread.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="T">The type of items to be enqueued and processed.</typeparam>
     public class BackgroundThreadQueue<T>
     {
         bool _warned;
+        /// <summary>
+        /// Initializes a new instance with no processor defined. The first enqueued item will raise the <see cref="Exception"/> event.
+        /// </summary>
         public BackgroundThreadQueue()
         {
             Continue = true;
-            Process = (o) => 
+            Process = (o) =>
             {
                 if (!_warned)
                 {
@@ -23,16 +26,27 @@ namespace Bam
             };
         }
 
+        /// <summary>
+        /// Initializes a new instance with the specified processing action.
+        /// </summary>
+        /// <param name="process">The action to invoke for each dequeued item.</param>
         public BackgroundThreadQueue(Action<T> process)
         {
             Continue = true;
             Process = process;
         }
 
+        /// <summary>
+        /// Gets the number of items currently waiting in the queue.
+        /// </summary>
         public int WriteQueueCount => _processQueue.Count;
 
         readonly ConcurrentQueue<T> _processQueue = new ConcurrentQueue<T>();
         readonly object _procLock = new object();
+        /// <summary>
+        /// Adds an item to the queue and signals the background thread to begin processing.
+        /// </summary>
+        /// <param name="data">The item to enqueue for processing.</param>
         public void Enqueue(T data)
         {
             lock (_procLock)
@@ -59,8 +73,14 @@ namespace Bam
             }
         }
 
+        /// <summary>
+        /// Occurs when an exception is thrown during item processing or when no processor is defined.
+        /// </summary>
         public event EventHandler Exception;
         bool _continue;
+        /// <summary>
+        /// Gets or sets whether the background thread should continue processing. Setting to true when items are queued restarts the processing thread.
+        /// </summary>
         public bool Continue
         {
             get => _continue;
@@ -73,12 +93,26 @@ namespace Bam
                 }
             }
         }
+        /// <summary>
+        /// Occurs when the background thread is waiting for new items to be enqueued.
+        /// </summary>
         public event EventHandler Waiting;
+
+        /// <summary>
+        /// Occurs when the background thread begins processing enqueued items.
+        /// </summary>
         public event EventHandler Processing;
+
+        /// <summary>
+        /// Occurs when the background thread has finished processing all enqueued items.
+        /// </summary>
         public event EventHandler QueueEmptied;
         Thread _processThread;
         readonly AutoResetEvent _waitSignal = new AutoResetEvent(false);
         readonly object _processThreadLock = new object();
+        /// <summary>
+        /// Gets the background processing thread, creating and configuring it if necessary.
+        /// </summary>
         public Thread ProcessThread
         {
             get
@@ -117,6 +151,9 @@ namespace Bam
             }
         }
 
+        /// <summary>
+        /// Gets or sets the action invoked for each item dequeued from the processing queue.
+        /// </summary>
         public Action<T> Process { get; set; }
     }
 }

@@ -9,6 +9,9 @@ using System.Collections.Concurrent;
 
 namespace Bam.Logging
 {
+    /// <summary>
+    /// Abstract base class for loggers that processes log events asynchronously via a background thread and a concurrent queue.
+    /// </summary>
     public abstract class Logger : ILogger, IHasRequiredProperties
     {
         readonly ConcurrentQueue<LogEvent> _logEventQueue;
@@ -16,6 +19,10 @@ namespace Bam.Logging
         readonly AutoResetEvent _waitForEnqueueLogEvent;
 
         readonly List<string> requiredProperties;
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Logger"/> class, setting up the event queue,
+        /// default verbosity to Information, and starting the background logging thread.
+        /// </summary>
         public Logger()
         {
             AppDomain.CurrentDomain.DomainUnload += new EventHandler(OnDomainUnload);
@@ -39,11 +46,18 @@ namespace Bam.Logging
             StopLoggingThread();
         }
 
+        /// <summary>
+        /// Gets the names of configuration properties required by this logger ("LogType" and "ApplicationName").
+        /// </summary>
         public string[] RequiredProperties
         {
             get { return requiredProperties.ToArray(); }
         }
 
+        /// <summary>
+        /// Stops and then restarts the background logging thread.
+        /// </summary>
+        /// <returns>This logger instance for method chaining.</returns>
         public virtual ILogger RestartLoggingThread()
         {
             StopLoggingThread();
@@ -53,6 +67,10 @@ namespace Bam.Logging
 
         readonly object _threadLock = new object();
         bool _keepLogging = true;
+        /// <summary>
+        /// Stops the background logging thread, waiting up to 3 seconds for it to finish before aborting.
+        /// </summary>
+        /// <returns>This logger instance for method chaining.</returns>
         public virtual ILogger StopLoggingThread()
         {
             if (_loggingThread != null)
@@ -99,8 +117,9 @@ namespace Bam.Logging
 
         bool _loggingThreadStarted;
         /// <summary>
-        /// Start the background logger commit thread.
+        /// Starts the background logging commit thread if it is not already running.
         /// </summary>
+        /// <returns>This logger instance for method chaining.</returns>
         public virtual ILogger StartLoggingThread()
         {
             if (!_loggingThreadStarted)
@@ -155,6 +174,7 @@ namespace Bam.Logging
         /// <summary>
         /// Blocks the current thread until the event queue empties.
         /// </summary>
+        /// <param name="sleep">Additional milliseconds to sleep after the queue is empty.</param>
         public virtual void BlockUntilEventQueueIsEmpty(int sleep = 0)
         {
             try
@@ -186,9 +206,15 @@ namespace Bam.Logging
 
         #region ILogger Members
 
+        /// <summary>
+        /// Gets a value indicating whether this is a null (no-op) logger. Always returns false for concrete loggers.
+        /// </summary>
         public virtual bool IsNull { get { return false; } }
 
         string appName;
+        /// <summary>
+        /// Gets or sets the application name used in log entries. Resolved from configuration or <see cref="ApplicationNameProvider"/> if not explicitly set.
+        /// </summary>
         public string ApplicationName
         {
             get
@@ -215,46 +241,103 @@ namespace Bam.Logging
         }
 
         /// <summary>
-        /// When overridden in a derived class will commit the specified logEvent
+        /// When overridden in a derived class, commits the specified log event
         /// to the underlying storage for the current Logger implementation.
         /// </summary>
-        /// <param name="logEvent"></param>
+        /// <param name="logEvent">The log event to persist or output.</param>
         public abstract void CommitLogEvent(LogEvent logEvent);
 
+        /// <summary>
+        /// Occurs when any log entry is added.
+        /// </summary>
         public event LogEntryAddedListener EntryAdded;
+
+        /// <summary>
+        /// Occurs when a fatal-level log event is added.
+        /// </summary>
         public event LogEntryAddedListener FatalEventOccurred;
+
+        /// <summary>
+        /// Occurs when an information-level log event is added.
+        /// </summary>
         public event LogEntryAddedListener InfoEventOccurred;
+
+        /// <summary>
+        /// Occurs when a warning-level log event is added.
+        /// </summary>
         public event LogEntryAddedListener WarnEventOccurred;
+
+        /// <summary>
+        /// Occurs when an error-level log event is added.
+        /// </summary>
         public event LogEntryAddedListener ErrorEventOccurred;
+
+        /// <summary>
+        /// Occurs when a custom-level log event is added.
+        /// </summary>
         public event LogEntryAddedListener CustomEventOccurred;
 
+        /// <summary>
+        /// Gets or sets the provider used to generate event IDs from application name and message signature. Defaults to <see cref="HashingEventIdProvider"/>.
+        /// </summary>
         public virtual IEventIdProvider EventIdProvider { get; set; }
 
+        /// <summary>
+        /// Adds an information-level log entry with the specified message.
+        /// </summary>
+        /// <param name="messageSignature">The message format string.</param>
         public void AddEntry(string messageSignature)
         {
             AddEntry(messageSignature, new string[] { });
         }
 
+        /// <summary>
+        /// Adds a log entry with the specified message and verbosity level.
+        /// </summary>
+        /// <param name="messageSignature">The message format string.</param>
+        /// <param name="verbosity">The verbosity level as an integer.</param>
         public virtual void AddEntry(string messageSignature, int verbosity)
         {
             AddEntry(messageSignature, verbosity, new string[] { });
         }
 
+        /// <summary>
+        /// Adds an error-level log entry with the specified message and exception.
+        /// </summary>
+        /// <param name="messageSignature">The message format string.</param>
+        /// <param name="ex">The exception to include in the log entry.</param>
         public virtual void AddEntry(string messageSignature, Exception ex)
         {
             AddEntry(messageSignature, ex, new string[] { });
         }
 
+        /// <summary>
+        /// Adds an information-level log entry with variable message values.
+        /// </summary>
+        /// <param name="messageSignature">The message format string.</param>
+        /// <param name="variableMessageValues">Values to substitute into the message format string.</param>
         public virtual void AddEntry(string messageSignature, params string[] variableMessageValues)
         {
             AddEntry(messageSignature, UserUtil.GetCurrentUser(true), variableMessageValues);
         }
 
+        /// <summary>
+        /// Adds a log entry with the specified verbosity level and variable message values.
+        /// </summary>
+        /// <param name="messageSignature">The message format string.</param>
+        /// <param name="verbosity">The verbosity level as an integer.</param>
+        /// <param name="variableMessageValues">Values to substitute into the message format string.</param>
         public virtual void AddEntry(string messageSignature, int verbosity, params string[] variableMessageValues)
         {
             AddEntry(messageSignature, UserUtil.GetCurrentUser(true), verbosity, variableMessageValues);
         }
 
+        /// <summary>
+        /// Adds an error-level log entry with the specified exception and variable message values.
+        /// </summary>
+        /// <param name="messageSignature">The message format string.</param>
+        /// <param name="ex">The exception to include in the log entry.</param>
+        /// <param name="variableMessageValues">Values to substitute into the message format string.</param>
         public virtual void AddEntry(string messageSignature, Exception ex, params string?[] variableMessageValues)
         {
             AddEntry(messageSignature, UserUtil.GetCurrentUser(true), ex, variableMessageValues);
@@ -342,11 +425,24 @@ namespace Bam.Logging
             OnEntryAdded(ev);
         }
 
+        /// <summary>
+        /// Adds a log entry with the specified verbosity level and exception.
+        /// </summary>
+        /// <param name="messageSignature">The message format string.</param>
+        /// <param name="verbosity">The verbosity level as an integer.</param>
+        /// <param name="ex">The exception to include in the log entry.</param>
         public void AddEntry(string messageSignature, int verbosity, Exception ex)
         {
             AddEntry(messageSignature, verbosity, ex, new string[] { });
         }
 
+        /// <summary>
+        /// Adds a log entry with the specified verbosity level, exception, and variable message values.
+        /// </summary>
+        /// <param name="messageSignature">The message format string.</param>
+        /// <param name="verbosity">The verbosity level as an integer.</param>
+        /// <param name="ex">The exception to include in the log entry.</param>
+        /// <param name="variableMessageValues">Values to substitute into the message format string.</param>
         public void AddEntry(string messageSignature, int verbosity, Exception ex, params string[] variableMessageValues)
         {
             LogEvent ev = CreateLogEvent(messageSignature, UserUtil.GetCurrentUser(true), "Application", (LogEventType)verbosity, ex, variableMessageValues);
@@ -446,74 +542,143 @@ namespace Bam.Logging
         }
 
         /// <summary>
-        /// Returns an id for the specified applicationName and messageSignature.
+        /// Returns a unique event ID computed from the application name and message signature using the <see cref="EventIdProvider"/>.
         /// </summary>
-        /// <param name="applicationName"></param>
-        /// <param name="messageSignature"></param>
-        /// <returns></returns>
+        /// <param name="applicationName">The name of the application.</param>
+        /// <param name="messageSignature">The message format string used to identify the event.</param>
+        /// <returns>An integer event ID.</returns>
         protected virtual int GetEventId(string applicationName, string messageSignature)
         {
             return EventIdProvider.GetEventId(applicationName, messageSignature);
         }
 
+        /// <summary>
+        /// Adds a log entry with the specified message and event type.
+        /// </summary>
+        /// <param name="messageSignature">The message format string.</param>
+        /// <param name="verbosity">The log event type indicating severity.</param>
         public void AddEntry(string messageSignature, LogEventType verbosity)
         {
             AddEntry(messageSignature, (int)verbosity);
         }
 
+        /// <summary>
+        /// Adds a log entry with the specified message, event type, and exception.
+        /// </summary>
+        /// <param name="messageSignature">The message format string.</param>
+        /// <param name="verbosity">The log event type indicating severity.</param>
+        /// <param name="ex">The exception to include in the log entry.</param>
         public void AddEntry(string messageSignature, LogEventType verbosity, Exception ex)
         {
             AddEntry(messageSignature, (int)verbosity, ex);
         }
 
+        /// <summary>
+        /// Adds a log entry with the specified message, event type, and variable message values.
+        /// </summary>
+        /// <param name="messageSignature">The message format string.</param>
+        /// <param name="type">The log event type indicating severity.</param>
+        /// <param name="variableMessageValues">Values to substitute into the message format string.</param>
         public virtual void AddEntry(string messageSignature, LogEventType type, params string?[] variableMessageValues)
         {
             AddEntry(messageSignature, (int)type, variableMessageValues);
         }
 
+        /// <summary>
+        /// Adds a log entry with the specified message, event type, exception, and variable message values.
+        /// </summary>
+        /// <param name="messageSignature">The message format string.</param>
+        /// <param name="type">The log event type indicating severity.</param>
+        /// <param name="ex">The exception to include in the log entry.</param>
+        /// <param name="variableMessageValues">Values to substitute into the message format string.</param>
         public virtual void AddEntry(string messageSignature, LogEventType type, Exception ex, params string[] variableMessageValues)
         {
             AddEntry(messageSignature, (int)type, ex, variableMessageValues);
         }
 
+        /// <summary>
+        /// Adds a log entry with the specified message and verbosity level.
+        /// </summary>
+        /// <param name="messageSignature">The message format string.</param>
+        /// <param name="verbosity">The verbosity level.</param>
         public virtual void AddEntry(string messageSignature, VerbosityLevel verbosity)
         {
             AddEntry(messageSignature, (int)verbosity);
         }
 
+        /// <summary>
+        /// Adds a log entry with the specified message, verbosity level, and exception.
+        /// </summary>
+        /// <param name="messageSignature">The message format string.</param>
+        /// <param name="verbosity">The verbosity level.</param>
+        /// <param name="ex">The exception to include in the log entry.</param>
         public virtual void AddEntry(string messageSignature, VerbosityLevel verbosity, Exception ex)
         {
             AddEntry(messageSignature, (int)verbosity, ex);
         }
 
+        /// <summary>
+        /// Adds a log entry with the specified message, verbosity level, and variable message values.
+        /// </summary>
+        /// <param name="messageSignature">The message format string.</param>
+        /// <param name="type">The verbosity level.</param>
+        /// <param name="variableMessageValues">Values to substitute into the message format string.</param>
         public virtual void AddEntry(string messageSignature, VerbosityLevel type, params string[] variableMessageValues)
         {
             AddEntry(messageSignature, (int)type, variableMessageValues);
         }
 
+        /// <summary>
+        /// Adds a log entry with the specified message, verbosity level, exception, and variable message values.
+        /// </summary>
+        /// <param name="messageSignature">The message format string.</param>
+        /// <param name="type">The verbosity level.</param>
+        /// <param name="ex">The exception to include in the log entry.</param>
+        /// <param name="variableMessageValues">Values to substitute into the message format string.</param>
         public virtual void AddEntry(string messageSignature, VerbosityLevel type, Exception ex, params string[] variableMessageValues)
         {
             AddEntry(messageSignature, (int)type, ex, variableMessageValues);
         }
 
+        /// <summary>
+        /// Adds an information-level log entry with the specified message and arguments.
+        /// </summary>
+        /// <param name="messageSignature">The message format string.</param>
+        /// <param name="args">Arguments to format into the message; converted to strings.</param>
         public void Info(string messageSignature, params object[] args)
         {
-            Args.ThrowIfNull(args);            
+            Args.ThrowIfNull(args);
             AddEntry(messageSignature, LogEventType.Information, args.Each(a => a.ToString()).ToArray());
         }
 
+        /// <summary>
+        /// Adds a warning-level log entry with the specified message and arguments.
+        /// </summary>
+        /// <param name="messageSignature">The message format string.</param>
+        /// <param name="args">Arguments to format into the message; converted to strings.</param>
         public void Warning(string messageSignature, params object[] args)
         {
             Args.ThrowIfNull(args);
             AddEntry(messageSignature, LogEventType.Warning, args.Each(a => a.ToString()).ToArray());
         }
 
+        /// <summary>
+        /// Adds an error-level log entry with the specified message and arguments.
+        /// </summary>
+        /// <param name="messageSignature">The message format string.</param>
+        /// <param name="args">Arguments to format into the message; converted to strings.</param>
         public void Error(string messageSignature, params object[] args)
         {
             Args.ThrowIfNull(args);
             AddEntry(messageSignature, LogEventType.Error, args.Each(a => a.ToString()).ToArray());
         }
 
+        /// <summary>
+        /// Adds an error-level log entry with the specified message, exception, and arguments.
+        /// </summary>
+        /// <param name="messageSignature">The message format string.</param>
+        /// <param name="ex">The exception to include in the log entry.</param>
+        /// <param name="args">Arguments to format into the message; converted to strings.</param>
         public void Error(string messageSignature, Exception ex, params object[] args)
         {
             Args.ThrowIfNull(args);

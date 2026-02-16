@@ -24,6 +24,9 @@ namespace Bam.DependencyInjection
             Default = new DependencyProvider();
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DependencyProvider"/> class with empty registrations.
+        /// </summary>
         public DependencyProvider()
         {
             _typeInstanceDictionary = new Dictionary<Type, object>();
@@ -33,12 +36,20 @@ namespace Bam.DependencyInjection
         
         // TODO: implement Circular dependency check
         
+        /// <summary>
+        /// Gets or sets the default global dependency provider instance.
+        /// </summary>
         public static DependencyProvider Default
         {
             get;
             set;
         }
 
+        /// <summary>
+        /// Creates a shallow copy of this dependency provider, duplicating all type-instance mappings,
+        /// class name mappings, and constructor parameter registrations.
+        /// </summary>
+        /// <returns>A new <see cref="DependencyProvider"/> with the same registrations.</returns>
         public virtual DependencyProvider Clone()
         {
             lock (_accessLock)
@@ -109,6 +120,11 @@ namespace Bam.DependencyInjection
             }
         }
 
+        /// <summary>
+        /// Copies constructor parameter registrations for the specified type from the given dependency provider into this one.
+        /// </summary>
+        /// <param name="type">The type whose constructor parameters should be copied.</param>
+        /// <param name="dependencyProvider">The source dependency provider to copy constructor parameters from.</param>
         public void CopyCtorParams(Type type, DependencyProvider dependencyProvider)
         {
             if (dependencyProvider._ctorParams.ContainsKey(type))
@@ -132,6 +148,12 @@ namespace Bam.DependencyInjection
             CopyTypeFrom(typeof(T), source, overwrite);
         }
 
+        /// <summary>
+        /// Copies the registration for the specified type from the source dependency provider into this one.
+        /// </summary>
+        /// <param name="type">The type whose registration should be copied.</param>
+        /// <param name="source">The source dependency provider to copy from.</param>
+        /// <param name="overwrite">If true, existing registrations of the same type are overwritten; otherwise they are kept.</param>
         public void CopyTypeFrom(Type type, DependencyProvider source, bool overwrite = true)
         {
             if (!_typeInstanceDictionary.ContainsKey(type) || overwrite)
@@ -305,6 +327,12 @@ namespace Bam.DependencyInjection
             return Construct<T>(ctorParams);
         }
 
+        /// <summary>
+        /// Constructs an instance of the specified type using registered instances of the specified constructor parameter types.
+        /// </summary>
+        /// <param name="type">The type to construct.</param>
+        /// <param name="ctorParamTypes">Types whose registered instances are passed to the constructor.</param>
+        /// <returns>The newly constructed instance.</returns>
         public object Construct(Type type, Type[] ctorParamTypes)
         {
             object[] ctorParams = GetCtorArgumentsFromTypes(ctorParamTypes);
@@ -344,21 +372,45 @@ namespace Bam.DependencyInjection
             }
         }
         
+        /// <summary>
+        /// Gets an instance registered under the specified class name, cast to type T.
+        /// </summary>
+        /// <typeparam name="T">The type to cast the resolved instance to.</typeparam>
+        /// <param name="className">The class name used to look up the registered type.</param>
+        /// <returns>The resolved instance cast to T.</returns>
         public T Get<T>(string className)
         {
             return (T)Get(className);
         }
 
+        /// <summary>
+        /// Gets an instance registered under the specified class name.
+        /// </summary>
+        /// <param name="className">The class name used to look up the registered type.</param>
+        /// <returns>The resolved instance, or null if the class name is not registered.</returns>
         public object Get(string className)
         {
             return Get(className, out Type t);
         }
 
+        /// <summary>
+        /// Attempts to get an instance of the specified type without throwing on failure.
+        /// </summary>
+        /// <param name="type">The type to resolve.</param>
+        /// <param name="value">When this method returns, contains the resolved instance, or null if resolution failed.</param>
+        /// <returns>True if the instance was successfully resolved; otherwise false.</returns>
         public bool TryGet(Type type, out object value)
         {
             return TryGet(type, out value, out Exception e);
         }
 
+        /// <summary>
+        /// Attempts to get an instance of the specified type without throwing on failure.
+        /// </summary>
+        /// <param name="type">The type to resolve.</param>
+        /// <param name="value">When this method returns, contains the resolved instance, or null if resolution failed.</param>
+        /// <param name="e">When this method returns, contains the exception that occurred during resolution, or null if successful.</param>
+        /// <returns>True if the instance was successfully resolved; otherwise false.</returns>
         public bool TryGet(Type type, out object value, out Exception e)
         {
             try
@@ -375,11 +427,22 @@ namespace Bam.DependencyInjection
             }
         }
 
+        /// <summary>
+        /// Gets an instance of the specified type, constructing it if not already registered.
+        /// </summary>
+        /// <param name="type">The type to resolve.</param>
+        /// <returns>The resolved or newly constructed instance.</returns>
         public object Get(Type type)
         {
             return Get(type, GetCtorParams(type).ToArray());
         }
 
+        /// <summary>
+        /// Gets an instance registered under the specified class name, resolving the associated type.
+        /// </summary>
+        /// <param name="className">The class name used to look up the registered type.</param>
+        /// <param name="type">When this method returns, contains the resolved type, or null if the class name is not registered.</param>
+        /// <returns>The resolved instance, or null if the class name is not registered.</returns>
         public object Get(string className, out Type type)
         {
             type = this[className];
@@ -404,6 +467,12 @@ namespace Bam.DependencyInjection
             return null;
         }
 
+        /// <summary>
+        /// Gets an instance of the specified type, constructing it using instances of the specified constructor parameter types if not already registered.
+        /// </summary>
+        /// <param name="type">The type to resolve.</param>
+        /// <param name="ctorParamTypes">Types whose registered instances are passed to the constructor.</param>
+        /// <returns>The resolved or newly constructed instance.</returns>
         public object Get(Type type, params Type[] ctorParamTypes)
         {
             if (this[type] == null)
@@ -434,11 +503,24 @@ namespace Bam.DependencyInjection
             }
         }
 
+        /// <summary>
+        /// Attempts to get an instance of type T without throwing on failure.
+        /// </summary>
+        /// <typeparam name="T">The type to resolve.</typeparam>
+        /// <param name="value">When this method returns, contains the resolved instance, or the default value of T if resolution failed.</param>
+        /// <returns>True if the instance was successfully resolved; otherwise false.</returns>
 		public bool TryGet<T>(out T value)
 		{
             return TryGet<T>(out value, out Exception ignore);
         }
 
+        /// <summary>
+        /// Attempts to get an instance of type T without throwing on failure.
+        /// </summary>
+        /// <typeparam name="T">The type to resolve.</typeparam>
+        /// <param name="value">When this method returns, contains the resolved instance, or the default value of T if resolution failed.</param>
+        /// <param name="ex">When this method returns, contains the exception that occurred during resolution, or null if successful.</param>
+        /// <returns>True if the instance was successfully resolved; otherwise false.</returns>
 		public bool TryGet<T>(out T value, out Exception ex)
 		{
 			ex = null;
@@ -541,17 +623,22 @@ namespace Bam.DependencyInjection
             Set<T>(new T());
         }
 
+        /// <summary>
+        /// Registers the specified instance as the resolution for type T, allowing overwrites.
+        /// </summary>
+        /// <typeparam name="T">The type to register the instance for.</typeparam>
+        /// <param name="instance">The instance to register.</param>
         public void Set<T>(T instance)
         {
             Set<T>(instance, false);
         }
 
         /// <summary>
-        /// Sets the inner instance of type T to the specified
-        /// instance.
+        /// Registers the specified instance as the resolution for type T.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="instance"></param>
+        /// <typeparam name="T">The type to register the instance for.</typeparam>
+        /// <param name="instance">The instance to register.</param>
+        /// <param name="throwIfSet">If true, throws an <see cref="InvalidOperationException"/> when type T is already registered.</param>
         public void Set<T>(T instance, bool throwIfSet)
         {
             Check<T>(throwIfSet);
@@ -559,11 +646,22 @@ namespace Bam.DependencyInjection
             this[typeof(T)] = instance;
         }
 
+        /// <summary>
+        /// Registers a factory function that creates instances of type T on each resolution.
+        /// </summary>
+        /// <typeparam name="T">The type to register the factory for.</typeparam>
+        /// <param name="instanciator">The factory function that creates instances of type T.</param>
         public void Set<T>(Func<T> instanciator)
         {
             Set<T>(instanciator, false);
         }
 
+        /// <summary>
+        /// Registers a factory function that creates instances of type T on each resolution.
+        /// </summary>
+        /// <typeparam name="T">The type to register the factory for.</typeparam>
+        /// <param name="instanciator">The factory function that creates instances of type T.</param>
+        /// <param name="throwIfSet">If true, throws an <see cref="InvalidOperationException"/> when type T is already registered.</param>
         public void Set<T>(Func<T> instanciator, bool throwIfSet = false)
         {
             Check<T>(throwIfSet);
@@ -571,6 +669,12 @@ namespace Bam.DependencyInjection
             this[typeof(T)] = instanciator;
         }
 
+        /// <summary>
+        /// Registers a factory function that receives a <see cref="Type"/> parameter and creates instances of type T.
+        /// </summary>
+        /// <typeparam name="T">The type to register the factory for.</typeparam>
+        /// <param name="instanciator">The factory function that receives the requested type and creates instances of type T.</param>
+        /// <param name="throwIfSet">If true, throws an <see cref="InvalidOperationException"/> when type T is already registered.</param>
         public void Set<T>(Func<Type, T> instanciator, bool throwIfSet = false)
         {
             Check<T>(throwIfSet);
@@ -578,6 +682,12 @@ namespace Bam.DependencyInjection
             this[typeof(T)] = instanciator;
         }
 
+        /// <summary>
+        /// Registers a factory function that creates instances for the specified type.
+        /// </summary>
+        /// <param name="type">The type to register the factory for.</param>
+        /// <param name="instanciator">The factory function that creates instances.</param>
+        /// <param name="throwIfSet">If true, throws an <see cref="InvalidOperationException"/> when the type is already registered.</param>
         public void Set(Type type, Func<object> instanciator, bool throwIfSet = false)
         {
             Check(type, throwIfSet);
@@ -585,11 +695,23 @@ namespace Bam.DependencyInjection
             this[type] = instanciator;
         }
 
+        /// <summary>
+        /// Registers a mapping from one type to another by constructing an instance of the implementation type.
+        /// </summary>
+        /// <param name="forType">The type to register (typically an interface or abstract class).</param>
+        /// <param name="useType">The implementation type to construct and register.</param>
+        /// <param name="throwIfSet">If true, throws an <see cref="InvalidOperationException"/> when the type is already registered.</param>
         public void Set(Type forType, Type useType, bool throwIfSet = false)
         {
             Set(forType, Construct(useType), throwIfSet);
         }
 
+        /// <summary>
+        /// Registers the specified instance for the given type.
+        /// </summary>
+        /// <param name="type">The type to register the instance for.</param>
+        /// <param name="instance">The instance to register.</param>
+        /// <param name="throwIfSet">If true, throws an <see cref="InvalidOperationException"/> when the type is already registered.</param>
         public void Set(Type type, object instance, bool throwIfSet = false)
         {
             Check(type, throwIfSet);
@@ -615,6 +737,9 @@ namespace Bam.DependencyInjection
             }
         }
 
+        /// <summary>
+        /// Gets all registered class names (simple or fully-qualified type names).
+        /// </summary>
         public string[] ClassNames => _classNameTypeDictionary.Keys.ToArray();
 
         /// <summary>
@@ -638,6 +763,11 @@ namespace Bam.DependencyInjection
             }
         }
 
+        /// <summary>
+        /// Gets the type registered under the specified class name, or null if not found.
+        /// </summary>
+        /// <param name="className">The class name to look up.</param>
+        /// <returns>The registered type, or null if no type is registered under the specified class name.</returns>
         public Type this[string className]
         {
             get
@@ -659,16 +789,29 @@ namespace Bam.DependencyInjection
         /// </summary>
         public Type[] MappedTypes => _typeInstanceDictionary.Keys.ToArray();
 
+        /// <summary>
+        /// Removes the registration for type T from this provider.
+        /// </summary>
+        /// <typeparam name="T">The type to remove.</typeparam>
         public void Remove<T>()
         {
             Remove(typeof(T));
         }
 
+        /// <summary>
+        /// Removes the registration for the specified class name from this provider.
+        /// </summary>
+        /// <param name="className">The class name whose registration should be removed.</param>
         public void Remove(string className)
         {
             Remove(className, out Type ignore);
         }
 
+        /// <summary>
+        /// Removes the registration for the specified class name from this provider and outputs the associated type.
+        /// </summary>
+        /// <param name="className">The class name whose registration should be removed.</param>
+        /// <param name="type">When this method returns, contains the type that was registered under the class name, or null if not found.</param>
         public void Remove(string className, out Type type)
         {
             type = this[className];
@@ -678,6 +821,10 @@ namespace Bam.DependencyInjection
             }
         }
 
+        /// <summary>
+        /// Removes the registration for the specified type, including both simple and fully-qualified class name mappings.
+        /// </summary>
+        /// <param name="type">The type whose registration should be removed.</param>
         public void Remove(Type type)
         {            
             string fullyQualifiedTypeName = string.Format("{0}.{1}", type.Namespace, type.Name);
@@ -701,16 +848,31 @@ namespace Bam.DependencyInjection
             }
         }
 
+        /// <summary>
+        /// Determines whether a type is registered under the specified class name.
+        /// </summary>
+        /// <param name="className">The class name to check.</param>
+        /// <returns>True if a type is registered under the specified class name; otherwise false.</returns>
         public bool HasClass(string className)
         {
             return this[className] != null;
         }
 
+        /// <summary>
+        /// Determines whether an instance or factory is registered for type T.
+        /// </summary>
+        /// <typeparam name="T">The type to check for.</typeparam>
+        /// <returns>True if type T is registered; otherwise false.</returns>
         public bool Contains<T>()
         {
             return Contains(typeof(T));
         }
 
+        /// <summary>
+        /// Determines whether an instance or factory is registered for the specified type.
+        /// </summary>
+        /// <param name="type">The type to check for.</param>
+        /// <returns>True if the type is registered; otherwise false.</returns>
         public bool Contains(Type type)
         {
             return this[type] != null;
@@ -829,6 +991,11 @@ namespace Bam.DependencyInjection
             }
         }
         
+        /// <summary>
+        /// Resolves constructor parameters for the specified type from registered instances and constructor parameter values.
+        /// </summary>
+        /// <param name="type">The type whose constructor parameters should be resolved.</param>
+        /// <returns>A list of resolved constructor parameter values.</returns>
         public List<object> GetCtorParams(Type type)
         {
             return GetCtorParams(type, out _);
@@ -839,6 +1006,12 @@ namespace Bam.DependencyInjection
             return GetCtorParams(type, constructingTypes, out _);
         }
         
+        /// <summary>
+        /// Resolves constructor parameters for the specified type and outputs the matching constructor.
+        /// </summary>
+        /// <param name="type">The type whose constructor parameters should be resolved.</param>
+        /// <param name="ctorInfo">When this method returns, contains the constructor whose parameters were successfully resolved, or null if none matched.</param>
+        /// <returns>A list of resolved constructor parameter values.</returns>
         public List<object> GetCtorParams(Type type, out ConstructorInfo ctorInfo)
         {
             HashSet<Type> constructingTypes = new HashSet<Type>();

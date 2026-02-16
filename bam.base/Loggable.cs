@@ -27,16 +27,28 @@ namespace Bam.Logging
             _allInstances.Add(this);
         }
 
+        /// <summary>
+        /// Sets the log verbosity level on all Loggable instances created so far.
+        /// </summary>
+        /// <param name="level">The verbosity level to apply to all instances.</param>
         public static void SetGlobalVerbosity(VerbosityLevel level)
         {
             _allInstances.Each(l=> l.LogVerbosity = level);
         }
-        
+
+        /// <summary>
+        /// Gets all Loggable instances that have been created.
+        /// </summary>
         public static IEnumerable<ILoggable> AllInstances => _allInstances.ToArray();
 
+        /// <summary>
+        /// Gets a string identifying this Loggable instance by type name and optional identifier tag.
+        /// </summary>
         public string LoggableIdentifier => $"TypeName={GetType().Name};{IdentifierTag?.Invoke()}";
 
-
+        /// <summary>
+        /// Gets or sets a function that returns an additional identifier string appended to <see cref="LoggableIdentifier"/>.
+        /// </summary>
         public Func<string> IdentifierTag { get; set; }
 
         /// <summary>
@@ -71,6 +83,11 @@ namespace Bam.Logging
             loggable.Subscribers.Each(Subscribe);
 		}
 
+        /// <summary>
+        /// Subscribes a handler to all events on this instance that have a <see cref="VerbosityAttribute"/> matching the specified level.
+        /// </summary>
+        /// <param name="levelToSubscribe">The verbosity level to subscribe to.</param>
+        /// <param name="handler">The handler to invoke when a matching event fires.</param>
         public virtual void Subscribe(VerbosityLevel levelToSubscribe, Action<ILoggable, LoggableEventArgs> handler)
         {
             Type emittingType = this.GetType();
@@ -90,6 +107,10 @@ namespace Bam.Logging
             });
         }
         
+        /// <summary>
+        /// Subscribes the specified logger to all events on this instance, filtered by the current <see cref="LogVerbosity"/>.
+        /// </summary>
+        /// <param name="logger">The logger to subscribe. If null, this method does nothing.</param>
         [Exclude]
         [DebuggerStepThrough]
         public virtual void Subscribe(ILogger? logger)
@@ -172,6 +193,9 @@ namespace Bam.Logging
             }
         }
 
+        /// <summary>
+        /// Occurs when a log message is raised via <see cref="Info"/>, <see cref="Warn"/>, <see cref="Error"/>, or <see cref="Console"/>.
+        /// </summary>
         public event EventHandler MessageReceived;
 
         /// <summary>
@@ -228,6 +252,12 @@ namespace Bam.Logging
             }
         }
         
+        /// <summary>
+        /// Fires the <see cref="MessageReceived"/> event with a <see cref="LogMessage"/> of the specified type.
+        /// </summary>
+        /// <param name="eventType">The severity of the log event.</param>
+        /// <param name="format">The message format string.</param>
+        /// <param name="args">Arguments to format into the message.</param>
         [Exclude]
         public void EventMessage(LogEventType eventType, string format, params string[] args)
         {
