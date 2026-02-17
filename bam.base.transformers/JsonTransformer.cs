@@ -8,12 +8,12 @@ namespace Bam.Base.Transformers
 
         public override TInput ReverseTransform(string output)
         {
-            return GetReverseTransformer().ReverseTransform(output);
+            return GetReverseTransformer().ReverseTransform(output)!;
         }
 
         public override string Transform(TInput value)
         {
-            return value.ToJson();
+            return value!.ToJson();
         }
 
         public override IValueReverseTransformer<string, TInput> GetReverseTransformer()

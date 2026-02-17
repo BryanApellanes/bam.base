@@ -19,8 +19,8 @@ namespace Bam
         public TData ReverseTransform(byte[] transformed)
         {
             IValueReverseTransformer<byte[], byte[]> reverseTransformer = TransformerPipeline.ByteTransformerPipeline.GetReverseTransformer();
-            byte[] utf8 = reverseTransformer.ReverseTransform(transformed);
-            string reversedString = Encoding.UTF8.GetString(utf8);
+            byte[] utf8 = reverseTransformer.ReverseTransform(transformed)!;
+            string reversedString = Encoding.UTF8.GetString(utf8!);
 
             return ConvertStringToData(reversedString);
         }

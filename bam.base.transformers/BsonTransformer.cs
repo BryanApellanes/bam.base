@@ -6,12 +6,12 @@ namespace Bam
     {
         public override TData ReverseTransform(byte[] output)
         {
-            return GetReverseTransformer().ReverseTransform(output);
+            return GetReverseTransformer().ReverseTransform(output)!;
         }
 
         public override byte[] Transform(TData input)
         {
-            return input.ToBson();
+            return input!.ToBson();
         }
 
         public override IValueReverseTransformer<byte[], TData> GetReverseTransformer()

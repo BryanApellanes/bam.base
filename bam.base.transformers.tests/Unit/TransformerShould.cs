@@ -22,8 +22,8 @@ namespace Bam.Base.Transformers.Tests
                 (transformer) =>
                 {
                     byte[] bson = transformer.Transform(testMonkey);
-                    TestMonkey decoded = transformer.GetReverseTransformer().ReverseTransform(bson);
-                    return decoded;
+                    TestMonkey decoded = transformer.GetReverseTransformer().ReverseTransform(bson)!;
+                    return decoded!;
                 })
             .TheTest
             .ShouldPass(because =>
@@ -44,8 +44,8 @@ namespace Bam.Base.Transformers.Tests
                 (transformer) =>
                 {
                     string json = transformer.Transform(testMonkey);
-                    TestMonkey decoded = transformer.GetReverseTransformer().ReverseTransform(json);
-                    return decoded;
+                    TestMonkey decoded = transformer.GetReverseTransformer().ReverseTransform(json)!;
+                    return decoded!;
                 })
             .TheTest
             .ShouldPass(because =>
@@ -68,8 +68,8 @@ namespace Bam.Base.Transformers.Tests
                 {
                     string encoded = transformer.Transform(randomBytes);
                     IValueReverseTransformer<string, byte[]> untransformer = transformer.GetReverseTransformer();
-                    byte[] decoded = untransformer.ReverseTransform(encoded);
-                    return new object[] { randomBytes, decoded };
+                    byte[] decoded = untransformer.ReverseTransform(encoded)!;
+                    return new object[] { randomBytes, decoded! };
                 })
             .TheTest
             .ShouldPass(because =>

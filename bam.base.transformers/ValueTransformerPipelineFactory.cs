@@ -67,7 +67,7 @@ namespace Bam
             {
                 ConstructorInfo ctor = namedTransformerTypes[name];
                 ParameterInfo[] ctorParameterInfos = ctor.GetParameters();
-                IValueTransformer<byte[], byte[]> transformer = (IValueTransformer<byte[], byte[]>) serviceRegistry.Construct(ctor.DeclaringType, ctorParameterInfos.Select(p => p.ParameterType).ToArray());
+                IValueTransformer<byte[], byte[]> transformer = (IValueTransformer<byte[], byte[]>) serviceRegistry.Construct(ctor.DeclaringType!, ctorParameterInfos.Select(p => p.ParameterType).ToArray());
                 if (transformer != null)
                 {
                     pipeline.Add(transformer);

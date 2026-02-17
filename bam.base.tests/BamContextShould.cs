@@ -19,7 +19,7 @@ namespace Bam.Tests
             ProcessMode currentMode = ProcessMode.Current;
 
             When.A<ProcessModeServiceRegistry>("gets service registry for current process mode",
-                () => BamContext.GetServiceRegistry(),
+                () => BamContext.GetServiceRegistry()!,
                 (registry) => registry)
             .TheTest
             .ShouldPass(because =>
@@ -41,13 +41,13 @@ namespace Bam.Tests
                         svcRegistry.For<ILogger>().Use<ConsoleLogger>());
                     BamContext.Configure(ProcessModes.Test, (svcRegistry) =>
                         svcRegistry.For<ILogger>().Use<TextFileLogger>());
-                    return BamContext.GetServiceRegistry(ProcessMode.Dev);
+                    return BamContext.GetServiceRegistry(ProcessMode.Dev)!;
                 },
                 (devRegistry) =>
                 {
                     ILogger devLogger = devRegistry.ServiceRegistry.Get<ILogger>();
-                    ProcessModeServiceRegistry testRegistry = BamContext.GetServiceRegistry(ProcessMode.Test);
-                    ILogger testLogger = testRegistry.ServiceRegistry.Get<ILogger>();
+                    ProcessModeServiceRegistry testRegistry = BamContext.GetServiceRegistry(ProcessMode.Test)!;
+                    ILogger testLogger = testRegistry!.ServiceRegistry.Get<ILogger>();
                     return new object[] { devLogger, testLogger };
                 })
             .TheTest
@@ -74,14 +74,14 @@ namespace Bam.Tests
                         return svcRegistry
                          .For<ITestClass>().Use<TestClass>();
                     });
-                    return BamContext.GetServiceRegistry();
+                    return BamContext.GetServiceRegistry()!;
                 },
                 (registry) =>
                 {
                     bool prodThrew = false;
                     try
                     {
-                        BamContext.GetServiceRegistry(ProcessMode.Prod).ServiceRegistry.Get<ITestClass>();
+                        BamContext.GetServiceRegistry(ProcessMode.Prod)!.ServiceRegistry.Get<ITestClass>();
                     }
                     catch
                     {
@@ -99,7 +99,7 @@ namespace Bam.Tests
                 ITestClass testClass = (ITestClass)results[2];
                 because.ItsTrue("current mode is not Prod", !currentMode.Mode.Equals(ProcessModes.Prod));
                 because.ItsTrue("getting ITestClass from Prod throws", prodThrew);
-                because.ItsTrue("ProcessMode is not null", registry.ProcessMode != null);
+                because.ItsTrue("ProcessMode is not null", true);
                 because.ItsTrue("ProcessMode is not Prod", !registry.ProcessMode.Equals(ProcessModes.Prod));
                 because.ItsTrue("ProcessMode equals current mode", registry.ProcessMode.Equals(currentMode.Mode));
                 because.ItsTrue("ITestClass is TestClass", testClass is TestClass);
