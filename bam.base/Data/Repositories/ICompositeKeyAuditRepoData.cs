@@ -8,14 +8,14 @@
         string[] CompositeKeyProperties { get; set; }
 
         bool Equals(object obj);
-        bool ExistsIn<T>(IRepository repository, out T existing) where T : class, new();
+        bool ExistsIn<T>(IRepository repository, out T? existing) where T : class, new();
         string GetCompositeKeyString(HashAlgorithms algorithm = HashAlgorithms.SHA256);
         int GetHashCode();
         int GetIntKeyHash();
         long GetLongKeyHash();
         ulong GetULongKeyHash();
         ulong Key();
-        T LoadByCompositeKey<T>(IRepository repository) where T : class, new();
-        T LoadByCompositeKeyId<T>(IRepository repository) where T : class, new();
+        T? LoadByCompositeKey<T>(IRepository repository) where T : class, new();
+        T? LoadByCompositeKeyId<T>(IRepository repository) where T : class, new();
     }
 }

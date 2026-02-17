@@ -58,17 +58,17 @@ namespace Bam
             : this(expected.Name, actual == null ? "null" : actual.GetType().Name)
         {
             this.Expected = expected;
-            this.Actual = actual?.GetType();
+            this.Actual = actual?.GetType()!;
         }
 
         public ExpectationFailedException(Type expected, object actual, bool htmlEncode)
             : this(expected.Name, actual == null ? "null" : actual.GetType().Name, htmlEncode)
         {
             this.Expected = expected;
-            this.Actual = actual?.GetType();
+            this.Actual = actual?.GetType()!;
         }
         
-        public object Expected { get; set; }
-        public object Actual { get; set; }
+        public object Expected { get; set; } = null!;
+        public object Actual { get; set; } = null!;
     }
 }

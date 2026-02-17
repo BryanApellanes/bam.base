@@ -34,13 +34,13 @@ namespace Bam.Logging
 		/// on the current Loggable instance and should be enclosed in curly braces {}.  The sender argument
 		/// to the registered event handler is used to resolve message variables.
 		/// </summary>
-        public string SenderMessageFormat { get; set; }
-		
+        public string SenderMessageFormat { get; set; } = null!;
+
 		/// <summary>
 		/// The "NamedFormat" message to use when outputting messages.  The EventArgs argument
 		/// to the registered event handler is used to resolve message variables.
 		/// </summary>
-        public string EventArgsMessageFormat { get; set; }
+        public string EventArgsMessageFormat { get; set; } = null!;
 
         public bool TryGetSenderMessage(object value, out string message)
         {

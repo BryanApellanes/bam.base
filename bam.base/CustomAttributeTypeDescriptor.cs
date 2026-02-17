@@ -14,12 +14,12 @@ namespace Bam
             Type = type;
             AttributeTypes = Analyze(type);
         }
-        public Type Type { get; set; }
+        public Type Type { get; set; } = null!;
         public HashSet<Type> AttributeTypes
         {
             get;
             private set;
-        }
+        } = null!;
 
         public static HashSet<Type> Analyze(Type type)
         {

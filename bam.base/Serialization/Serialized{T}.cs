@@ -1,10 +1,10 @@
-﻿namespace Bam.Serialization
+namespace Bam.Serialization
 {
     public class Serialized<T> : Serialized
     {
         public static implicit operator T(Serialized<T> serialized)
         {
-            return serialized.Deserialize();
+            return serialized.Deserialize()!;
         }
 
         public Serialized() { }
@@ -12,13 +12,13 @@
         {
         }
 
-        public Serialized(T data, SerializationFormat format) : base(data, format)
+        public Serialized(T data, SerializationFormat format) : base(data!, format)
         { 
         }
 
         public new T? Deserialize()
         {
-            return (T?)Serialization.Deserialize(this.Data, typeof(T), this.Format);
+            return (T?)Serialization.Deserialize(this.Data!, typeof(T), this.Format);
         }
     }
 }

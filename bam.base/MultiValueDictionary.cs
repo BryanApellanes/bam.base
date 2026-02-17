@@ -7,7 +7,7 @@ namespace Bam;
     /// </summary>
     /// <typeparam name="TKey">The type of the key.</typeparam>
     /// <typeparam name="TValue">The type of the value.</typeparam>
-    public class MultiValueDictionary<TKey, TValue> : Dictionary<TKey, HashSet<TValue>>
+    public class MultiValueDictionary<TKey, TValue> : Dictionary<TKey, HashSet<TValue>> where TKey : notnull
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="MultiValueDictionary&lt;TKey, TValue&gt;"/> class.
@@ -27,8 +27,8 @@ namespace Bam;
         {
             Args.ThrowIfNull(key, "key");
 
-            HashSet<TValue> container = null;
-            if(!this.TryGetValue(key, out container))
+            HashSet<TValue> container = null!;
+            if(!this.TryGetValue(key, out container!))
             {
                 container = new HashSet<TValue>();
                 base.Add(key, container);
@@ -48,8 +48,8 @@ namespace Bam;
             Args.ThrowIfNull(key, "key");
             
             bool toReturn = false;
-            HashSet<TValue> values = null;
-            if(this.TryGetValue(key, out values))
+            HashSet<TValue> values = null!;
+            if(this.TryGetValue(key, out values!))
             {
                 toReturn = values.Contains(value);
             }
@@ -66,8 +66,8 @@ namespace Bam;
         {
             Args.ThrowIfNull(key, "key");
 
-            HashSet<TValue> container = null;
-            if(this.TryGetValue(key, out container))
+            HashSet<TValue> container = null!;
+            if(this.TryGetValue(key, out container!))
             {
                 container.Remove(value);
                 if(container.Count <= 0)
@@ -111,11 +111,11 @@ namespace Bam;
         /// </returns>
         public HashSet<TValue> GetValues(TKey key, bool returnEmptySet)
         {
-            HashSet<TValue> toReturn = null;
-            if(!base.TryGetValue(key, out toReturn) && returnEmptySet)
+            HashSet<TValue> toReturn = null!;
+            if(!base.TryGetValue(key, out toReturn!) && returnEmptySet)
             {
                 toReturn = new HashSet<TValue>();
             }
-            return toReturn;
+            return toReturn!;
         }
     }

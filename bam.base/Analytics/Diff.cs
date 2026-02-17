@@ -178,7 +178,7 @@ namespace Bam.Analytics
       // The B-Version of the data (modified data) to be compared.
       DiffData DataB = new DiffData(DiffCodes(TextB, h, trimSpace, ignoreSpace, ignoreCase, separators));
 
-      h = null; // free up hashtable memory (maybe)
+      h = null!; // free up hashtable memory (maybe)
 
       LCS(DataA, 0, DataA.Length, DataB, 0, DataB.Length);
       return CreateDiffs(DataA, DataB);
@@ -220,7 +220,7 @@ namespace Bam.Analytics
       string []Lines;
       int []Codes;
       int lastUsedCode = h.Count;
-      object aCode;
+      object? aCode;
       string s;
 
       // strip off all cr, only use lf as textline separator.
@@ -241,7 +241,7 @@ namespace Bam.Analytics
         if (ignoreCase)
           s = s.ToLower();
         
-        aCode = h[s];
+        aCode = h[s]!;
         if (aCode == null) {
           lastUsedCode++;
           h[s] = lastUsedCode;

@@ -2,8 +2,8 @@ namespace Bam
 {
     public class ConfigChangedEventArgs: EventArgs
     {
-        public FileInfo File { get; set; }
-        public Config OldConfig { get; set; }
-        public Config NewConfig { get; set; }
+        public FileInfo File { get; set; } = null!;
+        public Config OldConfig { get; set; } = null!;
+        public Config NewConfig { get; set; } = null!;
     }
 }

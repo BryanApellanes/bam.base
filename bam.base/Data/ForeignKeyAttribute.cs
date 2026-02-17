@@ -15,9 +15,9 @@ namespace Bam.Data
 
         public string ForeignKeyName => $"FK_{Table}_{ReferencedTable}{Suffix}";
 
-        public string ReferencedKey { get; set; }
-        
-        public string ReferencedTable { get; set; }
+        public string ReferencedKey { get; set; } = null!;
+
+        public string ReferencedTable { get; set; } = null!;
 
         public string Suffix { get; set; }
     }

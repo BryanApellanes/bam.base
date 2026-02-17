@@ -2,6 +2,6 @@
 {
     public class BackgroundThreadQueueEventArgs: EventArgs
     {
-        public Exception Exception { get; set; }
+        public Exception Exception { get; set; } = null!;
     }
 }

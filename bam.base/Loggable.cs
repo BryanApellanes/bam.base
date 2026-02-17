@@ -49,7 +49,7 @@ namespace Bam.Logging
         /// <summary>
         /// Gets or sets a function that returns an additional identifier string appended to <see cref="LoggableIdentifier"/>.
         /// </summary>
-        public Func<string> IdentifierTag { get; set; }
+        public Func<string> IdentifierTag { get; set; } = null!;
 
         /// <summary>
         /// A value from 0 to 5, represented by the LogEventType enum.
@@ -173,7 +173,7 @@ namespace Bam.Logging
                                         string message = string.Empty;
                                         if (verbosity != null)
                                         {
-                                            message = verbosity.GetMessage(s, a);
+                                            message = verbosity.GetMessage(s!, a);
                                         }
 
                                         if (!string.IsNullOrEmpty(message))
@@ -196,7 +196,7 @@ namespace Bam.Logging
         /// <summary>
         /// Occurs when a log message is raised via <see cref="Info"/>, <see cref="Warn"/>, <see cref="Error"/>, or <see cref="Console"/>.
         /// </summary>
-        public event EventHandler MessageReceived;
+        public event EventHandler? MessageReceived;
 
         /// <summary>
         /// Fire the Message event with the specified information message

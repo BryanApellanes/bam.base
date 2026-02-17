@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 
 namespace Bam
 {
@@ -10,13 +10,11 @@ namespace Bam
             {
                 case OSNames.OSX:
                 case OSNames.Linux:
-                    return new FileInfo(assembly.CodeBase.TruncateFront("file://".Length));
+                    return new FileInfo(assembly.CodeBase!.TruncateFront("file://".Length));
                 case OSNames.Windows:
                 default:
-                    return new FileInfo(assembly.CodeBase.TruncateFront("file:///".Length));
+                    return new FileInfo(assembly.CodeBase!.TruncateFront("file:///".Length));
             }
-
-            return new FileInfo(assembly.CodeBase.TruncateFront("file:///".Length));
         }
 
         public static string GetFilePath(this Assembly assembly)

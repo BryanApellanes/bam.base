@@ -13,12 +13,12 @@ namespace Bam.Data
             this.ConnectionName = connectionName;
         }
 
-        public string TableName { get; set; }
+        public string TableName { get; set; } = null!;
 
         /// <summary>
         /// Logical name given to the schema that
-        /// the table is part of.  
+        /// the table is part of.
         /// </summary>
-        public string ConnectionName { get; set; }
+        public string ConnectionName { get; set; } = null!;
     }
 }

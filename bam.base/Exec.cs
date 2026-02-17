@@ -103,7 +103,7 @@ namespace Bam
             }
             else
             {
-                return null;
+                return null!;
             }
         }
 
@@ -117,7 +117,7 @@ namespace Bam
             catch (Exception ex)
             {
                 exceptionHandler(ex);
-                return default(T);
+                return default(T)!;
             }
         }
         
@@ -263,7 +263,7 @@ namespace Bam
 
         public static bool TakesTooLong<TResult>(this Func<TResult> function, TimeSpan timeToWait)
         {
-            return TakesTooLong(function, null, timeToWait);
+            return TakesTooLong(function, null!, timeToWait);
         }
 
         public static bool TakesTooLong<TResult>(this Func<TResult> function, Func<TResult, TResult> callBack, string threadName, int millisecondsToWait = 300)
@@ -332,11 +332,11 @@ namespace Bam
                 {
                     if (callBack != null)
                     {
-                        callBack(function(state));
+                        callBack(function(state!));
                     }
                     else
                     {
-                        function(state);
+                        function(state!);
                     }
 
                     returnThreadController.Set();
@@ -359,7 +359,7 @@ namespace Bam
             }
             catch (Exception ex)
             {
-                Log.Default.AddEntry("Exception occurred in Exec.TakesTooLong: {0}", ex, ex.Message);
+                Log.Default!.AddEntry("Exception occurred in Exec.TakesTooLong: {0}", ex, ex.Message);
                 return true;
             }
         }
@@ -454,7 +454,7 @@ namespace Bam
 
 		public static Thread ExecuteInThread(this Action<dynamic> action, dynamic argContext)
 		{
-            Thread thread = new Thread((o) => action(o))
+            Thread thread = new Thread((o) => action(o!))
             {
                 IsBackground = true
             };

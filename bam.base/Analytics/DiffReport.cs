@@ -80,11 +80,11 @@ namespace Bam.Analytics
             tokens.Add(line);
             if (line.Type == DiffType.Deleted)
             {
-                deleted.Add(line as DeletedDiffReportToken);
+                deleted.Add((line as DeletedDiffReportToken)!);
             }
             if (line.Type == DiffType.Inserted)
             {
-                inserted.Add(line as InsertedDiffReportToken);
+                inserted.Add((line as InsertedDiffReportToken)!);
             }
 
         }

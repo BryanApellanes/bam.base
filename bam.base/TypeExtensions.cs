@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using System.Reflection;
 
 namespace Bam
@@ -10,7 +10,7 @@ namespace Bam
             FieldInfo[] fields = type.GetFields(BindingFlags.Public | BindingFlags.Static);
             foreach (FieldInfo field in fields)
             {
-                forEach(field.GetRawConstantValue());
+                forEach(field.GetRawConstantValue()!);
             }
         }
         /// <summary>
@@ -35,13 +35,13 @@ namespace Bam
         public static object Construct(this Type type, params object[] ctorArgs)
         {
             ConstructorInfo ctor = GetConstructor(type, ctorArgs);
-            object val = null;
+            object val = null!;
             if (ctor != null)
             {
                 val = ctor.Invoke(ctorArgs);
             }
 
-            return val;
+            return val!;
         }
 
         public static bool TryConstruct(this Type type, out object constructed, params object[] ctorArgs)
@@ -53,7 +53,7 @@ namespace Bam
             params object[] ctorArgs)
         {
             bool result = false;
-            constructed = null;
+            constructed = null!;
             try
             {
                 constructed = Construct(type, ctorArgs);
@@ -77,7 +77,7 @@ namespace Bam
             params object[] ctorArgs)
         {
             bool result = true;
-            constructed = default(T);
+            constructed = default(T)!;
             try
             {
                 constructed = Construct<T>(type, ctorArgs);
@@ -170,8 +170,8 @@ namespace Bam
                 paramTypes.Add(o.GetType());
             }
 
-            ConstructorInfo ctor = type.GetConstructor(paramTypes.ToArray());
-            return ctor;
+            ConstructorInfo ctor = type.GetConstructor(paramTypes.ToArray())!;
+            return ctor!;
         }
     }
 }

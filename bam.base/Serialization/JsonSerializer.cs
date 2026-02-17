@@ -12,9 +12,9 @@ namespace Bam.Serialization
 
         public Newtonsoft.Json.Formatting Formatting { get; set; }
 
-        public JsonSerializerSettings JsonSerializerSettingsSettings { get; set; }
+        public JsonSerializerSettings JsonSerializerSettingsSettings { get; set; } = null!;
 
-        public Encoding Encoding { get; set; }
+        public Encoding Encoding { get; set; } = null!;
 
         public byte[] Serialize(object data)
         {

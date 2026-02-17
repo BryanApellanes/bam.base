@@ -43,7 +43,7 @@ namespace Bam
         {
             get;
             set;
-        }
+        } = null!;
 
         public int ProcessId
         {
@@ -85,7 +85,7 @@ namespace Bam
             set;
         }
         
-        string appName;
+        string appName = null!;
         public string ApplicationName
         {
             get

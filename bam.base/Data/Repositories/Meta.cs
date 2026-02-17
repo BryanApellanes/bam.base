@@ -30,7 +30,7 @@ namespace Bam.Data.Repositories
         /// </summary>
         /// <param name="data">The typed data object to wrap.</param>
         /// <param name="objectPersister">The object persister used for reading and writing.</param>
-        public Meta(T data, IObjectPersister objectPersister) : base(data, objectPersister)
+        public Meta(T data, IObjectPersister objectPersister) : base(data!, objectPersister)
         {
             Type = typeof(T);
         }
@@ -46,7 +46,7 @@ namespace Bam.Data.Repositories
 			}
 			set
 			{
-				Data = value;
+				Data = value!;
 			}
 		}
 
@@ -68,7 +68,7 @@ namespace Bam.Data.Repositories
     [Serializable]
 	public class Meta
 	{
-		IObjectPersister _objectPersister;
+		IObjectPersister _objectPersister = null!;
 		object _objectPersisterLock = new object();
 		/// <summary>
 		/// Gets or sets the object persister used for reading and writing data. Resolved from the service registry if not explicitly set.
@@ -77,7 +77,7 @@ namespace Bam.Data.Repositories
 		{
 			get
 			{
-				return _objectPersisterLock.DoubleCheckLock(ref _objectPersister, () => ServiceRegistry.Default.Get<IObjectPersister>());
+				return _objectPersisterLock.DoubleCheckLock(ref _objectPersister, () => ServiceRegistry.Default!.Get<IObjectPersister>());
 			}
 			set
 			{
@@ -137,7 +137,7 @@ namespace Bam.Data.Repositories
 		}
 
 
-        Type _type;
+        Type _type = null!;
         /// <summary>
         /// Gets or sets the type of the wrapped data object. If not explicitly set, returns the runtime type of <see cref="Data"/>.
         /// </summary>
@@ -145,7 +145,7 @@ namespace Bam.Data.Repositories
 		{
 			get
 			{
-				return _type ?? Data?.GetType();
+				return _type ?? Data?.GetType()!;
 			}
             set
             {
@@ -156,7 +156,7 @@ namespace Bam.Data.Repositories
         /// <summary>
         /// Gets the wrapped data object.
         /// </summary>
-		public object Data { get; internal set; }
+		public object Data { get; internal set; } = null!;
 
         /// <summary>
         /// Gets a value indicating whether the wrapped data object has the <see cref="SerializableAttribute"/>.
@@ -215,7 +215,7 @@ namespace Bam.Data.Repositories
 				return result;
 			}
 
-			return default(T);
+			return default(T)!;
 		}
 
         /// <summary>
@@ -261,7 +261,7 @@ namespace Bam.Data.Repositories
 			{
 				if (Data != null)
 				{
-					return GetId(RequireIdProperty).Value;
+					return GetId(RequireIdProperty)!.Value;
 				}
 				return 0;
 			}
@@ -318,7 +318,7 @@ namespace Bam.Data.Repositories
 				return property;
 			}
 
-			return null;
+			return null!;
 		}
 
         /// <summary>
@@ -340,7 +340,7 @@ namespace Bam.Data.Repositories
         /// <param name="data">The data object to initialize meta data for.</param>
 		public void SetMeta(object data)
 		{
-			Meta meta = data as Meta;
+			Meta meta = (data as Meta)!;
 			if (meta != null)
 			{
 				data = meta.Data;
@@ -514,7 +514,7 @@ namespace Bam.Data.Repositories
         public static string GetIdHash(object value, Type? type = null)
         {
             type = type ?? value.GetType();
-            ulong id = Meta.GetId(value).Value;
+            ulong id = Meta.GetId(value)!.Value;
             return GetIdHash(id, type);
         }
 
@@ -526,7 +526,7 @@ namespace Bam.Data.Repositories
         /// <returns>An MD5 hash string.</returns>
         public static string GetIdHash(long id, Type type)
         {
-            return "{0}::{1}".Format(id, type.FullName).Md5();
+            return "{0}::{1}".Format(id, type.FullName!).Md5();
         }
 
         /// <summary>
@@ -547,7 +547,7 @@ namespace Bam.Data.Repositories
 				return string.Empty;
 			}
 
-            return "{0}::{1}".Format(id, type.FullName).Md5();
+            return "{0}::{1}".Format(id, type.FullName!).Md5();
         }
 
         protected internal static string GetUuid(object? data, bool throwIfUuidPropertyMissing = false)
@@ -569,20 +569,20 @@ namespace Bam.Data.Repositories
 				PropertyInfo? prop = dataType.GetProperty(propName);
 				if (prop != null)
 				{
-					result = (string)prop.GetValue(data);
+					result = (string)prop.GetValue(data)!;
 				}
 				else if (throwIfPropertyMissing)
 				{
 					Args.Throw<InvalidOperationException>("The specified object of type {0} doesn't have a {1} property", dataType.Name, propName);
 				}
 			}
-			return result;
+			return result!;
 		}
 
 
 		protected internal static bool HasKeyProperty(object data, out PropertyInfo prop)
 		{
-			prop = GetKeyProperty(data.GetType(), false);
+			prop = GetKeyProperty(data.GetType(), false)!;
 			return prop != null;
 		}
 
@@ -597,7 +597,7 @@ namespace Bam.Data.Repositories
 			PropertyInfo? key;
 			if (HasKeyProperty(data, out key))
 			{
-				result = (long)key.GetValue(data) > 0;
+				result = (long)key.GetValue(data)! > 0;
 			}
 
 			return result;
@@ -609,7 +609,7 @@ namespace Bam.Data.Repositories
 			PropertyInfo? uuidProp = data.GetType().GetProperty("Uuid");
 			if (uuidProp != null)
 			{
-				result = !string.IsNullOrEmpty((string)uuidProp.GetValue(data));
+				result = !string.IsNullOrEmpty((string?)uuidProp.GetValue(data));
 			}
 
 			return result;
@@ -658,14 +658,14 @@ namespace Bam.Data.Repositories
 		/// </summary>
 		/// <param name="value"></param>
 		/// <param name="objectReaderWriter"></param>
-		internal void SetId(object value, IObjectPersister objectReaderWriter = null)
+		internal void SetId(object value, IObjectPersister objectReaderWriter = null!)
 		{
 			objectReaderWriter = objectReaderWriter ?? this.ObjectPersister;
 			Type type = value.GetType();
 			PropertyInfo? idProp = type.GetProperty("Id");
 			if (idProp != null)
 			{
-				ulong id = (ulong)idProp.GetValue(value);
+				ulong id = (ulong)idProp.GetValue(value)!;
                 if (id == 0)
                 {
                     ulong retrievedId = GetNextId(type, objectReaderWriter);

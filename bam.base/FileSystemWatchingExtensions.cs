@@ -19,7 +19,7 @@ namespace Bam
 
         public static FileSystemWatcher OnChange(this FileSystemWatcher watcher, FileSystemEventHandler changeHandler)
         {
-            if (watcher == null) return watcher;
+            if (watcher == null) return watcher!;
             watcher.Changed -= changeHandler;
             watcher.Changed += changeHandler;
             return watcher;
@@ -33,7 +33,7 @@ namespace Bam
 
         public static FileSystemWatcher OnCreated(this FileSystemWatcher watcher, FileSystemEventHandler createdHandler)
         {
-            if (watcher == null) return watcher;
+            if (watcher == null) return watcher!;
             watcher.Created -= createdHandler;
             watcher.Created += createdHandler;
             return watcher;
@@ -47,7 +47,7 @@ namespace Bam
 
         public static FileSystemWatcher OnDeleted(this FileSystemWatcher watcher, FileSystemEventHandler deletedHandler)
         {
-            if (watcher == null) return watcher;
+            if (watcher == null) return watcher!;
             watcher.Deleted -= deletedHandler;
             watcher.Deleted += deletedHandler;
             return watcher;
@@ -61,7 +61,7 @@ namespace Bam
 
         public static FileSystemWatcher OnError(this FileSystemWatcher watcher, ErrorEventHandler errorHandler)
         {
-            if (watcher == null) return watcher;
+            if (watcher == null) return watcher!;
             watcher.Error -= errorHandler;
             watcher.Error += errorHandler;
             return watcher;
@@ -75,7 +75,7 @@ namespace Bam
 
         public static FileSystemWatcher OnRenamed(this FileSystemWatcher watcher, RenamedEventHandler renamedHandler)
         {
-            if (watcher == null) return watcher;
+            if (watcher == null) return watcher!;
             watcher.Renamed -= renamedHandler;
             watcher.Renamed += renamedHandler;
             return watcher;
@@ -85,7 +85,7 @@ namespace Bam
         {
             if (File.Exists(directoryPath))
             {
-                directoryPath = new FileInfo(directoryPath).Directory.FullName;
+                directoryPath = new FileInfo(directoryPath)!.Directory!.FullName;
             }
             if (!_watchers.ContainsKey(directoryPath))
             {
@@ -99,12 +99,12 @@ namespace Bam
                 }
             }
 
-            if (_watchers.TryGetValue(directoryPath, out FileSystemWatcher fsWatcher))
+            if (_watchers.TryGetValue(directoryPath, out FileSystemWatcher? fsWatcher))
             {
                 return fsWatcher;
             }
 
-            return null;
+            return null!;
         }
     }
 }

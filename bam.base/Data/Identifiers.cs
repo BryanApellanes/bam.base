@@ -5,11 +5,11 @@ namespace Bam.Data
     /// </summary>
     public class Identifiers
     {
-        public object Data { get; set; }
+        public object Data { get; set; } = null!;
         
         public ulong LocalId { get; }
         
-        public string[] CompositeKeyProperties { get; set; }
+        public string[] CompositeKeyProperties { get; set; } = null!;
         
         public ulong CompositeKey { get; set; }
         

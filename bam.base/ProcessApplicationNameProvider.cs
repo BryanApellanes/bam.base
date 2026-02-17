@@ -8,7 +8,7 @@ namespace Bam
     {
         public string GetApplicationName()
         {
-            string name = BamEnvironmentVariables.GetBamVariable(BamEnvironmentVariables.BAM_APPLICATION_NAME);
+            string name = BamEnvironmentVariables.GetBamVariable(BamEnvironmentVariables.BAM_APPLICATION_NAME)!;
             if (string.IsNullOrEmpty(name) || name.StartsWith("UNKNOWN"))
             {
                 name = Config.GetHostServiceName();
@@ -17,7 +17,7 @@ namespace Bam
             return name;
         }
 
-        static ProcessApplicationNameProvider _applicationNameProvider;
+        static ProcessApplicationNameProvider _applicationNameProvider= null!;
         static object _applicationNameProviderLock = new object();
         public static ProcessApplicationNameProvider Current
         {

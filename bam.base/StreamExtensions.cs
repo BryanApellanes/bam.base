@@ -1,4 +1,4 @@
-﻿using System.Xml.Serialization;
+using System.Xml.Serialization;
 using YamlDotNet.Serialization;
 
 namespace Bam
@@ -15,7 +15,7 @@ namespace Bam
 
         public static object FromXmlStream(this Stream xmlStream, Type type)
         {
-            return new XmlSerializer(type).Deserialize(xmlStream);
+            return new XmlSerializer(type).Deserialize(xmlStream)!;
         }
 
         public static object FromJsonStream(this Stream stream, Type type)
@@ -39,7 +39,7 @@ namespace Bam
             Deserializer deserializer = new Deserializer();
             using (StreamReader sr = new StreamReader(ms))
             {
-                return deserializer.Deserialize(sr, type);
+                return deserializer.Deserialize(sr, type)!;
             }
         }
     }

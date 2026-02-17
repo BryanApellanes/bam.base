@@ -16,11 +16,11 @@ namespace Bam.Data
             this.Name = "".RandomString(5);
         }
 
-        public string Table { get; set; }
+        public string Table { get; set; } = null!;
         public string Name { get; set; }
-       
-        public string DbDataType { get; set; }
-        public string MaxLength { get; set; }
+
+        public string DbDataType { get; set; } = null!;
+        public string MaxLength { get; set; } = null!;
         public virtual bool AllowNull { get; set; }
 
         public override string ToString()

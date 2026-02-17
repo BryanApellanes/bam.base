@@ -11,9 +11,9 @@ namespace Bam.Data.Repositories
             Method = method;
             DaoName = daoName;
         }
-        public string ConnectionName { get; set; }
+        public string ConnectionName { get; set; } = null!;
         public CrudMethods Method { get; set; }
-        public string DaoName { get; set; }
+        public string DaoName { get; set; } = null!;
         public static Func<Uri, DaoInfo> DefaultUrlParser
         {
             get

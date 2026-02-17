@@ -195,6 +195,6 @@ namespace Bam.DependencyInjection
         {
             get;
             set;
-        }
+        } = null!;
     }
 }

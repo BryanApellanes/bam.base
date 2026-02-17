@@ -15,7 +15,7 @@ namespace Bam.Logging
     public abstract class Logger : ILogger, IHasRequiredProperties
     {
         readonly ConcurrentQueue<LogEvent> _logEventQueue;
-        Thread _loggingThread;
+        Thread _loggingThread = null!;
         readonly AutoResetEvent _waitForEnqueueLogEvent;
 
         readonly List<string> requiredProperties;
@@ -40,7 +40,7 @@ namespace Bam.Logging
             StartLoggingThread();
         }
 
-        protected virtual void OnDomainUnload(object sender, EventArgs e)
+        protected virtual void OnDomainUnload(object? sender, EventArgs e)
         {
             BlockUntilEventQueueIsEmpty();
             StopLoggingThread();
@@ -155,7 +155,7 @@ namespace Bam.Logging
                     Thread.Sleep(CommitCycleDelay);
                     while (_logEventQueue.Count > 0)
                     {
-                        if (_logEventQueue.TryDequeue(out LogEvent logEvent))
+                        if (_logEventQueue.TryDequeue(out LogEvent? logEvent))
                         {
                             if (logEvent != null && (int)logEvent.Severity <= (int)Verbosity)
                             {
@@ -211,7 +211,7 @@ namespace Bam.Logging
         /// </summary>
         public virtual bool IsNull { get { return false; } }
 
-        string appName;
+        string appName = null!;
         /// <summary>
         /// Gets or sets the application name used in log entries. Resolved from configuration or <see cref="ApplicationNameProvider"/> if not explicitly set.
         /// </summary>
@@ -250,32 +250,34 @@ namespace Bam.Logging
         /// <summary>
         /// Occurs when any log entry is added.
         /// </summary>
-        public event LogEntryAddedListener EntryAdded;
+        public event LogEntryAddedListener? EntryAdded;
 
         /// <summary>
         /// Occurs when a fatal-level log event is added.
         /// </summary>
-        public event LogEntryAddedListener FatalEventOccurred;
+        public event LogEntryAddedListener? FatalEventOccurred;
 
         /// <summary>
         /// Occurs when an information-level log event is added.
         /// </summary>
-        public event LogEntryAddedListener InfoEventOccurred;
+        public event LogEntryAddedListener? InfoEventOccurred;
 
         /// <summary>
         /// Occurs when a warning-level log event is added.
         /// </summary>
-        public event LogEntryAddedListener WarnEventOccurred;
+        public event LogEntryAddedListener? WarnEventOccurred;
 
         /// <summary>
         /// Occurs when an error-level log event is added.
         /// </summary>
-        public event LogEntryAddedListener ErrorEventOccurred;
+        public event LogEntryAddedListener? ErrorEventOccurred;
 
         /// <summary>
         /// Occurs when a custom-level log event is added.
         /// </summary>
-        public event LogEntryAddedListener CustomEventOccurred;
+#pragma warning disable CS0067
+        public event LogEntryAddedListener? CustomEventOccurred;
+#pragma warning restore CS0067
 
         /// <summary>
         /// Gets or sets the provider used to generate event IDs from application name and message signature. Defaults to <see cref="HashingEventIdProvider"/>.
@@ -368,7 +370,7 @@ namespace Bam.Logging
             }
             else
             {
-                AddEntry(messageSignature, user, "Application", ex, variableMessageValues);
+                AddEntry(messageSignature, user, "Application", ex, variableMessageValues!);
             }
         }
 
@@ -379,12 +381,12 @@ namespace Bam.Logging
 
         private void AddEntry(string messageSignature, string user, string category, int verbosity, params string?[] variableMessageValues)
         {
-            Exception ex = null;
+            Exception ex = null!;
             if ((LogEventType)verbosity == LogEventType.Error)
             {
                 ex = new Exception("A custom error event has been logged");
             }
-            LogEvent ev = CreateLogEvent(messageSignature, user, category, (LogEventType)verbosity, ex, variableMessageValues);
+            LogEvent ev = CreateLogEvent(messageSignature, user, category, (LogEventType)verbosity, ex!, variableMessageValues);
 
             QueueLogEvent(ev);
 
@@ -459,7 +461,7 @@ namespace Bam.Logging
 
         protected internal LogEvent CreateInfoEvent(string messageSignature, params string[] messageVariableValues)
         {
-            return CreateLogEvent(messageSignature, UserUtil.GetCurrentUser(true), "Application", LogEventType.Information, null, messageVariableValues);
+            return CreateLogEvent(messageSignature, UserUtil.GetCurrentUser(true), "Application", LogEventType.Information, null!, messageVariableValues);
         }
 
         protected internal LogEvent CreateWarningEvent(string message)
@@ -469,7 +471,7 @@ namespace Bam.Logging
 
         protected internal LogEvent CreateWarningEvent(string messageSignature, params string[] messageVariableValues)
         {
-            return CreateLogEvent(messageSignature, UserUtil.GetCurrentUser(true), "Application", LogEventType.Warning, null, messageVariableValues);
+            return CreateLogEvent(messageSignature, UserUtil.GetCurrentUser(true), "Application", LogEventType.Warning, null!, messageVariableValues);
         }
 
         protected internal LogEvent CreateErrorEvent(string message)
@@ -479,7 +481,7 @@ namespace Bam.Logging
 
         protected internal LogEvent CreateErrorEvent(string messageSignature, params string[] messageVariableValues)
         {
-            return CreateLogEvent(messageSignature, UserUtil.GetCurrentUser(true), "Application", LogEventType.Error, null, messageVariableValues);
+            return CreateLogEvent(messageSignature, UserUtil.GetCurrentUser(true), "Application", LogEventType.Error, null!, messageVariableValues);
         }
 
         protected internal LogEvent CreateErrorEvent(string messageSignature, Exception ex, params string[] messageVariableValues)
@@ -581,7 +583,7 @@ namespace Bam.Logging
         /// <param name="variableMessageValues">Values to substitute into the message format string.</param>
         public virtual void AddEntry(string messageSignature, LogEventType type, params string?[] variableMessageValues)
         {
-            AddEntry(messageSignature, (int)type, variableMessageValues);
+            AddEntry(messageSignature, (int)type, variableMessageValues!);
         }
 
         /// <summary>
@@ -679,10 +681,10 @@ namespace Bam.Logging
         /// <param name="messageSignature">The message format string.</param>
         /// <param name="ex">The exception to include in the log entry.</param>
         /// <param name="args">Arguments to format into the message; converted to strings.</param>
-        public void Error(string messageSignature, Exception ex, params object[] args)
+        public void Error(string messageSignature, Exception? ex, params object[] args)
         {
             Args.ThrowIfNull(args);
-            AddEntry(messageSignature, ex, args.Each(a => a.ToString()).ToArray());
+            AddEntry(messageSignature, ex!, args.Each(a => a.ToString()).ToArray());
         }
 
         #endregion

@@ -61,7 +61,7 @@ namespace Bam
         /// <param name="failureMessage">Optional message to include in the exception.</param>
         public static void ShouldBeFalse(this bool boolToCheck, string? failureMessage = null)
         {
-            IsFalse(boolToCheck, failureMessage);
+            IsFalse(boolToCheck, failureMessage!);
         }
 
         /// <summary>
@@ -268,7 +268,7 @@ namespace Bam
                 if (!string.IsNullOrEmpty(failureMessage))
                     throw new ExpectationFailedException(failureMessage, ShouldHtmlEncodeExceptions);
 
-                throw new ExpectationFailedException(expected.ToString(), actual.ToString(), ShouldHtmlEncodeExceptions);
+                throw new ExpectationFailedException(expected.ToString()!, actual.ToString()!, ShouldHtmlEncodeExceptions);
             }
         }
         
@@ -367,9 +367,9 @@ namespace Bam
                 throw new ExpectationFailedException("byte arrays are different");
             }
 
-            for (int i = 0; i < x.Length; i++)
+            for (int i = 0; i < x!.Length; i++)
             {
-                if (x[i] != y[i])
+                if (x[i] != y![i])
                 {
                     throw new ExpectationFailedException("byte arrays are different");
                 }
@@ -432,9 +432,9 @@ namespace Bam
             {
                 if (string.IsNullOrEmpty(failureMessage))
                 {
-                    string expectString = expected == null ? "null" : expected.ToString();
-                    string actualString = actual == null ? "null" : actual.ToString();
-                    throw new ExpectationFailedException(expectString, actualString, ShouldHtmlEncodeExceptions);
+                    string expectString = expected == null! ? "null" : expected.ToString()!;
+                    string actualString = actual == null! ? "null" : actual.ToString()!;
+                    throw new ExpectationFailedException(expectString!, actualString!, ShouldHtmlEncodeExceptions);
                 }
                 else
                 {
@@ -498,7 +498,7 @@ namespace Bam
             {
                 if (string.IsNullOrEmpty(failureMessage))
                 {
-                    throw new ExpectationFailedException(typeof(T), objectToCheck, ShouldHtmlEncodeExceptions);
+                    throw new ExpectationFailedException(typeof(T), objectToCheck!, ShouldHtmlEncodeExceptions);
                 }
 
                 throw new ExpectationFailedException(failureMessage);
@@ -969,7 +969,7 @@ namespace Bam
         /// <param name="failureMessage">Optional message to include in the exception if the assertion fails.</param>
         public static void ShouldNotBeNull(this object objectToCheck, string? failureMessage = null)
         {
-            IsNotNull(objectToCheck, failureMessage);
+            IsNotNull(objectToCheck, failureMessage!);
         }
 
         /// <summary>

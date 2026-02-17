@@ -1,4 +1,4 @@
-﻿namespace Bam
+namespace Bam
 {
     public static class Ipc
     {
@@ -34,7 +34,7 @@
         /// <returns></returns>
         public static IIpcMessage Get(string name, Type messageType, string? rootDirectory = null)
         {
-            if (!Exists(name, messageType, rootDirectory, out IIpcMessage result))
+            if (!Exists(name, messageType, rootDirectory!, out IIpcMessage result))
             {
                 result = Create(name, messageType, rootDirectory);
             }
@@ -55,7 +55,7 @@
         public static IIpcMessage Create(string name, Type type, string? rootDirectory = null, bool deleteExisting = false)
         {
             EnsureImplementationsAreSetOrDie();
-            return CreateMessage(name, type, rootDirectory);
+            return CreateMessage!(name, type, rootDirectory!)!;
             
             /* old implementation
              
@@ -85,27 +85,27 @@
         public static bool Exists<T>(string name, out IIpcMessage result)
         {
             EnsureImplementationsAreSetOrDie();
-            result = CreateMessage(name, typeof(T), string.Empty);//new IpcMessage(name, typeof(T));
-            return MessageIsPersisted(result);//File.Exists(result.MessageFile);
+            result = CreateMessage!(name, typeof(T), string.Empty)!;//new IpcMessage(name, typeof(T));
+            return MessageIsPersisted!(result!);//File!.Exists(result.MessageFile);
         }
 
         public static bool Exists(string name, Type messageType, out IIpcMessage result)
         {
             EnsureImplementationsAreSetOrDie();
-            result = CreateMessage(name, messageType, string.Empty);//new IpcMessage(name, messageType);
-            return MessageIsPersisted(result);//File.Exists(result.MessageFile);
+            result = CreateMessage!(name, messageType, string.Empty)!;//new IpcMessage(name, messageType);
+            return MessageIsPersisted!(result!);//File!.Exists(result.MessageFile);
         }
 
         public static bool Exists(string name, Type messageType, string? rootDirectory)
         {
-            return Exists(name, messageType, rootDirectory, out IIpcMessage ignore);
+            return Exists(name, messageType, rootDirectory!, out IIpcMessage ignore);
         }
 
         public static bool Exists(string name, Type messageType, string rootDirectory, out IIpcMessage result)
         {
             EnsureImplementationsAreSetOrDie();
-            result = CreateMessage(name, messageType, rootDirectory);//new IpcMessage(name, messageType, rootDirectory);
-            return MessageIsPersisted(result);//File.Exists(result.MessageFile);
+            result = CreateMessage!(name, messageType, rootDirectory)!;//new IpcMessage(name, messageType, rootDirectory);
+            return MessageIsPersisted!(result!);//File!.Exists(result.MessageFile);
         }
     }
 }

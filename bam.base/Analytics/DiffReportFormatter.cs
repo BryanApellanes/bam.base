@@ -14,7 +14,7 @@ namespace Bam.Analytics
             this.DiffReport = diffReport;
         }
 
-        public DiffReport DiffReport { get; set; }
+        public DiffReport DiffReport { get; set; } = null!;
 
         public bool NumberLines { get; set; }
 

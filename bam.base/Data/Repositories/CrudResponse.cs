@@ -1,4 +1,4 @@
-﻿namespace Bam.Data.Repositories
+namespace Bam.Data.Repositories
 {
     public class CrudResponse
     {
@@ -6,9 +6,9 @@
         /// The connection name also called the
         /// schema name or context name
         /// </summary>
-        public string CxName { get; set; }
+        public string CxName { get; set; } = null!;
         public bool Success { get; set; }
-        public object Dao { get; set; } // json
-        public string Message { get; set; }
+        public object Dao { get; set; } = null!; // json
+        public string Message { get; set; } = null!;
     }
 }

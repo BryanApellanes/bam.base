@@ -43,7 +43,7 @@ namespace Bam
                         OldConfig = oldConfig,
                         NewConfig = newConfig
                     };
-                    FireEvent(ConfigChanged, this, args);
+                    FireEvent(ConfigChanged!, this, args);
                 });
             }
         }
@@ -78,7 +78,7 @@ namespace Bam
                         OldConfig = oldConfig,
                         NewConfig = newConfig
                     };
-                    FireEvent(ConfigChanged, this, args);
+                    FireEvent(ConfigChanged!, this, args);
                 });
             }
         }
@@ -114,7 +114,7 @@ namespace Bam
                         OldConfig = oldConfig,
                         NewConfig = newConfig
                     };
-                    FireEvent(ConfigChanged, this, args);
+                    FireEvent(ConfigChanged!, this, args);
                 });
             }
         }
@@ -124,7 +124,7 @@ namespace Bam
         /// </summary>
         public string ApplicationName { get; private set; }
         
-        static Config _current;
+        static Config _current = null!;
         static readonly object _currentLock = new object();
         
         /// <summary>
@@ -154,7 +154,7 @@ namespace Bam
         /// <returns>A new <see cref="Config"/> instance.</returns>
         public static Config For(string applicationName, string? configFilePath = null)
         {
-            return new Config(applicationName, configFilePath);
+            return new Config(applicationName, configFilePath!);
         }
 
         /// <summary>
@@ -170,12 +170,12 @@ namespace Bam
         /// <summary>
         /// Gets or sets the file system watcher that monitors the configuration file for changes.
         /// </summary>
-        protected FileSystemWatcher ConfigChangeWatcher { get; set; }
+        protected FileSystemWatcher ConfigChangeWatcher { get; set; } = null!;
 
         /// <summary>
         /// Raised when the underlying configuration file changes on disk.
         /// </summary>
-        public event EventHandler ConfigChanged;
+        public event EventHandler? ConfigChanged;
 
         /// <summary>
         /// Gets or sets the <see cref="FileInfo"/> representing the configuration file on disk.
@@ -220,17 +220,17 @@ namespace Bam
             {
                 if (AppSettings.ContainsKey(key))
                 {
-                    AppSettings[key] = string.IsNullOrEmpty(value) ? defaultValue: value;
+                    AppSettings[key] = (string.IsNullOrEmpty(value) ? defaultValue: value)!;
                 }
                 else
                 {
-                    AppSettings.Add(key, string.IsNullOrEmpty(value) ? defaultValue: value);
+                    AppSettings.Add(key, (string.IsNullOrEmpty(value) ? defaultValue: value)!);
                 }
                 Save();
             }
         }
 
-        static IApplicationNameProvider _applicationNameProvider;
+        static IApplicationNameProvider _applicationNameProvider = null!;
         /// <summary>
         /// Gets or sets the application name provider used to determine config file paths.
         /// Defaults to <see cref="ProcessApplicationNameProvider.Current"/>.
@@ -349,7 +349,7 @@ namespace Bam
                 Dictionary<string, string> existing = configFile.FullName.FromYamlFile<Dictionary<string, string>>() ?? new Dictionary<string, string>();
                 foreach (string key in existing.Keys)
                 {
-                    appSettings.AddMissing(key, existing[key]);
+                    appSettings.TryAdd(key, existing[key]);
                 }
             }
             appSettings.ToYaml().SafeWriteToFile(configFile.FullName, true);
@@ -414,7 +414,7 @@ namespace Bam
         /// <returns></returns>
         public static DirectoryInfo GetDirectory(IApplicationNameProvider? applicationNameProvider = null)
         {
-            DirectoryInfo configDir = GetBamHomeConfigFile().Directory;
+            DirectoryInfo configDir = GetBamHomeConfigFile().Directory!;
 			applicationNameProvider = applicationNameProvider ?? ProcessApplicationNameProvider.Current;
             string typeConfigsFolderName = applicationNameProvider.GetApplicationName();
             if (string.IsNullOrEmpty(typeConfigsFolderName))
@@ -422,7 +422,7 @@ namespace Bam
                 typeConfigsFolderName = ApplicationDiagnosticInfo.UnknownApplication;//Bam.CoreServices.ApplicationRegistration.Data.Application.Unknown.Name;
             }
             
-            return new DirectoryInfo(Path.Combine(configDir.FullName, typeConfigsFolderName));
+            return new DirectoryInfo(Path.Combine(configDir!.FullName, typeConfigsFolderName));
         }
         
         /// <summary>
@@ -433,11 +433,11 @@ namespace Bam
         public static FileInfo GetBamHomeConfigFile(IApplicationNameProvider? applicationNameProvider = null)
         {
             applicationNameProvider = applicationNameProvider ?? ProcessApplicationNameProvider.Current;
-            Log.Trace("Config using applicationNameProvider of type ({0})", applicationNameProvider?.GetType().Name);
+            Log.Trace("Config using applicationNameProvider of type ({0})", applicationNameProvider!.GetType().Name);
             string providedAppName = applicationNameProvider.GetApplicationName();
             return GetBamHomeConfigFile(providedAppName);
         }
-        
+
         /// <summary>
         /// Get the config file for the specified application from the `.bam` directory of the process
         /// owner's profile.
@@ -447,7 +447,7 @@ namespace Bam
         public static FileInfo GetBamProfileConfigFile(IApplicationNameProvider? applicationNameProvider = null)
         {
 			applicationNameProvider = applicationNameProvider ?? ProcessApplicationNameProvider.Current;
-            Log.Trace("Config using applicationNameProvider of type ({0})", applicationNameProvider?.GetType().Name);
+            Log.Trace("Config using applicationNameProvider of type ({0})", applicationNameProvider!.GetType().Name);
             string providedAppName = applicationNameProvider.GetApplicationName();
             return GetBamProfileConfigFile(providedAppName);
         }
@@ -459,7 +459,7 @@ namespace Bam
         /// <returns>The <see cref="FileInfo"/> for the profile configuration file.</returns>
         public static FileInfo GetBamProfileConfigFile(string appName)
         {
-            string assemblyFile = Assembly.GetEntryAssembly().GetFileInfo().FullName;
+            string assemblyFile = Assembly.GetEntryAssembly()!.GetFileInfo().FullName;
             string assemblyName = Path.GetFileNameWithoutExtension(assemblyFile);
             string path = !appName.StartsWith("UNKNOWN")
                 ? Path.Combine(BamProfile.ConfigPath, appName, $"{appName}.appsettings.yaml")
@@ -477,7 +477,7 @@ namespace Bam
         /// <returns>The <see cref="FileInfo"/> for the home configuration file.</returns>
         public static FileInfo GetBamHomeConfigFile(string appName)
         {
-            string assemblyFile = Assembly.GetEntryAssembly().GetFileInfo().FullName;
+            string assemblyFile = Assembly.GetEntryAssembly()!.GetFileInfo().FullName;
             string assemblyName = Path.GetFileNameWithoutExtension(assemblyFile);
             string path = !appName.StartsWith("UNKNOWN")
                 ? Path.Combine(BamHome.ConfigPath, appName, $"{appName}.appsettings.yaml")
@@ -494,7 +494,7 @@ namespace Bam
         /// <returns></returns>
         public static string GetHostServiceName()
         {
-            string assemblyFile = Assembly.GetEntryAssembly().GetFileInfo().FullName;
+            string assemblyFile = Assembly.GetEntryAssembly()!.GetFileInfo().FullName;
             return Path.GetFileNameWithoutExtension(assemblyFile);
         }
         
@@ -503,7 +503,7 @@ namespace Bam
             FileInfo configFile = new FileInfo(path);
             if (!configFile.Exists)
             {
-                if (!configFile.Directory.Exists)
+                if (!configFile!.Directory!.Exists)
                 {
                     configFile.Directory.Create();
                 }

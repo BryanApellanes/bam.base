@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Globalization;
 using System.Security;
 using System.Security.Cryptography;
@@ -16,7 +16,7 @@ namespace Bam
         private static readonly ulong DiscreteValues = (ulong)Math.Pow(Base, BlockSize);
 
         private static ulong _globalCounter;
-        private static string _hostname;
+        private static string _hostname= null!;
         
         private static string Hostname
         {

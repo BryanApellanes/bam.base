@@ -20,7 +20,7 @@ namespace Bam
         /// <summary>
         /// The name of the client variable
         /// </summary>
-        public string VarName { get; set; }
+        public string VarName { get; set; } = null!;
 
         /// <summary>
         /// Describes the client side method case

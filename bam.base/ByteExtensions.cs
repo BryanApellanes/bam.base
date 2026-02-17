@@ -32,7 +32,7 @@ namespace Bam
         {
             get;
             set;
-        }
+        } = null!;
 
         public static object Decode(this byte[] data, Type type)
         {

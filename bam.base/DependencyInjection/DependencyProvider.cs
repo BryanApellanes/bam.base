@@ -206,8 +206,8 @@ namespace Bam.DependencyInjection
             PropertyInfo[] properties = type.GetProperties();
             foreach (PropertyInfo prop in properties)
             {
-                object value = this[prop.PropertyType];
-                Delegate getter = value as Delegate;
+                object? value = this[prop.PropertyType];
+                Delegate? getter = value as Delegate;
                 value = getter != null ? getter.DynamicInvoke() : value;
 
                 if (value == null && prop.HasCustomAttributeOfType(out InjectAttribute attr))
@@ -253,11 +253,11 @@ namespace Bam.DependencyInjection
             if (value == null && attr.Required)
             {
                 string msgFormat = "Unable to construct required injection property: Name = {0}, Type = {1}";
-                string message = string.Format(msgFormat, $"{prop.DeclaringType.Name}.{prop.Name}", tryType.FullName);
+                string message = string.Format(msgFormat, $"{prop!.DeclaringType!.Name}.{prop.Name}", tryType.FullName);
                 throw new InvalidOperationException(message);
             }
 
-            return value;
+            return value!;
         }
 
         /// <summary>
@@ -291,13 +291,13 @@ namespace Bam.DependencyInjection
                 ctorTypes[i] = ctorParams[i].GetType();
             }
 
-            ConstructorInfo ctor = type.GetConstructor(ctorTypes);
+            ConstructorInfo ctor = type.GetConstructor(ctorTypes)!;
             if (ctor == null)
             {
                 Throw(type, ctorTypes);
             }
 
-            this[type] = ctor.Invoke(ctorParams);
+            this[type] = ctor!.Invoke(ctorParams);
             return this[type];
         }
 
@@ -416,12 +416,12 @@ namespace Bam.DependencyInjection
             try
             {
                 value = Get(type);
-                e = null;
+                e = null!;
                 return true;
             }
             catch (Exception ex)
             {
-                value = null;
+                value = null!;
                 e = ex;
                 return false;
             }
@@ -464,7 +464,7 @@ namespace Bam.DependencyInjection
                 return result;
             }
 
-            return null;
+            return null!;
         }
 
         /// <summary>
@@ -523,8 +523,8 @@ namespace Bam.DependencyInjection
         /// <returns>True if the instance was successfully resolved; otherwise false.</returns>
 		public bool TryGet<T>(out T value, out Exception ex)
 		{
-			ex = null;
-			value = default(T);
+			ex = null!;
+			value = default(T)!;
 			bool result = false;
 			try
 			{
@@ -551,7 +551,7 @@ namespace Bam.DependencyInjection
                 T getInternal = GetInternal<T>();
                 if(getInternal == null)
                 {
-                    this[typeof(T)] = Construct<T>();
+                    this[typeof(T)] = Construct<T>()!;
                 }
             }
 
@@ -572,7 +572,7 @@ namespace Bam.DependencyInjection
         {
             if (this[typeof(T)] == null)
             {
-                this[typeof(T)] = setToIfNull;
+                this[typeof(T)] = setToIfNull!;
             }
 
             return GetInternal<T>();
@@ -643,7 +643,7 @@ namespace Bam.DependencyInjection
         {
             Check<T>(throwIfSet);
 
-            this[typeof(T)] = instance;
+            this[typeof(T)] = instance!;
         }
 
         /// <summary>
@@ -778,7 +778,7 @@ namespace Bam.DependencyInjection
                 }
                 else
                 {
-                    return null;
+                    return null!;
                 }
             }
         }
@@ -908,11 +908,11 @@ namespace Bam.DependencyInjection
                         }
                     }
 
-                    return result;
+                    return result!;
                 }
                 else
                 {
-                    return null;
+                    return null!;
                 }
             }
             set
@@ -979,7 +979,7 @@ namespace Bam.DependencyInjection
             {
                 return _ctorParams[forType][parameterName];
             }
-            return null;
+            return null!;
         }
 
         private void GetCtorAndParams(Type type, out ConstructorInfo ctor, out List<object> ctorParams)
@@ -1029,7 +1029,7 @@ namespace Bam.DependencyInjection
                 throw new DependencyLoopException(type, constructingTypes);
             }
             
-            ctorInfo = null;
+            ctorInfo = null!;
             ConstructorInfo[] ctors = type.GetConstructors();
             List<object> ctorParams = new List<object>();
             foreach (ConstructorInfo ctor in ctors)
@@ -1039,14 +1039,14 @@ namespace Bam.DependencyInjection
                 {
                     foreach (ParameterInfo paramInfo in parameters)
                     {
-                        object ctorParam = GetCtorParameterValue(type, paramInfo.Name);
+                        object ctorParam = GetCtorParameterValue(type, paramInfo.Name!);
                         if (ctorParam != null)
                         {
                             if (ctorParam is Delegate d)
                             {
-                                ctorParam = d.DynamicInvoke();
+                                ctorParam = d.DynamicInvoke()!;
                             }
-                            ctorParams.Add(ctorParam);
+                            ctorParams.Add(ctorParam!);
                         }
                         else
                         {
@@ -1057,10 +1057,10 @@ namespace Bam.DependencyInjection
                                 {
                                     if (existing is Delegate d)
                                     {
-                                        existing = d.DynamicInvoke();
+                                        existing = d.DynamicInvoke()!;
                                     }
 
-                                    ctorParams.Add(existing);
+                                    ctorParams.Add(existing!);
                                 }
                                 else
                                 {

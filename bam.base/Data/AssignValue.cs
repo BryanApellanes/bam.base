@@ -73,7 +73,7 @@ namespace Bam.Data
             Args.ThrowIfNull(dictionary);
             foreach(TKey key in dictionary.Keys)
             {
-                yield return new AssignValue(key.ToString(), dictionary[key]?.ToString(), columnNameFormatter);
+                yield return new AssignValue(key.ToString()!, dictionary[key]?.ToString(), columnNameFormatter);
             }
         }
     }

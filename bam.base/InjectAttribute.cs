@@ -14,7 +14,7 @@
             Required = required;
         }
 
-        public Type TypeToUse { get; set; }
+        public Type TypeToUse { get; set; } = null!;
         public bool Required { get; set; }
     }
 }

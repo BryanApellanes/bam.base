@@ -11,7 +11,7 @@ namespace Bam.Analytics
     [XmlInclude(typeof(InsertedDiffReportToken))]
     public class DiffReportToken
     {
-        internal string text;
+        internal string text = null!;
         internal int lineNum;
         public DiffReportToken() { }
         public DiffReportToken(string text, int tokenNumber)

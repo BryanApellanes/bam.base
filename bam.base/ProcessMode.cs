@@ -1,4 +1,4 @@
-﻿using Bam.Configuration;
+using Bam.Configuration;
 
 namespace Bam
 {
@@ -36,8 +36,8 @@ namespace Bam
         {
             get
             {
-                string fromConfig = Config.Current["ProcessMode", nameof(ProcessModes.Dev)];
-                return FromString(fromConfig);
+                string fromConfig = Config.Current["ProcessMode", nameof(ProcessModes.Dev)]!;
+                return FromString(fromConfig!);
             }
         }
 
@@ -49,7 +49,7 @@ namespace Bam
             get { return new ProcessMode { Mode = BamEnvironmentVariables.ProcessMode() }; }
         }
 
-        static ProcessMode _current;
+        static ProcessMode _current= null!;
         /// <summary>
         /// Gets or sets the current process mode. First checks for a <c>--ProcessMode:&lt;value&gt;</c> command-line argument,
         /// then falls back to <see cref="FromBamConfig"/>.
@@ -60,7 +60,7 @@ namespace Bam
             {
                 if (_current == null)
                 {
-                    string processModeArg = Environment.GetCommandLineArgs()
+                    string? processModeArg = Environment.GetCommandLineArgs()
                         .FirstOrDefault(a => a.StartsWith("--ProcessMode"));
                     if (!string.IsNullOrEmpty(processModeArg))
                     {

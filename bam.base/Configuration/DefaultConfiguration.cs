@@ -21,7 +21,7 @@ namespace Bam.Configuration
         static NameValueCollection _appSettings = ConfigurationManager.AppSettings;
         static ConnectionStringSettingsCollection _connectionStrings = ConfigurationManager.ConnectionStrings;
 
-        public static IConfigurationResolver ConfigurationResolver { get; set; }
+        public static IConfigurationResolver ConfigurationResolver { get; set; } = null!;
 
         /// <summary>
         /// Gets the application settings.
@@ -154,10 +154,10 @@ namespace Bam.Configuration
         /// specified key is not found.</param>
         public static string GetAppSetting(string key, string defaultValue)
         {
-            string returnValue = _appSettings[key];
+            string returnValue = _appSettings[key]!;
             if (string.IsNullOrEmpty(returnValue) && ConfigurationResolver != null)
             {
-                returnValue = ConfigurationResolver?[key, defaultValue];
+                returnValue = ConfigurationResolver?[key, defaultValue]!;
             }
             return string.IsNullOrEmpty(returnValue) ? defaultValue: returnValue;
         }
@@ -464,16 +464,16 @@ namespace Bam.Configuration
         public static void SetProperty(object target, string propertyName)
         {
             Type type = target.GetType();
-            PropertyInfo property = type.GetProperty(propertyName);
+            PropertyInfo property = type.GetProperty(propertyName)!;
             if (property != null)
             {
                 SetProperty(target, type, property);
             }
             else
             {
-                string propValue = _appSettings[type.Name + "." + property.Name];
+                string propValue = _appSettings[type.Name + "." + property!.Name]!;
                 if (string.IsNullOrEmpty(propValue))
-                    propValue = _appSettings[property.Name];
+                    propValue = _appSettings[property.Name]!;
             }
         }
 
@@ -510,7 +510,7 @@ namespace Bam.Configuration
             Dictionary<string, string> appSettings = new Dictionary<string, string>();
             foreach (string key in _appSettings.Keys)
             {
-                appSettings.Add(key, _appSettings[key]);
+                appSettings.Add(key, _appSettings[key]!);
             }
 
             return GetProperty(targetTypeName, property, appSettings);
@@ -625,7 +625,7 @@ namespace Bam.Configuration
             PropertyInfo[] proxyProperties = proxyType.GetProperties();
             foreach (PropertyInfo proxyProp in proxyProperties)
             {
-                PropertyInfo targetProp = targetType.GetProperty(proxyProp.Name);
+                PropertyInfo targetProp = targetType.GetProperty(proxyProp.Name)!;
                 if (targetProp != null)
                     SetProperty(target, proxyType, targetProp);
             }
@@ -651,12 +651,12 @@ namespace Bam.Configuration
             Type destinationType = destination.GetType();
             foreach (PropertyInfo destinationProperty in destinationType.GetProperties())
             {
-                PropertyInfo sourceProperty = sourceType.GetProperty(destinationProperty.Name);
+                PropertyInfo sourceProperty = sourceType.GetProperty(destinationProperty.Name)!;
                 if (sourceProperty != null &&
                     sourceProperty.PropertyType.Equals(destinationProperty.PropertyType) &&
                     destinationProperty.CanWrite)
                 {
-                    object value = sourceProperty.GetValue(source, null);
+                    object value = sourceProperty.GetValue(source, null)!;
                     destinationProperty.SetValue(destination, value, null);
                 }
             }
@@ -684,11 +684,11 @@ namespace Bam.Configuration
             foreach (string property in target.RequiredProperties)
             {
                 Type targetType = target.GetType();
-                PropertyInfo prop = targetType.GetProperty(property);
+                PropertyInfo prop = targetType.GetProperty(property)!;
                 if (prop == null)
                     throw new InvalidIHasRequiredPropertiesImplementationException(targetType, property);
 
-                string propVal = (string)prop.GetValue(target, null);
+                string propVal = (string)prop.GetValue(target, null)!;
 
                 if (string.IsNullOrEmpty(propVal))
                     throw new RequiredPropertyNotSetException(configType, prop);
@@ -713,7 +713,7 @@ namespace Bam.Configuration
             Dictionary<string, string> appSettingDictionary = new Dictionary<string, string>();
             foreach (string appSettingKey in _appSettings.Keys)
             {
-                appSettingDictionary.Add(appSettingKey, _appSettings[appSettingKey]);
+                appSettingDictionary.Add(appSettingKey, _appSettings[appSettingKey]!);
             }
             InvokeConfigMethods(target, appSettingDictionary);
         }

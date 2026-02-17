@@ -1,4 +1,4 @@
-﻿using YamlDotNet.Serialization;
+using YamlDotNet.Serialization;
 
 namespace Bam
 {
@@ -77,7 +77,7 @@ namespace Bam
             return file.FullName.DecodeFromFile<T>();
         }
 
-        static Dictionary<string, SerializationFormat> _serializationFormats;
+        static Dictionary<string, SerializationFormat> _serializationFormats= null!;
         static object _serializationFormatsLock = new object();
 
         public static Dictionary<string, SerializationFormat> SerializationFormats
@@ -97,7 +97,7 @@ namespace Bam
             }
         }
 
-        static Dictionary<SerializationFormat, Func<Stream, Type, object>> _deserializers;
+        static Dictionary<SerializationFormat, Func<Stream, Type, object>> _deserializers= null!;
         static object _deserializersLock = new object();
 
         public static Dictionary<SerializationFormat, Func<Stream, Type, object>> Deserializers
@@ -111,7 +111,7 @@ namespace Bam
                             SerializationFormat.Invalid, (stream, type) =>
                             {
                                 Args.Throw<InvalidOperationException>("Invalid SerializationFormat specified");
-                                return null;
+                                return null!;
                             }
                         },
                         {SerializationFormat.Xml, (stream, type) => stream.FromXmlStream(type)},
@@ -128,7 +128,7 @@ namespace Bam
             }
         }
 
-        static Dictionary<SerializationFormat, Action<Stream, object>> _serializeActions;
+        static Dictionary<SerializationFormat, Action<Stream, object>> _serializeActions= null!;
         static object _serializeActionsLock = new object();
 
         public static Dictionary<SerializationFormat, Action<Stream, object>> SerializeActions

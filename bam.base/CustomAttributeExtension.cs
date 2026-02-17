@@ -23,7 +23,7 @@ namespace Bam
         /// <returns>MethodInfo or null</returns>
         public static MethodInfo GetFirstMethodWithAttributeOfType<T>(this Type typeToAnalyze, out T attr) where T : Attribute
         {
-            attr = null;
+            attr = null!;
             MethodInfo[] methods = typeToAnalyze.GetMethods();
             foreach (MethodInfo method in methods)
             {
@@ -31,7 +31,7 @@ namespace Bam
                     return method;
             }
 
-            return null;
+            return null!;
         }
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace Bam
         {
             PropertyInfo[] properties = typeToAnalyze.GetProperties();
             List<PropertyInfo> retVals = new List<PropertyInfo>();
-            attribute = null;
+            attribute = null!;
             foreach (PropertyInfo property in properties)
             {
                 object[] attributes = property.GetCustomAttributes(typeof(T), true);
@@ -68,7 +68,7 @@ namespace Bam
                 }
             }
 
-            return null;
+            return null!;
         }
 
         public static MethodInfo[] GetMethodsWithAttributeOfType<T>(this Type typeToAnalyze) where T : Attribute
@@ -92,7 +92,7 @@ namespace Bam
         /// <returns></returns>
         public static PropertyInfo[] GetPropertiesWithAttributeOfType<T>(this Type typeToAnalyze) where T : Attribute
         {
-            return GetPropertiesWithAttributeOfType<T>(typeToAnalyze, null);
+            return GetPropertiesWithAttributeOfType<T>(typeToAnalyze, null!);
         }
 
         /// <summary>
@@ -117,7 +117,7 @@ namespace Bam
         /// <returns></returns>
         public static PropertyInfo[] GetPropertiesWithAttributeOfType<T>(this Type typeToAnalyze, bool inherit) where T : Attribute
         {
-            return GetPropertiesWithAttributeOfType<T>(typeToAnalyze, null, inherit);
+            return GetPropertiesWithAttributeOfType<T>(typeToAnalyze, null!, inherit);
         }
 
         /// <summary>
@@ -185,13 +185,13 @@ namespace Bam
 
         public static bool HasCustomAttributeOfType<T>(this MemberInfo member, bool inherit) where T : Attribute
         {
-            T outT = default;
+            T outT = default!;
             return HasCustomAttributeOfType<T>(member, inherit, out outT);
         }
 
         public static T GetCustomAttributeOfType<T>(this MemberInfo memberInfo) where T : Attribute
         {
-            T retVal = default;
+            T retVal = default!;
             HasCustomAttributeOfType<T>(memberInfo, out retVal);
             return retVal;
         }
@@ -219,7 +219,7 @@ namespace Bam
         {
             if (memberInfo == null)
             {
-                attribute = null;
+                attribute = null!;
                 return false;
             }
             object[] customAttributes = memberInfo.GetCustomAttributes(typeof(T), inherit);
@@ -232,7 +232,7 @@ namespace Bam
         {
             if (parameterInfo == null)
             {
-                attribute = null;
+                attribute = null!;
                 return false;
             }
 
@@ -244,7 +244,7 @@ namespace Bam
             bool concreteAttribute)
             where T : Attribute
         {
-            attribute = default;
+            attribute = default!;
             if (concreteAttribute)
             {
                 foreach (object foundAttribute in customAttributes)
@@ -295,7 +295,7 @@ namespace Bam
 
         public static bool HasCustomAttributeOfType(this MemberInfo memberInfo, Type type, bool inherit, out object attribute)
         {
-            attribute = null;
+            attribute = null!;
             object[] customAttributes = memberInfo.GetCustomAttributes(type, inherit);
             foreach (object attr in customAttributes)
             {

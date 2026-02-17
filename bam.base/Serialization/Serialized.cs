@@ -1,4 +1,4 @@
-﻿namespace Bam
+namespace Bam
 {
     public class Serialized
     {
@@ -23,12 +23,12 @@
 
         public int Size
         {
-            get => Data.Length;
+            get => Data!.Length;
         }
 
         public virtual object? Deserialize() 
         {
-            return Serialization.Serialization.Deserialize(this.Data, this.Type, this.Format);
+            return Serialization.Serialization.Deserialize(this.Data!, this.Type!, this.Format);
         }
     }
 }

@@ -18,7 +18,7 @@ namespace Bam
             this.TypeSafeFunction = function;
             this.Thread = new Thread(() =>
             {
-                Object = function();
+                Object = function()!;
             });
         }
 
@@ -26,7 +26,7 @@ namespace Bam
         {
             get;
             set;
-        }
+        } = null!;
 
         public T Result
         {
@@ -36,7 +36,7 @@ namespace Bam
                 {
                     return (T)Object;
                 }
-                return default(T);
+                return default(T)!;
             }
         }
     }
@@ -94,7 +94,7 @@ namespace Bam
         {
             get;
             set;
-        }
+        } = null!;
 
         /// <summary>
         /// The Function originally passed to the constructor 
@@ -105,7 +105,7 @@ namespace Bam
         {
             get;
             set;
-        }
+        } = null!;
 
         /// <summary>
         /// Implicitly convert NamedThread to Thread
@@ -125,10 +125,10 @@ namespace Bam
             }
         }
 
-        public object Object { get; set; }
+        public object Object { get; set; } = null!;
 
-        public string Name { get; set; }
-        public Thread Thread { get; set; }
+        public string Name { get; set; } = null!;
+        public Thread Thread { get; set; } = null!;
 
         public void Start()
         {

@@ -13,6 +13,6 @@ namespace Bam
         }
         
         public ProcessInfo ProcessInfo { get; set; }
-        public string Message { get; set; }
+        public string Message { get; set; } = null!;
     }
 }

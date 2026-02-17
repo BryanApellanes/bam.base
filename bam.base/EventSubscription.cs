@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 
 namespace Bam
 {
@@ -9,10 +9,10 @@ namespace Bam
     /// </summary>
     public class EventSubscription : IEventSubscription
     {
-        public string EventName { get; set; }
-        public Delegate Delegate { get; set; }
-        public FieldInfo FieldInfo { get; set; }
-        public EventInfo EventInfo { get; set; }
+        public string EventName { get; set; } = null!;
+        public Delegate Delegate { get; set; } = null!;
+        public FieldInfo FieldInfo { get; set; } = null!;
+        public EventInfo EventInfo { get; set; } = null!;
 
         public virtual object? Invoke(params object[] args)
         {
@@ -31,7 +31,7 @@ namespace Bam
 
         public override bool Equals(object? obj)
         {
-            EventSubscription compareTo = obj as EventSubscription;
+            EventSubscription compareTo = (obj as EventSubscription)!;
             if(compareTo == null)
             {
                 return false;

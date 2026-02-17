@@ -53,7 +53,7 @@ namespace Bam
             Assembly = assembly;
         }
 
-		public string InfoFileName { get; set; }
+		public string InfoFileName { get; set; } = null!;
 		
 		/// <summary>
 		/// The path to the Assembly (.dll)
@@ -61,7 +61,7 @@ namespace Bam
 		[XmlIgnore]
 		[YamlIgnore]
 		[JsonIgnore]
-		public string AssemblyFilePath { get; set; }
+		public string AssemblyFilePath { get; set; } = null!;
 
 		[XmlIgnore]
 		[YamlIgnore]
@@ -74,9 +74,9 @@ namespace Bam
 			}
 		}
 
-		public byte[] AssemblyBytes { get; set; }
+		public byte[] AssemblyBytes { get; set; } = null!;
 		
-		Assembly _assembly;
+		Assembly _assembly = null!;
 
 		[XmlIgnore]
 		[YamlIgnore]
@@ -101,13 +101,13 @@ namespace Bam
 				}
 			}
 
-			return _assembly;
+			return _assembly!;
 		}
 
 		[XmlIgnore]
 		[YamlIgnore]
 		[JsonIgnore]
-		public string Root { get; set; }
+		public string Root { get; set; } = null!;
 
 		[XmlIgnore]
 		[YamlIgnore]
@@ -133,7 +133,7 @@ namespace Bam
         /// <returns></returns>
         public static GeneratedAssemblyInfo GetGeneratedAssembly(string infoFileName, IAssemblyGenerator generator)
         {
-            GeneratedAssemblyInfo assemblyInfo = GeneratedAssemblies.GetGeneratedAssemblyInfo(infoFileName);
+            GeneratedAssemblyInfo assemblyInfo = GeneratedAssemblies.GetGeneratedAssemblyInfo(infoFileName)!;
 
             if (assemblyInfo == null)
             {
@@ -144,16 +144,16 @@ namespace Bam
                     assemblyInfo = assemblyInfo.InfoFilePath.FromJsonFile<GeneratedAssemblyInfo>();
                     if (assemblyInfo == null /* the file was empty for some reason */ || !assemblyInfo.InfoFileName.Equals(infoFileName) || !assemblyInfo.AssemblyExists) // regenerate if the names don't match
                     {
-                        assemblyInfo = generator.GenerateAssembly();
+                        assemblyInfo = generator.GenerateAssembly()!;
                     }
                 }
                 else
                 {
-                    assemblyInfo = generator.GenerateAssembly();
+                    assemblyInfo = generator.GenerateAssembly()!;
                 }
             }
 
-            GeneratedAssemblies.SetAssemblyInfo(infoFileName, assemblyInfo);
+            GeneratedAssemblies.SetAssemblyInfo(infoFileName, assemblyInfo!);
             return assemblyInfo;
         }
 	}

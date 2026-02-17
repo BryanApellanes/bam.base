@@ -87,7 +87,7 @@ namespace Bam.Logging
         /// <param name="args">Arguments to format into the message.</param>
         public static void Info(string messageSignature, params object[] args)
         {
-            Default.AddEntry(messageSignature, LogEventType.Information, args?.Select(a => a.ToString())?.ToArray());
+            Default!.AddEntry(messageSignature, LogEventType.Information, args?.Select(a => a.ToString())?.ToArray()!);
         }
 
         /// <summary>
@@ -97,7 +97,7 @@ namespace Bam.Logging
         /// <param name="args">Arguments to format into the message.</param>
         public static void Warn(string messageSignature, params object[] args)
         {
-            Default.AddEntry(messageSignature, LogEventType.Warning, args?.Select(a => a?.ToString())?.ToArray());
+            Default!.AddEntry(messageSignature, LogEventType.Warning, args?.Select(a => a?.ToString())?.ToArray()!);
         }
 
         /// <summary>
@@ -118,7 +118,7 @@ namespace Bam.Logging
         /// <param name="args">Arguments to format into the message.</param>
         public static void Error(string messageSignature, Exception ex, params object[] args)
         {
-            Default.AddEntry(messageSignature, ex, args?.Select(a => a.ToString())?.ToArray());
+            Default!.AddEntry(messageSignature, ex, args?.Select(a => a.ToString())?.ToArray()!);
         }
 
         /// <summary>
@@ -210,11 +210,11 @@ namespace Bam.Logging
         {
             lock (_currentLoggerLock)
             {
-                _currentLogger = null;
+                _currentLogger = null!;
             }
         }
 
-        static ILogger _currentLogger;
+        static ILogger _currentLogger= null!;
         static object _currentLoggerLock = new object();
         private static ILogger GetDefaultLogger()
         {
@@ -244,37 +244,37 @@ namespace Bam.Logging
             lock (_currentLoggerLock)
             {
                 string loggerTypeName = $"{logType}";
-                Type loggerType = null;
+                Type loggerType = null!;
                 try
                 {
-                    loggerType = Type.GetType(loggerTypeName);
+                    loggerType = Type.GetType(loggerTypeName)!;
                 }
                 catch
                 {
                     loggerTypeName = $"{logType}Logger";
-                    loggerType = Type.GetType(loggerTypeName);
+                    loggerType = Type.GetType(loggerTypeName)!;
                 }
                 
                 if (loggerType == null)
                 {
                     try
                     {
-                        loggerType = Type.GetType($"{_loggingNamespace}.{logType}Logger");
+                        loggerType = Type.GetType($"{_loggingNamespace}.{logType}Logger")!;
                     }
                     catch
                     {
-                        loggerType = null;
+                        loggerType = null!;
                     }
 
                     if (loggerType == null)
                     {
                         try
                         {
-                            loggerType = Type.GetType($"{_loggingNamespace}.{logType}");
+                            loggerType = Type.GetType($"{_loggingNamespace}.{logType}")!;
                         }
                         catch
                         {
-                            loggerType = null;
+                            loggerType = null!;
                         }
                     }
 
@@ -298,7 +298,7 @@ namespace Bam.Logging
         {
             try
             {
-                ConstructorInfo ctor = loggerType.GetConstructor(Type.EmptyTypes);
+                ConstructorInfo ctor = loggerType.GetConstructor(Type.EmptyTypes)!;
                 if (ctor == null)
                 {
                     throw new InvalidOperationException($"The specified logType ({loggerType.FullName}) doesn't have a parameterless constructor.");
@@ -332,7 +332,7 @@ namespace Bam.Logging
         /// <returns>The <see cref="IMultiTargetLogger"/> that now contains the added logger.</returns>
         public static IMultiTargetLogger AddLogger(ILogger loggerInstance)
         {
-            IMultiTargetLogger main = null;
+            IMultiTargetLogger main = null!;
 
             if (_currentLogger == null)
             {
@@ -341,7 +341,7 @@ namespace Bam.Logging
             }
             else
             {
-                main = _currentLogger as IMultiTargetLogger;
+                main = (_currentLogger as IMultiTargetLogger)!;
                 if (main == null)
                 {
                     main = (IMultiTargetLogger)CreateLogger(typeof(IMultiTargetLogger));
@@ -375,28 +375,28 @@ namespace Bam.Logging
         /// Adds an information-level log entry with the specified message to the default logger.
         /// </summary>
         /// <param name="messageSignature">The message format string.</param>
-        public static void AddEntry(string messageSignature) { Default.AddEntry(messageSignature); }
+        public static void AddEntry(string messageSignature) { Default!.AddEntry(messageSignature); }
 
         /// <summary>
         /// Adds a log entry with the specified message and verbosity level to the default logger.
         /// </summary>
         /// <param name="messageSignature">The message format string.</param>
         /// <param name="verbosity">The verbosity level as an integer.</param>
-        public static void AddEntry(string messageSignature, int verbosity) { Default.AddEntry(messageSignature, verbosity); }
+        public static void AddEntry(string messageSignature, int verbosity) { Default!.AddEntry(messageSignature, verbosity); }
 
         /// <summary>
         /// Adds a log entry with the specified message and event type to the default logger.
         /// </summary>
         /// <param name="messageSignature">The message format string.</param>
         /// <param name="type">The type of log event.</param>
-        public static void AddEntry(string messageSignature, LogEventType type) { Default.AddEntry(messageSignature, type); }
+        public static void AddEntry(string messageSignature, LogEventType type) { Default!.AddEntry(messageSignature, type); }
 
         /// <summary>
         /// Adds an error-level log entry with the specified message and exception to the default logger.
         /// </summary>
         /// <param name="messageSignature">The message format string.</param>
         /// <param name="ex">The exception to include in the log entry.</param>
-        public static void AddEntry(string messageSignature, Exception ex) { Default.AddEntry(messageSignature, ex); }
+        public static void AddEntry(string messageSignature, Exception ex) { Default!.AddEntry(messageSignature, ex); }
 
         /// <summary>
         /// Adds a log entry with the specified message, verbosity level, and exception to the default logger.
@@ -404,7 +404,7 @@ namespace Bam.Logging
         /// <param name="messageSignature">The message format string.</param>
         /// <param name="verbosity">The verbosity level as an integer.</param>
         /// <param name="ex">The exception to include in the log entry.</param>
-        public static void AddEntry(string messageSignature, int verbosity, Exception ex) { Default.AddEntry(messageSignature, verbosity, ex); }
+        public static void AddEntry(string messageSignature, int verbosity, Exception ex) { Default!.AddEntry(messageSignature, verbosity, ex); }
 
         /// <summary>
         /// Adds a log entry with the specified message, event type, and exception to the default logger.
@@ -412,14 +412,14 @@ namespace Bam.Logging
         /// <param name="messageSignature">The message format string.</param>
         /// <param name="type">The type of log event.</param>
         /// <param name="ex">The exception to include in the log entry.</param>
-        public static void AddEntry(string messageSignature, LogEventType type, Exception ex) { Default.AddEntry(messageSignature, type, ex); }
+        public static void AddEntry(string messageSignature, LogEventType type, Exception ex) { Default!.AddEntry(messageSignature, type, ex); }
 
         /// <summary>
         /// Adds an information-level log entry with variable message values to the default logger.
         /// </summary>
         /// <param name="messageSignature">The message format string.</param>
         /// <param name="variableMessageValues">Values to substitute into the message format string.</param>
-        public static void AddEntry(string messageSignature, params string[] variableMessageValues) { Default.AddEntry(messageSignature, variableMessageValues); }
+        public static void AddEntry(string messageSignature, params string[] variableMessageValues) { Default!.AddEntry(messageSignature, variableMessageValues); }
 
         /// <summary>
         /// Adds a log entry with the specified verbosity and variable message values to the default logger.
@@ -427,7 +427,7 @@ namespace Bam.Logging
         /// <param name="messageSignature">The message format string.</param>
         /// <param name="verbosity">The verbosity level as an integer.</param>
         /// <param name="variableMessageValues">Values to substitute into the message format string.</param>
-        public static void AddEntry(string messageSignature, int verbosity, params string[] variableMessageValues) { Default.AddEntry(messageSignature, verbosity, variableMessageValues); }
+        public static void AddEntry(string messageSignature, int verbosity, params string[] variableMessageValues) { Default!.AddEntry(messageSignature, verbosity, variableMessageValues); }
 
         /// <summary>
         /// Adds a log entry with the specified event type and variable message values to the default logger.
@@ -435,7 +435,7 @@ namespace Bam.Logging
         /// <param name="messageSignature">The message format string.</param>
         /// <param name="type">The type of log event.</param>
         /// <param name="variableMessageValues">Values to substitute into the message format string.</param>
-        public static void AddEntry(string messageSignature, LogEventType type, params string[] variableMessageValues) { Default.AddEntry(messageSignature, type, variableMessageValues); }
+        public static void AddEntry(string messageSignature, LogEventType type, params string[] variableMessageValues) { Default!.AddEntry(messageSignature, type, variableMessageValues); }
 
         /// <summary>
         /// Adds a log entry with the specified verbosity, exception, and variable message values to the default logger.
@@ -444,7 +444,7 @@ namespace Bam.Logging
         /// <param name="verbosity">The verbosity level as an integer.</param>
         /// <param name="ex">The exception to include in the log entry.</param>
         /// <param name="variableMessageValues">Values to substitute into the message format string.</param>
-        public static void AddEntry(string messagesignature, int verbosity, Exception ex, params string[] variableMessageValues) { Default.AddEntry(messagesignature, verbosity, ex, variableMessageValues); }
+        public static void AddEntry(string messagesignature, int verbosity, Exception ex, params string[] variableMessageValues) { Default!.AddEntry(messagesignature, verbosity, ex, variableMessageValues); }
 
         /// <summary>
         /// Adds a log entry with the specified event type, exception, and variable message values to the default logger.
@@ -453,7 +453,7 @@ namespace Bam.Logging
         /// <param name="type">The type of log event.</param>
         /// <param name="ex">The exception to include in the log entry.</param>
         /// <param name="variableMessageValues">Values to substitute into the message format string.</param>
-        public static void AddEntry(string messagesignature, LogEventType type, Exception ex, params string[] variableMessageValues) { Default.AddEntry(messagesignature, type, ex, variableMessageValues); }
+        public static void AddEntry(string messagesignature, LogEventType type, Exception ex, params string[] variableMessageValues) { Default!.AddEntry(messagesignature, type, ex, variableMessageValues); }
 
         /// <summary>
         /// Adds an error-level log entry with the specified exception and variable message values to the default logger.
@@ -461,7 +461,7 @@ namespace Bam.Logging
         /// <param name="messageSignature">The message format string.</param>
         /// <param name="ex">The exception to include in the log entry.</param>
         /// <param name="variableMessageValues">Values to substitute into the message format string.</param>
-        public static void AddEntry(string messageSignature, Exception ex, params string[] variableMessageValues) { Default.AddEntry(messageSignature, ex, variableMessageValues); }
+        public static void AddEntry(string messageSignature, Exception ex, params string[] variableMessageValues) { Default!.AddEntry(messageSignature, ex, variableMessageValues); }
 
         /// <summary>
         /// Blocks the current thread until the event queue is empty.  Keep
@@ -470,7 +470,7 @@ namespace Bam.Logging
         /// thread is running it will be restarted.
         /// </summary>
         /// <param name="sleep">Additional milliseconds to sleep after the queue is empty.</param>
-        public static void BlockUntilEventQueueIsEmpty(int sleep = 0) { Default.BlockUntilEventQueueIsEmpty(sleep); }
+        public static void BlockUntilEventQueueIsEmpty(int sleep = 0) { Default!.BlockUntilEventQueueIsEmpty(sleep); }
         #endregion
 
         /// <summary>
@@ -478,7 +478,7 @@ namespace Bam.Logging
         /// </summary>
         public static void Restart()
         {
-            Default.RestartLoggingThread();
+            Default!.RestartLoggingThread();
         }
 
         /// <summary>
@@ -486,7 +486,7 @@ namespace Bam.Logging
         /// </summary>
         public static void Start()
         {
-            Default.StartLoggingThread();
+            Default!.StartLoggingThread();
         }
 
         /// <summary>
@@ -494,7 +494,7 @@ namespace Bam.Logging
         /// </summary>
         public static void Stop()
         {
-            Default.StopLoggingThread();
+            Default!.StopLoggingThread();
         }        
     }
 }

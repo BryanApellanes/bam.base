@@ -7,13 +7,13 @@ namespace Bam.Logging
     [Serializable]
     public class LogEvent
     {
-        string source;
-        string category;
+        string source= null!;
+        string category= null!;
         int eventid;
-        string user;
+        string user= null!;
         DateTime timeOccurred;
-        string message;
-        string computer;
+        string message= null!;
+        string computer= null!;
         LogEventType type;
 
         public string Source
@@ -64,10 +64,10 @@ namespace Bam.Logging
             set => this.timeOccurred = value;
         }
 
-        public string MessageSignature { get; set; }
+        public string MessageSignature { get; set; } = null!;
 
-        public string?[] MessageVariableValues { get; set; }
+        public string?[] MessageVariableValues { get; set; } = null!;
 
-        public string StackTrace { get; set; }
+        public string StackTrace { get; set; } = null!;
     }
 }

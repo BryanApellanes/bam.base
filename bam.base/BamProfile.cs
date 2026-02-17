@@ -44,11 +44,11 @@ namespace Bam
             {
                 if (OSInfo.Current == OSNames.Windows)
                 {
-                    return Environment.GetEnvironmentVariable("USERPROFILE") ?? System.IO.Path.Combine(Environment.GetEnvironmentVariable("HOMEDRIVE"), Environment.GetEnvironmentVariable("HOMEPATH"));
+                    return Environment.GetEnvironmentVariable("USERPROFILE") ?? System.IO.Path.Combine(Environment.GetEnvironmentVariable("HOMEDRIVE")!, Environment.GetEnvironmentVariable("HOMEPATH")!);
                 }
                 else
                 {
-                    return Environment.GetEnvironmentVariable("HOME");
+                    return Environment.GetEnvironmentVariable("HOME")!;
                 }
             }
         }
@@ -222,7 +222,7 @@ namespace Bam
 			T instance = file.FromJsonFile<T>();
 			if (instance == null)
 			{
-				return default(T);
+				return default(T)!;
 			}
 			return instance;
         }
@@ -237,7 +237,7 @@ namespace Bam
 			T instance = file.FromYamlFile<T>();
 			if (instance == null)
 			{
-				return default(T);
+				return default(T)!;
 			}
 			return instance;
         }

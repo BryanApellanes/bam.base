@@ -26,7 +26,7 @@ namespace Bam.Data
         {
             AssignNumbers();
 			SetParameterPrefixes();
-            return string.Format("SET {0} ", this.Parameters.ToArray().ToDelimited(p => p.ToString()));
+            return string.Format("SET {0} ", this.Parameters.ToArray().ToDelimited(p => p.ToString()!));
         }
 
         protected void AssignNumbers()
@@ -34,7 +34,7 @@ namespace Bam.Data
             for (int? i = this.StartNumber; i < this.NextNumber; i++)
             {
                 int? index = i - this.StartNumber;
-                this.Parameters[index.Value].Number = i;
+                this.Parameters[index!.Value].Number = i!.Value;
             }
         }
 

@@ -114,7 +114,7 @@ namespace Bam
         {
             Args.ThrowIfNull(type);
             Args.ThrowIfNull(methodName);
-            return (T)type.GetMethod(methodName).Invoke(null, args);
+            return (T)type!.GetMethod(methodName)!.Invoke(null, args)!;
         }
 
         public static bool HasGenericArguments(this Type type)
@@ -139,7 +139,7 @@ namespace Bam
         {
             Args.ThrowIfNull(instance, "instance");
             Args.ThrowIfNull(methodName, "methodName");
-            return (T)instance.GetType().GetMethod(methodName, args.Select(a => a.GetType()).ToArray()).Invoke(instance, args);
+            return (T)instance!.GetType().GetMethod(methodName, args.Select(a => a.GetType()).ToArray())!.Invoke(instance, args)!;
         }
 
         /// <summary>
@@ -158,14 +158,14 @@ namespace Bam
             Args.ThrowIfNull(methodName, "methodName");
             try
             {
-                MethodInfo method = instance.GetType().GetMethod(methodName, args.Select(a => a.GetType()).ToArray());
-                MethodInfo genericMethod = method.MakeGenericMethod(typeof(TArg));
-                return (T)genericMethod.Invoke(instance, args);
+                MethodInfo method = instance.GetType().GetMethod(methodName, args.Select(a => a.GetType()).ToArray())!;
+                MethodInfo genericMethod = method!.MakeGenericMethod(typeof(TArg));
+                return (T)genericMethod.Invoke(instance, args)!;
             }
             catch (AmbiguousMatchException ame)
             {
                 IEnumerable<MethodInfo> methods = instance.GetType().GetMethods().Where(mi => mi.Name.Equals(methodName) && mi.ContainsGenericParameters && mi.GetParameters().Length == args.Length);
-                T response = default(T);
+                T response = default(T)!;
                 bool gotOne = false;
                 foreach (MethodInfo method in methods)
                 {
@@ -188,7 +188,7 @@ namespace Bam
                     if (useThisOne)
                     {
                         MethodInfo genericMethod = method.MakeGenericMethod(typeof(TArg));
-                        response = (T)genericMethod.Invoke(instance, args);
+                        response = (T)genericMethod.Invoke(instance, args)!;
                         gotOne = true;
                         break;
                     }
@@ -197,7 +197,7 @@ namespace Bam
                 {
                     throw ame;
                 }
-                return response;
+                return response!;
             }
         }
 
@@ -227,7 +227,7 @@ namespace Bam
         {
             Args.ThrowIfNull(instance, "instance");
             Args.ThrowIfNull(methodName, "methodName");
-            return instance.GetType().GetMethod(methodName).Invoke(instance, args);
+            return instance!.GetType().GetMethod(methodName)!.Invoke(instance, args)!;
         }
 
         /// <summary>
@@ -256,7 +256,7 @@ namespace Bam
         {
             Args.ThrowIfNull(instance, "instance");
             Type type = instance.GetType();
-            prop = type.GetProperty(propertyName);
+            prop = type.GetProperty(propertyName)!;
             return prop != null;
         }
 
@@ -300,9 +300,9 @@ namespace Bam
 
         public static T Subscribe<T>(this T instance, string eventName, Delegate handler)
         {
-            EventInfo eventInfo = typeof(T).GetEvent(eventName);
+            EventInfo eventInfo = typeof(T).GetEvent(eventName)!;
             Args.ThrowIfNull(eventInfo, "eventName");
-            eventInfo.AddEventHandler(instance, handler);
+            eventInfo!.AddEventHandler(instance, handler);
             return instance;
         }
 
@@ -332,7 +332,7 @@ namespace Bam
         public static T SubscribeOnce<T>(this T instance, string eventName, Delegate handler, out IEventSubscription subscription)
         {
             T result = instance.UnSubscribe(eventName, handler).Subscribe(eventName, handler);
-            subscription = instance.GetEventSubscriptions(eventName).FirstOrDefault(es => es.Delegate.Equals(handler));
+            subscription = instance!.GetEventSubscriptions(eventName).FirstOrDefault(es => es.Delegate.Equals(handler))!;
             return result;
         }
 
@@ -354,7 +354,7 @@ namespace Bam
         public static object SubscribeOnce(this object instance, string eventName, Delegate handler, out IEventSubscription subscription)
         {
             object result = instance.UnSubscribe(eventName, handler).Subscribe(eventName, handler);
-            subscription = instance.GetEventSubscriptions(eventName).FirstOrDefault(es => es.Delegate.Equals(handler));
+            subscription = instance!.GetEventSubscriptions(eventName).FirstOrDefault(es => es.Delegate.Equals(handler))!;
             return result;
         }
 
@@ -371,9 +371,9 @@ namespace Bam
         /// <returns></returns>
         public static object Subscribe(this object instance, string eventName, Delegate handler)
         {
-            EventInfo eventInfo = instance.GetType().GetEvent(eventName);
+            EventInfo eventInfo = instance.GetType().GetEvent(eventName)!;
             Args.ThrowIfNull(eventInfo, "eventName");
-            eventInfo.AddEventHandler(instance, handler);
+            eventInfo!.AddEventHandler(instance, handler);
             return instance;
         }
 
@@ -407,9 +407,9 @@ namespace Bam
         /// <returns></returns>
         public static object UnSubscribe(this object instance, string eventName, Delegate handler)
         {
-            EventInfo eventInfo = instance.GetType().GetEvent(eventName);
+            EventInfo eventInfo = instance.GetType().GetEvent(eventName)!;
             Args.ThrowIfNull(eventInfo, "eventName");
-            eventInfo.RemoveEventHandler(instance, handler);
+            eventInfo!.RemoveEventHandler(instance, handler);
             return instance;
         }
         public static T UnSubscribe<T>(this T instance, string eventName, EventHandler handler)
@@ -426,9 +426,9 @@ namespace Bam
         /// <returns></returns>
         public static T UnSubscribe<T>(this T instance, string eventName, Delegate handler)
         {
-            EventInfo eventInfo = typeof(T).GetEvent(eventName);
+            EventInfo eventInfo = typeof(T).GetEvent(eventName)!;
             Args.ThrowIfNull(eventInfo, "eventName");
-            eventInfo.RemoveEventHandler(instance, handler);
+            eventInfo!.RemoveEventHandler(instance, handler);
             return instance;
         }
 
@@ -535,8 +535,8 @@ namespace Bam
         /// <returns></returns>
         public static object PropertyIfNullOrBlank(this object instance, string propertyName, object value, bool throwIfPropertyNotFound = true)
         {
-            object currentValue = instance.Property(propertyName, throwIfPropertyNotFound);
-            string stringValue = currentValue as string;
+            object currentValue = instance.Property(propertyName, throwIfPropertyNotFound)!;
+            string? stringValue = currentValue as string;
             return instance.PropertyIf(currentValue == null || string.IsNullOrEmpty(stringValue), propertyName, value, throwIfPropertyNotFound);
         }
 
@@ -556,7 +556,7 @@ namespace Bam
             {
                 instance.Property(propertyName, value, throwIfPropertyNotFound);
             }
-            return null;
+            return null!;
         }
 
         /// <summary>
@@ -608,7 +608,7 @@ namespace Bam
         public static object Property<T>(this T instance, string propertyName, object value, bool throwIfPropertyNotFound = true)
         {
             Args.ThrowIfNull(instance, "instance");
-            Type type = instance.GetType(); // get the actual instance type since it may be an extender of T
+            Type type = instance!.GetType(); // get the actual instance type since it may be an extender of T
             PropertyInfo property = GetPropertyOrThrow(type, propertyName, throwIfPropertyNotFound);
             SetProperty(instance, property, value);
             return instance;
@@ -616,7 +616,7 @@ namespace Bam
 
         private static PropertyInfo GetPropertyOrThrow(Type type, string propertyName, bool throwIfPropertyNotFound)
         {
-            PropertyInfo property = type.GetProperty(propertyName);
+            PropertyInfo property = type.GetProperty(propertyName)!;
             if (property == null)
             {
                 property = FindPropertyInfoOrThrow(type, propertyName, throwIfPropertyNotFound);
@@ -627,18 +627,18 @@ namespace Bam
                 PropertyNotFound(propertyName, type);
             }
 
-            return property;
+            return property!;
         }
 
         public static PropertyInfo FindPropertyInfoOrThrow(Type type, string propertyName, bool throwIfPropertyNotFound)
         {
-            PropertyInfo property = type.GetProperties().FirstOrDefault(t => t.Name.Equals(propertyName, StringComparison.InvariantCultureIgnoreCase));
+            PropertyInfo property = type.GetProperties().FirstOrDefault(t => t.Name.Equals(propertyName, StringComparison.InvariantCultureIgnoreCase))!;
             if (property == null && throwIfPropertyNotFound)
             {
                 PropertyNotFound(propertyName, type);
             }
 
-            return property;
+            return property!;
         }
         
         public static void SetProperty(this object instance, PropertyInfo property, object value)
@@ -647,7 +647,7 @@ namespace Bam
             {
                 if (value == DBNull.Value)
                 {
-                    value = null;
+                    value = null!;
                 }
                 else if ((value is int || value is decimal) &&
                    (property.PropertyType == typeof(long) ||
@@ -689,8 +689,8 @@ namespace Bam
         {
             instance.EachPropertyInfo(pi =>
             {
-                object value = pi.GetValue(instance, null);
-                action(pi, value);
+                object value = pi.GetValue(instance, null)!;
+                action(pi, value!);
             });
         }
 
@@ -698,8 +698,8 @@ namespace Bam
         {
             instance.EachPropertyInfo((pi, i) =>
             {
-                object value = pi.GetValue(instance, null);
-                action(pi, value, i);
+                object value = pi.GetValue(instance, null)!;
+                action(pi, value!, i);
             });
         }
         /// <summary>
@@ -767,7 +767,7 @@ namespace Bam
             {
                 if (propertyPredicate(pi))
                 {
-                    yield return eacher(pi, pi.GetValue(instance));
+                    yield return eacher(pi, pi.GetValue(instance)!);
                 }
             };
         }
@@ -789,7 +789,7 @@ namespace Bam
             output.Append(type == typeof(int) || type == typeof(long) || type == typeof(uint) || type == typeof(ulong) ? type.Name: type.Name.DropTrailingNonLetters());
             if (type.IsGenericType)
             {
-                output.AppendFormat("<{0}>", type.GetGenericArguments().ToDelimited(t => includeNamespace ? "{0}.{1}".Format(t.Namespace, t.ToTypeString(false)): t.ToTypeString(false)));
+                output.AppendFormat("<{0}>", type.GetGenericArguments().ToDelimited(t => includeNamespace ? "{0}.{1}".Format(t.Namespace!, t.ToTypeString(false)): t.ToTypeString(false)));
             }
             if (type.IsArray)
             {
@@ -824,7 +824,7 @@ namespace Bam
 
             return type.IsArray ||
                    typeof(IEnumerable).IsAssignableFrom(type) ||
-                   type.GetInterface(typeof(IEnumerable<>).FullName) != null;
+                   type.GetInterface(typeof(IEnumerable<>).FullName!) != null;
         }
 
         /// <summary>
@@ -841,7 +841,7 @@ namespace Bam
                 result = property.PropertyType.GetElementType();
             }
             else if (property.PropertyType != typeof(string) &&
-                     property.PropertyType.GetInterface(typeof(IEnumerable<>).FullName) != null)
+                     property.PropertyType.GetInterface(typeof(IEnumerable<>).FullName!) != null)
             {
                 result = property.PropertyType.GetInterfaces()
                     .Where(t => t.IsGenericType == true && t.GetGenericTypeDefinition() == typeof(IEnumerable<>))
@@ -874,10 +874,10 @@ namespace Bam
         public static bool HasEnumerableOfMe(this Type self, Type toCheck, out PropertyInfo enumerableProperty)
         {
             bool result = false;
-            enumerableProperty = null;
+            enumerableProperty = null!;
             foreach (PropertyInfo property in toCheck.GetProperties())
             {
-                Type enumerableType = property.GetEnumerableType();
+                Type enumerableType = property.GetEnumerableType()!;
                 if (enumerableType != null)
                 {
                     if (enumerableType == self)
@@ -904,11 +904,11 @@ namespace Bam
 
         public static PropertyInfo GetProperty(this MethodInfo method)
         {
-            if (!method.IsSpecialName) return null;
+            if (!method.IsSpecialName) return null!;
             string propertyName = method.Name.Substring(4);
-            PropertyInfo p = method.DeclaringType.GetProperty(propertyName);
+            PropertyInfo p = method!.DeclaringType!.GetProperty(propertyName)!;
 
-            return p;
+            return p!;
         }
 
 
@@ -916,11 +916,11 @@ namespace Bam
         {
             try
             {
-                return sourceType.GetProperty(propertyName);
+                return sourceType.GetProperty(propertyName)!;
             }
-            catch (AmbiguousMatchException ame)
+            catch (AmbiguousMatchException)
             {
-                return sourceType.GetProperties().FirstOrDefault(p => p.DeclaringType == sourceType && p.Name == propertyName);
+                return sourceType.GetProperties().FirstOrDefault(p => p.DeclaringType == sourceType && p.Name == propertyName)!;
             }
         }
 
@@ -965,13 +965,13 @@ namespace Bam
 
         public static bool IsPrimitiveOrNullable(this Type type)
         {
-            Type underlyingType = Nullable.GetUnderlyingType(type);
+            Type underlyingType = Nullable.GetUnderlyingType(type)!;
             return type.IsPrimitive || underlyingType == null ? type.IsPrimitive : underlyingType.IsPrimitive;
         }
 
         public static bool IsNullable(this Type type, out Type underlyingType)
         {
-            underlyingType = Nullable.GetUnderlyingType(type);
+            underlyingType = Nullable.GetUnderlyingType(type)!;
             return underlyingType != null;
         }
 
@@ -990,7 +990,7 @@ namespace Bam
         /// </returns>
         public static bool IsForEachable(this Type type, out Type underlyingType)
         {
-            underlyingType = null;
+            underlyingType = null!;
             if (type == typeof(string))
             {
                 return false;
@@ -998,11 +998,11 @@ namespace Bam
 
             if (type.IsArray)
             {
-                underlyingType = type.GetElementType();
+                underlyingType = type.GetElementType()!;
                 return true;
             }
 
-            underlyingType = type.GetGenericArguments().FirstOrDefault();
+            underlyingType = type.GetGenericArguments().FirstOrDefault()!;
             return type.GetInterfaces().Contains(typeof(IEnumerable));
         }
 
@@ -1031,7 +1031,7 @@ namespace Bam
         /// </returns>
         public static bool IsNullable<T>(this Type type, out Type underlyingType)
         {
-            underlyingType = Nullable.GetUnderlyingType(type);
+            underlyingType = Nullable.GetUnderlyingType(type)!;
             if (underlyingType != null)
             {
                 return underlyingType == typeof(T);

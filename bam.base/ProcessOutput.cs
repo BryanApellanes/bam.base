@@ -31,13 +31,13 @@ namespace Bam.CommandLine
             this.ExitCode = exitCode;
         }
 
-        public Process Process { get; }
+        public Process Process { get; } = null!;
         public bool TimedOut { get; set; }
         public int ExitCode { get; set; }
-        public StringBuilder ActiveStandardOut { get; set; }
-        public StringBuilder ActiveStandardError { get; set; }
+        public StringBuilder ActiveStandardOut { get; set; } = null!;
+        public StringBuilder ActiveStandardError { get; set; } = null!;
 
-        string _standardOutput;
+        string _standardOutput = null!;
         public string StandardOutput
         {
             get
@@ -50,7 +50,7 @@ namespace Bam.CommandLine
             }
             set => _standardOutput = value;
         }
-        string _standardError;
+        string _standardError = null!;
         public string StandardError
         {
             get

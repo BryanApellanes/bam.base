@@ -68,7 +68,7 @@ namespace Bam
         {
             if (ProcessThread.ThreadState != (ThreadState.Running | ThreadState.Background | ThreadState.WaitSleepJoin))
             {
-                _processThread = null;
+                _processThread = null!;
                 ProcessThread.Start();
             }
         }
@@ -76,7 +76,7 @@ namespace Bam
         /// <summary>
         /// Occurs when an exception is thrown during item processing or when no processor is defined.
         /// </summary>
-        public event EventHandler Exception;
+        public event EventHandler? Exception;
         bool _continue;
         /// <summary>
         /// Gets or sets whether the background thread should continue processing. Setting to true when items are queued restarts the processing thread.
@@ -96,18 +96,18 @@ namespace Bam
         /// <summary>
         /// Occurs when the background thread is waiting for new items to be enqueued.
         /// </summary>
-        public event EventHandler Waiting;
+        public event EventHandler? Waiting;
 
         /// <summary>
         /// Occurs when the background thread begins processing enqueued items.
         /// </summary>
-        public event EventHandler Processing;
+        public event EventHandler? Processing;
 
         /// <summary>
         /// Occurs when the background thread has finished processing all enqueued items.
         /// </summary>
-        public event EventHandler QueueEmptied;
-        Thread _processThread;
+        public event EventHandler? QueueEmptied;
+        Thread _processThread = null!;
         readonly AutoResetEvent _waitSignal = new AutoResetEvent(false);
         readonly object _processThreadLock = new object();
         /// <summary>
@@ -130,7 +130,7 @@ namespace Bam
                                 Processing?.Invoke(this, new BackgroundThreadQueueEventArgs());
                                 while (_processQueue.Count > 0)
                                 {
-                                    if (_processQueue.TryDequeue(out T val))
+                                    if (_processQueue.TryDequeue(out T? val) && val != null)
                                     {
                                         Process(val);
                                     }

@@ -19,21 +19,21 @@ namespace Bam
                 this.Bcc = new MailAddress[] { };
             }
 
-            public MailAddress From { get; set; }
+            public MailAddress From { get; set; } = null!;
             public MailAddress[] To { get; set; }
             public MailAddress[] Cc { get; set; }
             public MailAddress[] Bcc { get; set; }
-            public string Subject { get; set; }
-            public string Body { get; set; }
-            public Attachment[] Attachments { get; set; }
+            public string Subject { get; set; } = null!;
+            public string Body { get; set; } = null!;
+            public Attachment[] Attachments { get; set; } = null!;
             public bool IsBodyHtml { get; set; }
 
             public int Port { get; set; }
 
             public bool EnablSsl { get; set; }
-            public string SmtpHost { get; set; }
-            public string UserName { get; set; }
-            public string Password { get; set; }
+            public string SmtpHost { get; set; } = null!;
+            public string UserName { get; set; } = null!;
+            public string Password { get; set; } = null!;
         }
 
         public Email()

@@ -1,4 +1,4 @@
-﻿using Bam.Configuration;
+using Bam.Configuration;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -7,10 +7,12 @@ namespace Bam
 {
     public static class RuntimeSettings
     {
+#pragma warning disable CS0169
         static RuntimeConfig? _runtimeConfig;
+#pragma warning restore CS0169
         static readonly object _runtimeConfigLock = new object();
         
-        static string _processDataFolder;
+        static string _processDataFolder= null!;
         static readonly object _processDataFolderLock = new object();
 
         public static string ProcessDataFolder
@@ -59,8 +61,8 @@ namespace Bam
             return _osAliases[OSInfo.Current];
         }
 
-        public static FileInfo EntryExecutable => Assembly.GetEntryAssembly().GetFileInfo();
-        public static DirectoryInfo EntryDirectory => EntryExecutable.Directory;
+        public static FileInfo EntryExecutable => Assembly.GetEntryAssembly()!.GetFileInfo();
+        public static DirectoryInfo EntryDirectory => EntryExecutable.Directory!;
 
         static readonly Dictionary<OSNames, string> _genDirs = new Dictionary<OSNames, string>()
         {
@@ -171,7 +173,7 @@ namespace Bam
         /// The path to the '.bam' directory found in the home directory of the owner of the
         /// current process.
         /// </summary>
-        public static string BamProfileDir => Path.Combine(ProcessProfileDir, ".bam");
+        public static string BamProfileDir => Path.Combine(ProcessProfileDir!, ".bam");
 
         /// <summary>
         /// The path to the the '.bam' directory found in the current working directory. 
@@ -207,9 +209,9 @@ namespace Bam
         
         public static string GetEntryAssemblyDirectoryFilePathFor(string fileName)
         {
-            Assembly entry = Assembly.GetEntryAssembly();
+            Assembly entry = Assembly.GetEntryAssembly()!;
             FileInfo file = entry.GetFileInfo();
-            DirectoryInfo directoryInfo = file.Directory;
+            DirectoryInfo directoryInfo = file.Directory!;
             string directory = directoryInfo == null ? "." : directoryInfo.FullName;
             string result = Path.Combine(directory, fileName);
             return result;

@@ -118,7 +118,7 @@ namespace Bam
         /// <returns></returns>
         public static E Exception<E>(string msgFormat, params object[] values) where E : Exception
         {
-            return Exception<E>(msgFormat, null, values);
+            return Exception<E>(msgFormat, null!, values);
         }
 
         /// <summary>
@@ -134,8 +134,8 @@ namespace Bam
         /// <returns></returns>
         public static E Exception<E>(string msgFormat, Exception innerException, params object[] values) where E : Exception
         {
-            ConstructorInfo ctor  = typeof(E).GetConstructor(new Type[] { typeof(string), typeof(Exception) });
-            return (E)ctor.Invoke(new object[] { string.Format(msgFormat, values), innerException });
+            ConstructorInfo ctor  = typeof(E).GetConstructor(new Type[] { typeof(string), typeof(Exception) })!;
+            return (E)ctor!.Invoke(new object[] { string.Format(msgFormat, values), innerException });
         }
 
         /// <summary>

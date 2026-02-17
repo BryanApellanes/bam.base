@@ -1,4 +1,4 @@
-﻿namespace Bam
+namespace Bam
 {
     public static class GenericExtensions
     {
@@ -16,11 +16,11 @@
         {
             if (values.Length == 0)
             {
-                return default(T);
+                return default(T)!;
             }
 
             T result = values[0];
-            values.Each(s => result = s.ToString().CompareTo(result.ToString()) == 1 ? s : result);
+            values.Each(s => result = s!.ToString()!.CompareTo(result!.ToString()) == 1 ? s : result);
             return result;
         }
     }

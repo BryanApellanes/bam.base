@@ -1,4 +1,4 @@
-﻿namespace Bam
+namespace Bam
 {
     public static class DictionaryExtensions
     {
@@ -30,7 +30,7 @@
         /// <param name="value"></param>
         public static void Set<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TKey key, TValue value) where TKey : notnull
         {
-            if (!AddMissing(dictionary, key, value))
+            if (!dictionary.TryAdd(key, value))
             {
                 dictionary[key] = value;
             }
@@ -45,7 +45,7 @@
             object result = type.Construct(ctorParams);
             foreach (object key in dictionary.Keys)
             {
-                result.Property(key.ToString(), dictionary[key]);
+                result.Property(key.ToString()!, dictionary[key]);
             }
 
             return result;

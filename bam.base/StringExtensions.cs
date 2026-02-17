@@ -1,4 +1,4 @@
-﻿using Bam.CommandLine;
+using Bam.CommandLine;
 //using Microsoft.AspNetCore.WebUtilities;
 using Newtonsoft.Json;
 using System.Diagnostics;
@@ -49,10 +49,10 @@ namespace Bam
         public static byte[] HexToBytes(this string hexString)
         {
             //check for null
-            if (hexString == null) return null;
+            if (hexString == null) return null!;
             //get length
             int len = hexString.Length;
-            if (len % 2 == 1) return null;
+            if (len % 2 == 1) return null!;
             int len_half = len / 2;
             //create a byte array
             byte[] bs = new byte[len_half];
@@ -698,7 +698,7 @@ namespace Bam
         public static object FromYaml(this string yaml, Type type)
         {
             Deserializer deserializer = new Deserializer();
-            return deserializer.Deserialize(yaml, type);
+            return deserializer.Deserialize(yaml, type)!;
         }
         
         public static T FromYaml<T>(this string yaml, bool ignoreUnmatchedProperties)
@@ -726,7 +726,7 @@ namespace Bam
         /// <returns></returns>
         public static T FromJson<T>(this string json)
         {
-            return JsonConvert.DeserializeObject<T>(json);
+            return JsonConvert.DeserializeObject<T>(json)!;
         }
 
         public static bool TryFromJson<T>(this string json)
@@ -741,8 +741,8 @@ namespace Bam
 
         public static bool TryFromJson<T>(this string json, out T instance, out Exception exception)
         {
-            instance = default(T);
-            exception = null;
+            instance = default(T)!;
+            exception = null!;
             try
             {
                 instance = FromJson<T>(json);
@@ -764,7 +764,7 @@ namespace Bam
         /// <returns></returns>
         public static object FromJson(this string json, Type type)
         {
-            return JsonConvert.DeserializeObject(json, type);
+            return JsonConvert.DeserializeObject(json, type)!;
         }
 
         /// <summary>
@@ -806,7 +806,7 @@ namespace Bam
         {
             using (StreamReader sr = new StreamReader(filePath))
             {
-                return new XmlSerializer(type).Deserialize(sr);
+                return new XmlSerializer(type).Deserialize(sr)!;
             }
         }
 
@@ -820,7 +820,7 @@ namespace Bam
         /// <returns>instance of T</returns>
         public static T FromXml<T>(this string xmlString)
         {
-            return FromXml<T>(xmlString, Encoding.Default);
+            return FromXml<T>(xmlString, Encoding.Default)!;
         }
 
         /// <summary>
@@ -840,9 +840,9 @@ namespace Bam
         public static object FromXml(this string xml, Type type, Encoding? encoding = null)
         {
             XmlSerializer ser = new XmlSerializer(type);
-            byte[] xmlBytes = encoding.GetBytes(xml);
+            byte[] xmlBytes = encoding!.GetBytes(xml);
             MemoryStream ms = new MemoryStream(xmlBytes);
-            return ser.Deserialize(ms);
+            return ser.Deserialize(ms)!;
         }
 
         public static Task<ProcessOutput> RunAsync(this string command, int timeout = 600000)
@@ -964,7 +964,7 @@ namespace Bam
 
         public static string GetNextFileName(this string path, out int num)
         {
-            return GetNextFileName(path, null, out num);
+            return GetNextFileName(path, null!, out num);
         }
 
         /// <summary>
@@ -978,7 +978,7 @@ namespace Bam
         {
             namer = namer ?? ((_i, f, e) => $"{f}_{_i}{e}");
             FileInfo file = new FileInfo(path);
-            DirectoryInfo dir = file.Directory;
+            DirectoryInfo dir = file.Directory!;
             string extension = Path.GetExtension(path);
             string fileName = Path.GetFileNameWithoutExtension(path);
             int i = 0;
@@ -988,7 +988,7 @@ namespace Bam
             {
                 i++;
                 string nextFile = namer(i, fileName, extension);
-                currentPath = Path.Combine(dir.FullName, nextFile);
+                currentPath = Path.Combine(dir!.FullName, nextFile);
                 num = i;
             }
 
@@ -1144,9 +1144,9 @@ namespace Bam
 
             lock (FileLock.Named(fileInfo.FullName))
             {
-                if (!fileInfo.Directory.Exists)
+                if (!fileInfo!.Directory!.Exists)
                 {
-                    fileInfo.Directory.Create();
+                    fileInfo.Directory!.Create();
                 }
                 using (StreamWriter sw = new StreamWriter(filePath, true))
                 {
@@ -1170,7 +1170,7 @@ namespace Bam
             startInfo.FileName = command;
             startInfo.Arguments = arguments;
 
-            return startInfo.Run(output, error, timeout);//return Run(startInfo, output, error, timeout);
+            return startInfo.Run(output!, error, timeout);//return Run(startInfo, output, error, timeout);
         }
 
         /// <summary>

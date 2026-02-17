@@ -10,12 +10,12 @@ namespace Bam
         /// <summary>
         /// Gets or sets the application name provider associated with this workspace.
         /// </summary>
-        public IApplicationNameProvider ApplicationNameProvider { get; set; }
+        public IApplicationNameProvider ApplicationNameProvider { get; set; } = null!;
 
         /// <summary>
         /// Gets or sets the root directory of this workspace.
         /// </summary>
-        public DirectoryInfo Root { get; set; }
+        public DirectoryInfo Root { get; set; } = null!;
 
         /// <summary>
         /// Creates a directory at the path formed by joining the specified segments relative to the workspace root.
@@ -136,7 +136,7 @@ namespace Bam
             return _logger;
         }*/
         
-        static Workspace _current;
+        static Workspace _current= null!;
         static readonly object _currentLock = new object();
         
         /// <summary>

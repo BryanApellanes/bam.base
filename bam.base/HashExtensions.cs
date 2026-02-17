@@ -1,11 +1,11 @@
-﻿using System.Security.Cryptography;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Bam
 {
     public static class HashExtensions
     {
-        static Dictionary<HashAlgorithms, Func<byte[], HMAC>> _hmacs;
+        static Dictionary<HashAlgorithms, Func<byte[], HMAC>> _hmacs= null!;
         static readonly object _hmacsLock = new object();
         public static Dictionary<HashAlgorithms, Func<byte[], HMAC>> Hmacs
         {
@@ -22,7 +22,7 @@ namespace Bam
             }
         }
 
-        static Dictionary<HashAlgorithms, Func<HashAlgorithm>> _hashAlgorithms;
+        static Dictionary<HashAlgorithms, Func<HashAlgorithm>> _hashAlgorithms= null!;
         static readonly object _hashAlgorithmLock = new object();
         public static Dictionary<HashAlgorithms, Func<HashAlgorithm>> HashAlgorithms
         {

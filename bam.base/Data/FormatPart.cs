@@ -20,7 +20,7 @@ namespace Bam.Data
                 return StartNumber + Parameters.Count();
             }
         }
-		Func<string, string> _columnNameProvider;
+		Func<string, string> _columnNameProvider = null!;
 		public Func<string, string> ColumnNameFormatter
 		{
 			get

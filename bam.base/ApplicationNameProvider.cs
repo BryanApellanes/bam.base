@@ -2,7 +2,7 @@ namespace Bam
 {
     public static class ApplicationNameProvider
     {
-        static IApplicationNameProvider _defaultApplicationNameProvider;
+        static IApplicationNameProvider _defaultApplicationNameProvider = null!;
         static object _defaultLock = new object();
         public static IApplicationNameProvider Default
         {

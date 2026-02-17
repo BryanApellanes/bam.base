@@ -1,4 +1,4 @@
-﻿namespace Bam
+namespace Bam
 {
     public class ByteReverseTransformerPipeline : IValueReverseTransformer<byte[], byte[]>
     {
@@ -36,9 +36,9 @@
             byte[] result = transformed;
             foreach(IValueReverseTransformer<byte[], byte[]> reverseTransformer in _reverseTransformers)
             {
-                result = reverseTransformer.ReverseTransform(result);
+                result = reverseTransformer.ReverseTransform(result!)!;
             }
-            return result;
+            return result!;
         }
 
         public static ByteReverseTransformerPipeline For(ByteTransformerPipeline transformerPipeline)

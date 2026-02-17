@@ -8,9 +8,9 @@
             Format = format;
             FormatArgs = formatArgs;
         }
-        public string Format { get; set; }
-        public string[] FormatArgs { get; set; }
-        public Type SourceType { get; set; }
+        public string Format { get; set; } = null!;
+        public string[] FormatArgs { get; set; } = null!;
+        public Type SourceType { get; set; } = null!;
         public override string ToString()
         {
             return string.Format(Format, FormatArgs);

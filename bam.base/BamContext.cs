@@ -18,7 +18,7 @@ namespace Bam
         {
         }
 
-        ServiceRegistry _serviceRegistry;
+        ServiceRegistry _serviceRegistry = null!;
         readonly object _serviceRegistryLock = new object();
         /// <summary>
         /// Gets or sets the service registry for this context, lazily initialized via <see cref="GetDefaultContextServiceRegistry"/>.
@@ -35,7 +35,7 @@ namespace Bam
         /// <returns>The default <see cref="ServiceRegistry"/> for this context.</returns>
         public virtual ServiceRegistry GetDefaultContextServiceRegistry()
         {
-            return GetServiceRegistry();
+            return GetServiceRegistry()!;
         }
 
         static BamContext? _current;
@@ -92,7 +92,7 @@ namespace Bam
                     CommonConfigure(
                         new ServiceRegistry()
                         // Add dev dependencies here
-                            .Include(ServiceRegistry.Default)
+                            .Include(ServiceRegistry.Default!)
                         )
                 ) 
             },
@@ -101,7 +101,7 @@ namespace Bam
                     CommonConfigure(
                         new ServiceRegistry()
                         // Add test dependencies here
-                            .Include(ServiceRegistry.Default)
+                            .Include(ServiceRegistry.Default!)
                         )
                 )
             },
@@ -110,7 +110,7 @@ namespace Bam
                     CommonConfigure(
                         new ServiceRegistry()
                         // Add prod dependencies here
-                            .Include(ServiceRegistry.Default)
+                            .Include(ServiceRegistry.Default!)
                         )
                 )
             }
@@ -143,7 +143,7 @@ namespace Bam
         /// <param name="configurer">A function that receives a copy of the current registry and returns a configured registry.</param>
         public static void Configure(ProcessModes processMode, Func<ServiceRegistry, ServiceRegistry> configurer)
         {
-            ProcessModeServiceRegistry existing = Current.registryConfigurers[processMode];
+            ProcessModeServiceRegistry existing = Current!.registryConfigurers[processMode];
             if (existing != null)
             {
                 ServiceRegistry newRegistry = new ServiceRegistry();

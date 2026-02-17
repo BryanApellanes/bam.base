@@ -1,4 +1,4 @@
-﻿using Bam.Console;
+using Bam.Console;
 using Bam.CommandLine;
 using System.Diagnostics;
 using System.Text;
@@ -62,7 +62,7 @@ namespace Bam
         /// <returns></returns>
         public static ProcessOutput Run(this ProcessStartInfo startInfo, ProcessOutputCollector output, int? timeout = null)
         {
-            return Run(startInfo, null, output, timeout);
+            return Run(startInfo, null!, output, timeout);
         }
         /// <summary>
         /// Run the specified command in a separate process capturing the output
@@ -127,8 +127,8 @@ namespace Bam
             {
                 process.Exited += (o, a) =>
                 {
-                    Process p = (Process)o;
-                    output.ExitCode = p.ExitCode;
+                    Process p = (Process)o!;
+                    output.ExitCode = p!.ExitCode;
                     p.Dispose();
                 };
             }
@@ -138,7 +138,7 @@ namespace Bam
 
         private static void WaitForExit(ProcessOutputCollector output, int? timeout, ref int exitCode, ref bool timedOut, Process process, AutoResetEvent outputWaitHandle, AutoResetEvent errorWaitHandle)
         {
-            if (process.WaitForExit(timeout.Value) &&
+            if (process.WaitForExit(timeout!.Value) &&
                 outputWaitHandle.WaitOne(timeout.Value) &&
                 errorWaitHandle.WaitOne(timeout.Value))
             {

@@ -24,7 +24,7 @@ namespace Bam
 
         public byte[] ConvertObjectToBytes(T value)
         {
-            string json = value.ToJson();
+            string json = value!.ToJson();
             return ConvertStringToBytes(json);
         }
 

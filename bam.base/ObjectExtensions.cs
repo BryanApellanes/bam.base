@@ -1,4 +1,4 @@
-﻿using Bam.Data.Repositories;
+using Bam.Data.Repositories;
 using Newtonsoft.Json;
 using System.Collections;
 using System.Collections.Specialized;
@@ -20,7 +20,7 @@ namespace Bam
             foreach (PropertyInfo prop in dyn.GetProperties())
             {
                 string key = keyMunger(prop);
-                result[key] = valueConverter(prop.GetValue(instance));
+                result[key] = valueConverter(prop.GetValue(instance)!);
             }
             return result;
 
@@ -98,7 +98,7 @@ namespace Bam
                     {
                         if (property.PropertyType == typeof(string[]))
                         {
-                            string[] values = (string[])property.GetValue(obj, null) ?? new string[] { };
+                            string[] values = (string[])(property.GetValue(obj, null) ?? new string[] { });
                             result.Add(property.Name, string.Join(", ", values));
                         }
 #if NET472
@@ -123,7 +123,7 @@ namespace Bam
 #endif
                         else if (property.PropertyType == typeof(System.Net.CookieCollection))
                         {
-                            object value = property.GetValue(obj, null);
+                            object value = property.GetValue(obj, null)!;
                             if (value != null)
                             {
                                 System.Net.CookieCollection values = (System.Net.CookieCollection)value;
@@ -142,12 +142,12 @@ namespace Bam
                         }
                         else if (property.PropertyType == typeof(NameValueCollection))
                         {
-                            object value = property.GetValue(obj, null);
+                            object value = property.GetValue(obj, null)!;
                             if (value != null)
                             {
                                 NameValueCollection values = (NameValueCollection)value;
                                 List<string> strings = new List<string>();
-                                foreach (string key in values.AllKeys)
+                                foreach (string? key in values.AllKeys)
                                 {
                                     strings.Add($"{key}={values[key]}");
                                 }
@@ -161,7 +161,7 @@ namespace Bam
                         }
                         else if (property.GetIndexParameters().Length == 0)
                         {
-                            object value = property.GetValue(obj, null);
+                            object value = property.GetValue(obj, null)!;
                             string stringValue = "[null]";
                             if (value != null)
                             {
@@ -170,18 +170,18 @@ namespace Bam
                                     List<string> strings = new List<string>();
                                     foreach (object o in values)
                                     {
-                                        strings.Add(o.ToString());
+                                        strings.Add(o.ToString()!);
                                     }
 
                                     stringValue = string.Join("\r\n\t", strings.ToArray());
                                 }
                                 else
                                 {
-                                    stringValue = value.ToString();
+                                    stringValue = value.ToString()!;
                                 }
                             }
 
-                            result.Add(property.Name, stringValue);
+                            result.Add(property.Name, stringValue!);
                         }
                         else if (property.GetIndexParameters().Length > 0)
                         {
@@ -213,7 +213,7 @@ namespace Bam
                     {
                         if (property.PropertyType == typeof(string[]))
                         {
-                            string[] values = (string[])property.GetValue(obj, null) ?? new string[] { };
+                            string[] values = (string[])(property.GetValue(obj, null) ?? new string[] { });
                             returnValue.AppendFormat("{0}: {1}{2}", property.Name, string.Join(", ", values),
                                 separator);
                         }
@@ -239,7 +239,7 @@ namespace Bam
 #endif
                         else if (property.PropertyType == typeof(System.Net.CookieCollection))
                         {
-                            object value = property.GetValue(obj, null);
+                            object value = property.GetValue(obj, null)!;
                             if (value != null)
                             {
                                 System.Net.CookieCollection values = (System.Net.CookieCollection)value;
@@ -259,12 +259,12 @@ namespace Bam
                         }
                         else if (property.PropertyType == typeof(NameValueCollection))
                         {
-                            object value = property.GetValue(obj, null);
+                            object value = property.GetValue(obj, null)!;
                             if (value != null)
                             {
                                 NameValueCollection values = (NameValueCollection)value;
                                 List<string> strings = new List<string>();
-                                foreach (string key in values.AllKeys)
+                                foreach (string? key in values.AllKeys)
                                 {
                                     strings.Add(string.Format("{0}={1}", key, values[key]));
                                 }
@@ -279,7 +279,7 @@ namespace Bam
                         }
                         else if (property.GetIndexParameters().Length == 0)
                         {
-                            object value = property.GetValue(obj, null);
+                            object value = property.GetValue(obj, null)!;
                             string stringValue = "[null]";
                             if (value != null)
                             {
@@ -288,14 +288,14 @@ namespace Bam
                                     List<string> strings = new List<string>();
                                     foreach (object o in values)
                                     {
-                                        strings.Add(o.ToString());
+                                        strings.Add(o.ToString()!);
                                     }
 
                                     stringValue = string.Join("\r\n\t", strings.ToArray());
                                 }
                                 else
                                 {
-                                    stringValue = value.ToString();
+                                    stringValue = value.ToString()!;
                                 }
                             }
 
@@ -403,13 +403,13 @@ namespace Bam
                 ei => type.GetField(ei.Name,
                     BindingFlags.NonPublic |
                     BindingFlags.Instance |
-                    BindingFlags.GetField);
+                    BindingFlags.GetField)!;
 
             // ** yuck **
             IEnumerable<IEventSubscription> results = from eventInfo in type.GetEvents()
                                                       let eventFieldInfo = ei2fi(eventInfo)
                                                       let eventFieldValue =
-                                                          (Delegate)eventFieldInfo?.GetValue(instance)
+                                                          (Delegate?)eventFieldInfo?.GetValue(instance)
                                                       from subscribedDelegate in eventFieldValue == null
                                                           ? new Delegate[] { }
                                                           : eventFieldValue.GetInvocationList()
@@ -436,7 +436,7 @@ namespace Bam
         {
             if (destination == null || source == null)
             {
-                return destination;
+                return destination!;
             }
 
             ForEachProperty(destination, source, CopyProperty);
@@ -455,7 +455,7 @@ namespace Bam
         {
             if (destination == null || source == null)
             {
-                return destination;
+                return destination!;
             }
 
             ForEachProperty(destination, source, CloneProperty);
@@ -486,7 +486,7 @@ namespace Bam
                     ParameterInfo[] indexParameters = sourceProp.GetIndexParameters();
                     if (indexParameters == null || indexParameters.Length == 0)
                     {
-                        object value = sourceProp.GetValue(source, null);
+                        object value = sourceProp.GetValue(source, null)!;
                         destProp.SetValue(destination, value, null);
                     }
                 }
@@ -500,7 +500,7 @@ namespace Bam
             {
                 if (destProp.IsCompatibleWith(sourceProp))
                 {
-                    object value = sourceProp.GetValue(source, null);
+                    object value = sourceProp.GetValue(source, null)!;
                     if (value is ICloneable cloneable)
                     {
                         value = cloneable.Clone();
@@ -533,7 +533,7 @@ namespace Bam
 
         public static void ToYamlFile(this object? val, FileInfo file)
         {
-            if (!file.Directory.Exists)
+            if (!file!.Directory!.Exists)
             {
                 file.Directory.Create();
             }
@@ -569,7 +569,7 @@ namespace Bam
             {
                 // don't crash
             }
-            return default;
+            return default!;
         }
 
         /// <summary>
@@ -613,7 +613,7 @@ namespace Bam
         {
             if (source == null)
             {
-                return source;
+                return source!;
             }
 
             object result = type.Construct(ctorParams);
@@ -658,7 +658,7 @@ namespace Bam
         {
             get;
             set;
-        }
+        } = null!;
 
         public static IObjectEncoding Encode(this object value)
         {

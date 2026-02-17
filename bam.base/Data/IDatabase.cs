@@ -1,4 +1,4 @@
-﻿/*
+/*
 	Copyright © Bryan Apellanes 2015  
 */
 
@@ -78,7 +78,7 @@ namespace Bam.Data
         DataTable GetDataTable(string sqlStatement, params DbParameter[] dbParameters);
         DataTable GetDataTableFromReader(ISqlStringBuilder sqlStatement);
         DataTable GetDataTableFromReader(string sqlStatement, CommandType commandType, DbParameter[] dbParameters, DbConnection conn, bool closeConnection = true);
-        DataTable GetDataTableFromReader(string sqlStatement, DbParameter[] dbParameters, DbConnection conn = null);
+        DataTable GetDataTableFromReader(string sqlStatement, DbParameter[] dbParameters, DbConnection conn = null!);
         DataTable GetDataTableFromReader(string sqlStatement, DbParameter[] dbParameters, out DbConnection conn);
         DataTable GetDataTableFromReader(string sqlStatement, object dbParameters);
         DataTable GetDataTableFromReader(string sqlStatement, object dbParameters, out DbConnection conn);
@@ -101,10 +101,10 @@ namespace Bam.Data
         IQuery<C, T> GetQuery<C, T>(Delegate where)
             where C : IQueryFilter, IFilterToken, new()
             where T : IDao, new();
-        IQuery<C, T> GetQuery<C, T>(Func<C, IQueryFilter<C>> where, IOrderBy<C> orderBy = null)
+        IQuery<C, T> GetQuery<C, T>(Func<C, IQueryFilter<C>> where, IOrderBy<C> orderBy = null!)
             where C : IQueryFilter, IFilterToken, new()
             where T : IDao, new();
-        IQuery<C, T> GetQuery<C, T>(WhereDelegate<C> where, IOrderBy<C> orderBy = null)
+        IQuery<C, T> GetQuery<C, T>(WhereDelegate<C> where, IOrderBy<C> orderBy = null!)
             where C : IQueryFilter, IFilterToken, new()
             where T : IDao, new();
         IQuerySet GetQuerySet();
@@ -113,8 +113,8 @@ namespace Bam.Data
         ISqlStringBuilder GetSqlStringBuilder();
         void Hydrate(IDao dao);
         T New<T>() where T : IDao, new();
-        IEnumerable<dynamic> Query(string sqlQuery, Dictionary<string, object> dictDbParameters, string typeName = null);
-        IEnumerable<dynamic> Query(string sqlQuery, object dynamicDbParameters, string typeName = null);
+        IEnumerable<dynamic> Query(string sqlQuery, Dictionary<string, object> dictDbParameters, string typeName = null!);
+        IEnumerable<dynamic> Query(string sqlQuery, object dynamicDbParameters, string typeName = null!);
         IEnumerable<T> Query<T>(string sqlQuery, Dictionary<string, object> dbParameters);
         IEnumerable<T> Query<T>(string sqlQuery, Func<DataRow, T> rowProcessor, params DbParameter[] dbParameters);
         IEnumerable<T> Query<T>(string sqlQuery, object dynamicDbParameters);
@@ -127,10 +127,10 @@ namespace Bam.Data
         void ReleaseConnection(DbConnection conn);
         T Save<T>(T dao) where T : IDao, new();
         ISqlStringBuilder Sql();
-        EnsureSchemaStatus TryEnsureSchema(Assembly assembly, ILogger logger = null);
-        EnsureSchemaStatus TryEnsureSchema(Type type, ILogger logger = null);
-        EnsureSchemaStatus TryEnsureSchema(Type type, bool force, out Exception ex, ILogger logger = null);
-        EnsureSchemaStatus TryEnsureSchema(Type type, out Exception ex, ILogger logger = null);
-        EnsureSchemaStatus TryEnsureSchema<T>(ILogger logger = null);
+        EnsureSchemaStatus TryEnsureSchema(Assembly assembly, ILogger logger = null!);
+        EnsureSchemaStatus TryEnsureSchema(Type type, ILogger logger = null!);
+        EnsureSchemaStatus TryEnsureSchema(Type type, bool force, out Exception ex, ILogger logger = null!);
+        EnsureSchemaStatus TryEnsureSchema(Type type, out Exception ex, ILogger logger = null!);
+        EnsureSchemaStatus TryEnsureSchema<T>(ILogger logger = null!);
     }
 }

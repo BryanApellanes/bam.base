@@ -21,7 +21,7 @@ namespace Bam.Data.Repositories
 		{
 			get
 			{
-				return this.Meta.ReadProperty<object>(PropertyInfo);
+				return this.Meta.ReadProperty<object>(PropertyInfo)!;
 			}
 		}
 
@@ -70,7 +70,7 @@ namespace Bam.Data.Repositories
 			}
 		}
 
-		Dictionary<int, DateTime> _versionDates;
+		Dictionary<int, DateTime> _versionDates = null!;
 		object _versionDatesLock = new object();
 		public Dictionary<int, DateTime> VersionDates
 		{
@@ -105,7 +105,7 @@ namespace Bam.Data.Repositories
 			lock(_versionDatesLock)
 			{
 				Meta.WriteProperty(PropertyInfo, propertyValue);
-				_versionDates = null;
+				_versionDates = null!;
 			}
 		}
 
@@ -115,7 +115,7 @@ namespace Bam.Data.Repositories
 			{
 				object value = Meta.ReadPropertyVersion<object>(PropertyInfo, version);
 				Meta.WriteProperty(PropertyInfo, value);
-				_versionDates = null;
+				_versionDates = null!;
 			}
 		}
 	}

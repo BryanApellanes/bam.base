@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using Bam.Services;
 
 namespace Bam.DependencyInjection
@@ -145,8 +145,8 @@ namespace Bam.DependencyInjection
                     
                     if (provider != null)
                     {
-                        object instance = provider.IsStatic ? null : provider.DeclaringType.Construct();
-                        Default = (ServiceRegistry)provider.Invoke(instance, null);
+                        object? instance = provider.IsStatic ? null : provider.DeclaringType!.Construct();
+                        Default = (ServiceRegistry)provider.Invoke(instance, null)!;
                     }
                 }
             }
@@ -154,9 +154,9 @@ namespace Bam.DependencyInjection
             {
                 if (!Default.TryGet(out ServiceRegistry result))
                 {
-                    result = orDefault;
+                    result = orDefault!;
                 }
-                return result;
+                return result!;
             };
         }
     }

@@ -1,4 +1,4 @@
-﻿using Bam.CommandLine;
+using Bam.CommandLine;
 using System.Runtime.InteropServices;
 using Bam.Logging;
 
@@ -39,7 +39,7 @@ namespace Bam
 
         public static bool IsOsX => Current == OSNames.OSX;
         public static bool IsMac => IsOsX;
-        public static string TargetFrameworkVersion => Config.Current["TargetFramework"].Or(DefaultTargetFrameworkVersion);
+        public static string TargetFrameworkVersion => Config.Current["TargetFramework"].Or(DefaultTargetFrameworkVersion)!;
 
         private static readonly Dictionary<OSNames, string> _referenceRuntimeNames = new Dictionary<OSNames, string>
         {

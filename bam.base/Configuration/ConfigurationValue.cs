@@ -16,12 +16,12 @@
             this.Value = value;
         }
 
-        public string Key { get; set; }
+        public string Key { get; set; } = null!;
 
         /// <summary>
         /// Gets or sets the default value specified when this ConfigurationValue was resolved.
         /// </summary>
-        public string DefaultValue { get; set; }
+        public string DefaultValue { get; set; } = null!;
 
         /// <summary>
         /// Gets or sets the callConfigService argument when this ConfigurationValue was resolved.

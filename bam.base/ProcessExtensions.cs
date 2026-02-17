@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 
 namespace Bam
 {
@@ -6,7 +6,7 @@ namespace Bam
     {        public static ProcessStartInfo GetStartInfo(this Process process, params string[] processArgs)
         {
             ProcessStartInfo processStartInfo = CreateStartInfo(false);
-            processStartInfo.FileName = new FileInfo(process.MainModule.FileName).FullName;
+            processStartInfo.FileName = new FileInfo(process!.MainModule!.FileName).FullName;
             processStartInfo.Arguments = string.Join(" ", processArgs);
             return processStartInfo;
         }

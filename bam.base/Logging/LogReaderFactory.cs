@@ -8,7 +8,7 @@ namespace Bam.Logging
 	{
 		public LogReaderFactory() { }
 
-		static LogReaderFactory _default;
+		static LogReaderFactory _default= null!;
 		static object _defaultLock = new object();
 		public static LogReaderFactory Default
 		{
@@ -45,7 +45,7 @@ namespace Bam.Logging
 			{
 				return _readers[loggerType]();
 			}
-			return null;
+			return null!;
 		}
 	}
 }

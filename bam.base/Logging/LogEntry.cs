@@ -11,19 +11,19 @@ namespace Bam.Logging
 		{
 			get;
 			set;
-		}
+		} = null!;
 
 		public string Message
 		{
 			get;
 			set;
-		}
+		} = null!;
 
 		public string Computer
 		{
 			get;
 			set;
-		}
+		} = null!;
 
 		public Severity Severity
 		{
@@ -35,7 +35,7 @@ namespace Bam.Logging
 		{
 			get;
 			set;
-		}
+		} = null!;
 
 		public int EventID
 		{
@@ -47,7 +47,7 @@ namespace Bam.Logging
 		{
 			get;
 			set;
-		}
+		} = null!;
 
 		public DateTime Time
 		{
@@ -55,10 +55,10 @@ namespace Bam.Logging
 			set;
 		}
 
-        public string MessageSignature { get; set; }
+        public string MessageSignature { get; set; } = null!;
 
-        public string[] MessageVariableValues { get; set; }
+        public string[] MessageVariableValues { get; set; } = null!;
 
-        public string StackTrace { get; set; }
+        public string StackTrace { get; set; } = null!;
     }
 }

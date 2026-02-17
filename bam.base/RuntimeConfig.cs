@@ -11,11 +11,11 @@ namespace Bam
             this.NugetPackageRoot = BamProfile.NugetPackagePath;
         }
 
-        public string ReferenceAssemblies { get; set; }
-        public string GenDir { get; set; }
-        public string BamProfileDir { get; set; }
-        public string BamDir { get; set; }
-        public string ProcessProfileDir { get; set; }
+        public string ReferenceAssemblies { get; set; } = null!;
+        public string GenDir { get; set; } = null!;
+        public string BamProfileDir { get; set; } = null!;
+        public string BamDir { get; set; } = null!;
+        public string ProcessProfileDir { get; set; } = null!;
 
         public string NugetPackageRoot { get; set; }
 
@@ -48,7 +48,7 @@ namespace Bam
                 GenDir = RuntimeSettings.GetGenDir(),
                 BamProfileDir = RuntimeSettings.BamProfileDir,
                 BamDir = RuntimeSettings.BamDir,
-                ProcessProfileDir = RuntimeSettings.ProcessProfileDir
+                ProcessProfileDir = RuntimeSettings.ProcessProfileDir!
             };
             config.ToYamlFile(runtimeConfigFile);
             

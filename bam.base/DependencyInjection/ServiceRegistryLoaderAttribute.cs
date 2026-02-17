@@ -30,7 +30,7 @@
         /// </summary>
         public List<ProcessModes> ProcessModes { get; set; }
 
-        public string RegistryName { get; set; }
-        public string Description { get; set; }
+        public string RegistryName { get; set; } = null!;
+        public string Description { get; set; } = null!;
     }
 }

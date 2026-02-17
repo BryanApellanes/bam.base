@@ -2,10 +2,10 @@ namespace Bam.Logging
 {
     public class LoggableEventArgs: EventArgs
     {
-        public ILoggable Sender { get; set; }
-        public string Message { get; set; }
+        public ILoggable Sender { get; set; } = null!;
+        public string Message { get; set; } = null!;
         public VerbosityLevel VerbosityLevel { get; set; }
-        public VerbosityAttribute VerbosityAttribute { get; set; }
+        public VerbosityAttribute VerbosityAttribute { get; set; } = null!;
 
         public static LoggableEventArgs ForLoggable(ILoggable loggable, VerbosityAttribute verbosityAttribute)
         {

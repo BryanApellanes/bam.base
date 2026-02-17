@@ -42,8 +42,8 @@ namespace Bam
         public static TException CreateException<TException>(string messageFormat, params object[] args) where TException : Exception
         {
             Type exceptionType = typeof(TException);
-            ConstructorInfo ctor = exceptionType.GetConstructor(new Type[] { typeof(string)});
-            return (TException)ctor.Invoke(new object[] { string.Format(messageFormat, args) });
+            ConstructorInfo ctor = exceptionType.GetConstructor(new Type[] { typeof(string)})!;
+            return (TException)ctor!.Invoke(new object[] { string.Format(messageFormat, args) });
         }
 
         public static void ThrowInvalidOperation(string messageFormat, params object[] args)
