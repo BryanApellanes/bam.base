@@ -14,7 +14,7 @@ namespace Bam.Serialization
 
         public JsonSerializerSettings JsonSerializerSettingsSettings { get; set; } = null!;
 
-        public Encoding Encoding { get; set; } = null!;
+        public Encoding Encoding { get; set; } = Encoding.UTF8;
 
         public byte[] Serialize(object data)
         {

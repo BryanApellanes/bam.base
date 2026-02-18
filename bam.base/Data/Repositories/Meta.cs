@@ -103,7 +103,7 @@ namespace Bam.Data.Repositories
 				{
 					++result;
 				}
-				metaFile.FullName.SafeWriteFile(result.ToString());
+				metaFile.FullName.SafeWriteFile(result.ToString(), true);
 				return result;
 			}
 			else
