@@ -16,6 +16,6 @@
         IEnumerable<T> RetrieveAll<T>() where T : class, new();
         IEnumerable<T> SaveCollection<T>(IEnumerable<T> values) where T : class, new();
         T? Save<T>(T? toSave) where T : class, new();
-        T? Update<T>(T? toUpdate) where T : new();
+        T Update<T>(T toUpdate) where T : new();
     }
 }
