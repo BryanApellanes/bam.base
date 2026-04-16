@@ -432,7 +432,7 @@ namespace Bam.DependencyInjection
         /// </summary>
         /// <param name="type">The type to resolve.</param>
         /// <returns>The resolved or newly constructed instance.</returns>
-        public object Get(Type type)
+        public virtual object Get(Type type)
         {
             return Get(type, GetCtorParams(type).ToArray());
         }
@@ -544,7 +544,7 @@ namespace Bam.DependencyInjection
         /// </summary>
         /// <typeparam name="T">The type of the object to get.</typeparam>
         /// <returns>T</returns>
-        public T Get<T>()
+        public virtual T Get<T>()
         {
             if (this[typeof(T)] == null)
             {
@@ -584,7 +584,7 @@ namespace Bam.DependencyInjection
         /// <typeparam name="T">The type of the object to get.</typeparam>
         /// <param name="ctorParams">Array of objects to pass to the constructor of type T</param>
         /// <returns>T</returns>
-        public T Get<T>(params object[] ctorParams)
+        public virtual T Get<T>(params object[] ctorParams)
         {
             if (this[typeof(T)] == null)
             {
@@ -602,7 +602,7 @@ namespace Bam.DependencyInjection
         /// <param name="type"></param>
         /// <param name="ctorParams"></param>
         /// <returns></returns>
-        public object Get(Type type, params object[] ctorParams)
+        public virtual object Get(Type type, params object[] ctorParams)
         {
             if (this[type] == null)
             {
