@@ -19,6 +19,7 @@ namespace Bam.Data
         Decimal,
         String,
         ByteArray,
-        DateTime
+        DateTime,
+        Vector
     }
 }

@@ -41,8 +41,10 @@ namespace Bam.Data
         ISqlStringBuilder Insert(string tableName, dynamic valueAssignments);
         ISqlStringBuilder Insert(string tableName, params AssignValue[] values);
         ISqlStringBuilder Insert<T>(T instance) where T : IDao, new();
+        ISqlStringBuilder Limit(int count);
         ISqlStringBuilder OrderBy(string columnName, SortOrder order = SortOrder.Ascending);
         ISqlStringBuilder OrderBy<C>(IOrderBy<C> orderBy) where C : IQueryFilter, IFilterToken, new();
+        ISqlStringBuilder OrderByNearest(string columnName, Vector value, VectorDistance distance);
         void Reset();
         ISqlStringBuilder Select(Type daoType);
         ISqlStringBuilder Select(Type daoType, params string[] columnNames);
