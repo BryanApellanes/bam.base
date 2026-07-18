@@ -14,12 +14,13 @@ namespace Bam.Data
         /// </summary>
         /// <param name="defaultLiteral">
         /// The default literal exactly as it should appear after <c>DEFAULT</c> (e.g. <c>"'[]'"</c>),
-        /// or null for no default.
+        /// or null for no default. An empty literal is normalized to null so
+        /// <see cref="DefaultLiteral"/> honors the <see cref="IDefaultLiteralColumn"/> contract.
         /// </param>
         public JsonColumnAttribute(string? defaultLiteral = null)
         {
             this.DbDataType = "jsonb";
-            this.DefaultLiteral = defaultLiteral;
+            this.DefaultLiteral = string.IsNullOrEmpty(defaultLiteral) ? null : defaultLiteral;
         }
 
         /// <summary>

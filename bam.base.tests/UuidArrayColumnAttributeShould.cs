@@ -43,4 +43,21 @@ public class UuidArrayColumnAttributeShould : UnitTestMenuContainer
         .SoBeHappy()
         .UnlessItFailed();
     }
+
+    [UnitTest]
+    public void NormalizeEmptyLiteralToNullThroughTheContract()
+    {
+        When.A<UuidArrayColumnAttribute>("normalizes an empty default literal to null through IDefaultLiteralColumn",
+            new UuidArrayColumnAttribute(string.Empty) { Name = "RelatedEpisodeIds" },
+            (attribute) => attribute)
+        .TheTest
+        .ShouldPass<UuidArrayColumnAttribute>((because, _, attribute) =>
+        {
+            IDefaultLiteralColumn contract = attribute;
+            because.ItsTrue("DefaultLiteral is null through the contract", contract.DefaultLiteral == null);
+            because.ItsTrue("default clause is empty through the contract", contract.GetDefaultClause().Equals(string.Empty));
+        })
+        .SoBeHappy()
+        .UnlessItFailed();
+    }
 }

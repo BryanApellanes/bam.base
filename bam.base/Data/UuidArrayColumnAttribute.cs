@@ -14,12 +14,13 @@ namespace Bam.Data
         /// </summary>
         /// <param name="defaultLiteral">
         /// The default literal exactly as it should appear after <c>DEFAULT</c>; defaults to
-        /// <c>"'{}'"</c> (empty array). Pass null for no default.
+        /// <c>"'{}'"</c> (empty array). Pass null for no default. An empty literal is normalized
+        /// to null so <see cref="DefaultLiteral"/> honors the <see cref="IDefaultLiteralColumn"/> contract.
         /// </param>
         public UuidArrayColumnAttribute(string? defaultLiteral = "'{}'")
         {
             this.DbDataType = "uuid[]";
-            this.DefaultLiteral = defaultLiteral;
+            this.DefaultLiteral = string.IsNullOrEmpty(defaultLiteral) ? null : defaultLiteral;
         }
 
         /// <summary>

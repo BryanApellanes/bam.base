@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Bam.Data
 {
     /// <summary>
@@ -6,7 +8,7 @@ namespace Bam.Data
     /// string columns in the data pipeline (type translation, DDL rendering, and native jsonb
     /// parameter binding), not to model JSON structure.
     /// </summary>
-    public sealed class Json
+    public sealed class Json : IEquatable<Json>
     {
         /// <summary>
         /// Creates a Json value from the specified raw JSON text.
@@ -30,12 +32,12 @@ namespace Bam.Data
         /// <summary>
         /// Gets a Json value holding an empty JSON array (<c>[]</c>).
         /// </summary>
-        public static Json EmptyArray => new Json("[]");
+        public static Json EmptyArray { get; } = new Json("[]");
 
         /// <summary>
         /// Gets a Json value holding an empty JSON object (<c>{}</c>).
         /// </summary>
-        public static Json EmptyObject => new Json("{}");
+        public static Json EmptyObject { get; } = new Json("{}");
 
         /// <summary>
         /// Gets the raw JSON text.
@@ -58,6 +60,7 @@ namespace Bam.Data
         /// Converts a Json value to its raw JSON text.
         /// </summary>
         /// <param name="json">The Json value.</param>
+        [return: NotNullIfNotNull(nameof(json))]
         public static implicit operator string?(Json? json)
         {
             return json?.Value;
@@ -66,13 +69,45 @@ namespace Bam.Data
         /// <summary>
         /// Determines value equality: identical raw JSON text (ordinal comparison).
         /// </summary>
+        public bool Equals(Json? other)
+        {
+            if (other is null)
+            {
+                return false;
+            }
+            return Value.Equals(other.Value, StringComparison.Ordinal);
+        }
+
+        /// <summary>
+        /// Determines value equality: identical raw JSON text (ordinal comparison).
+        /// </summary>
         public override bool Equals(object? obj)
         {
-            if (obj is Json other)
+            return obj is Json other && Equals(other);
+        }
+
+        /// <summary>
+        /// Determines value equality: identical raw JSON text (ordinal comparison).
+        /// </summary>
+        public static bool operator ==(Json? left, Json? right)
+        {
+            if (ReferenceEquals(left, right))
             {
-                return Value.Equals(other.Value, StringComparison.Ordinal);
+                return true;
             }
-            return false;
+            if (left is null || right is null)
+            {
+                return false;
+            }
+            return left.Equals(right);
+        }
+
+        /// <summary>
+        /// Determines value inequality: differing raw JSON text (ordinal comparison).
+        /// </summary>
+        public static bool operator !=(Json? left, Json? right)
+        {
+            return !(left == right);
         }
 
         /// <summary>

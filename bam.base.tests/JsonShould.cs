@@ -96,7 +96,34 @@ public class JsonShould : UnitTestMenuContainer
         .UnlessItFailed();
     }
 
+    [UnitTest]
+    public void EquateWithValueSemanticOperators()
+    {
+        When.A<Json>("equates with value-semantic equality operators",
+            new Json("[1,2]"),
+            (json) => new JsonOperatorOutcome(
+                json == new Json("[1,2]"),
+                json != new Json("[1,3]"),
+                Json.EmptyArray == Json.EmptyArray,
+                (Json?)null == (Json?)null,
+                json == (Json?)null,
+                json!.Equals((Json?)null)))
+        .TheTest
+        .ShouldPass<JsonOperatorOutcome>((because, _, outcome) =>
+        {
+            because.ItsTrue("== is value equality for identical text", outcome.SameTextEqual);
+            because.ItsTrue("!= is value inequality for differing text", outcome.DifferentTextNotEqual);
+            because.ItsTrue("the sentinel compares equal to itself", outcome.SentinelEqualsItself);
+            because.ItsTrue("null == null is true", outcome.NullsEqual);
+            because.ItsTrue("a value never equals null via ==", !outcome.ValueEqualsNull);
+            because.ItsTrue("a value never equals null via Equals", !outcome.EqualsNull);
+        })
+        .SoBeHappy()
+        .UnlessItFailed();
+    }
+
     private sealed record JsonConversionOutcome(string Value, string Text, string? RoundTripped);
     private sealed record JsonEmptyShapesOutcome(string EmptyArray, string EmptyObject);
     private sealed record JsonEqualityOutcome(bool SameTextEqual, bool DifferentTextEqual, bool HashCodesMatch);
+    private sealed record JsonOperatorOutcome(bool SameTextEqual, bool DifferentTextNotEqual, bool SentinelEqualsItself, bool NullsEqual, bool ValueEqualsNull, bool EqualsNull);
 }

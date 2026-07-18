@@ -43,4 +43,21 @@ public class JsonColumnAttributeShould : UnitTestMenuContainer
         .SoBeHappy()
         .UnlessItFailed();
     }
+
+    [UnitTest]
+    public void NormalizeEmptyLiteralToNullThroughTheContract()
+    {
+        When.A<JsonColumnAttribute>("normalizes an empty default literal to null through IDefaultLiteralColumn",
+            new JsonColumnAttribute(string.Empty) { Name = "Metadata" },
+            (attribute) => attribute)
+        .TheTest
+        .ShouldPass<JsonColumnAttribute>((because, _, attribute) =>
+        {
+            IDefaultLiteralColumn contract = attribute;
+            because.ItsTrue("DefaultLiteral is null through the contract", contract.DefaultLiteral == null);
+            because.ItsTrue("default clause is empty through the contract", contract.GetDefaultClause().Equals(string.Empty));
+        })
+        .SoBeHappy()
+        .UnlessItFailed();
+    }
 }
