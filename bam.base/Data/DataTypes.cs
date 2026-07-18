@@ -20,6 +20,8 @@ namespace Bam.Data
         String,
         ByteArray,
         DateTime,
-        Vector
+        Vector,
+        Json,
+        UuidArray
     }
 }
