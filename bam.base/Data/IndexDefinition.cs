@@ -19,13 +19,21 @@ namespace Bam.Data
         /// <param name="storageParameters">Storage parameters rendered as a <c>WITH (...)</c> clause, or null for none.</param>
         public IndexDefinition(string name, string tableName, IReadOnlyList<IndexColumn> columns, bool unique = false, string? accessMethod = null, string? operatorClass = null, string? storageParameters = null)
         {
-            if (string.IsNullOrEmpty(name))
+            if (name == null)
             {
                 throw new ArgumentNullException(nameof(name));
             }
-            if (string.IsNullOrEmpty(tableName))
+            if (name.Length == 0)
+            {
+                throw new ArgumentException("name is required.", nameof(name));
+            }
+            if (tableName == null)
             {
                 throw new ArgumentNullException(nameof(tableName));
+            }
+            if (tableName.Length == 0)
+            {
+                throw new ArgumentException("tableName is required.", nameof(tableName));
             }
             if (columns == null || columns.Count == 0)
             {
@@ -33,7 +41,7 @@ namespace Bam.Data
             }
             this.Name = name;
             this.TableName = tableName;
-            this.Columns = columns;
+            this.Columns = columns.ToArray();
             this.Unique = unique;
             this.AccessMethod = accessMethod;
             this.OperatorClass = operatorClass;

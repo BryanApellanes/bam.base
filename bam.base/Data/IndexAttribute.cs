@@ -100,9 +100,13 @@ namespace Bam.Data
         /// </exception>
         public IndexDefinition GetIndexDefinition(string tableName, string? inferredColumnName = null)
         {
-            if (string.IsNullOrEmpty(tableName))
+            if (tableName == null)
             {
                 throw new ArgumentNullException(nameof(tableName));
+            }
+            if (tableName.Length == 0)
+            {
+                throw new ArgumentException("tableName is required.", nameof(tableName));
             }
             List<IndexColumn> columns = new List<IndexColumn>();
             if (!string.IsNullOrEmpty(inferredColumnName))

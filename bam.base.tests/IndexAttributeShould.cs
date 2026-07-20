@@ -1,3 +1,4 @@
+using System.Reflection;
 using Bam.Data;
 using Bam.DependencyInjection;
 using Bam.Test;
@@ -129,5 +130,40 @@ public class IndexAttributeShould : UnitTestMenuContainer
         .UnlessItFailed();
     }
 
+    [UnitTest]
+    public void ResolveDeclarationsAppliedAsAttributes()
+    {
+        When.A<Type>("resolves declarations applied as attributes through reflection",
+            typeof(IndexedFixture),
+            (fixtureType) =>
+            {
+                IndexAttribute[] classLevel = fixtureType.GetCustomAttributes<IndexAttribute>(false).ToArray();
+                PropertyInfo property = fixtureType.GetProperty(nameof(IndexedFixture.CreatedAt))!;
+                IndexAttribute[] propertyLevel = property.GetCustomAttributes<IndexAttribute>(false).ToArray();
+                return new AttributeUsageOutcome(classLevel, propertyLevel);
+            })
+        .TheTest
+        .ShouldPass<AttributeUsageOutcome>((because, outcome) =>
+        {
+            because.ItsTrue("both class-level declarations are retrieved (AllowMultiple)", outcome.ClassLevel.Length == 2);
+            because.ItsTrue("the unique single-column declaration round-trips", outcome.ClassLevel.Any(attribute => attribute.Unique && attribute.ColumnNames.Length == 1 && attribute.ColumnNames[0].Equals("TenantId")));
+            because.ItsTrue("the composite declaration round-trips", outcome.ClassLevel.Any(attribute => !attribute.Unique && attribute.ColumnNames.Length == 2 && attribute.ColumnNames[1].Equals("CreatedAt")));
+            because.ItsTrue("the property-level declaration is retrieved", outcome.PropertyLevel.Length == 1);
+            because.ItsTrue("the property-level order round-trips", outcome.PropertyLevel[0].Order == SortOrder.Descending);
+        })
+        .SoBeHappy()
+        .UnlessItFailed();
+    }
+
+    [Index("TenantId", Unique = true)]
+    [Index("TenantId", "CreatedAt")]
+    private sealed class IndexedFixture
+    {
+        [Index(Order = SortOrder.Descending)]
+        public string? CreatedAt { get; set; }
+    }
+
     private sealed record IndexRejectionOutcome(bool EmptyColumnsThrew, bool MismatchedOrdersThrew);
+
+    private sealed record AttributeUsageOutcome(IndexAttribute[] ClassLevel, IndexAttribute[] PropertyLevel);
 }

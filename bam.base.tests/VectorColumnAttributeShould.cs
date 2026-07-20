@@ -65,14 +65,33 @@ public class VectorColumnAttributeShould : UnitTestMenuContainer
             (attribute) =>
             {
                 VectorIndexAttribute hnsw = new VectorIndexAttribute { Method = VectorIndexMethod.Hnsw, Distance = VectorDistance.InnerProduct };
-                bool setterThrew = false;
+                VectorIndexAttribute cosine = new VectorIndexAttribute();
+                bool accessMethodSetterThrew = false;
                 try
                 {
                     attribute.AccessMethod = "btree";
                 }
-                catch (InvalidOperationException)
+                catch (NotSupportedException)
                 {
-                    setterThrew = true;
+                    accessMethodSetterThrew = true;
+                }
+                bool operatorClassSetterThrew = false;
+                try
+                {
+                    attribute.OperatorClass = "jsonb_path_ops";
+                }
+                catch (NotSupportedException)
+                {
+                    operatorClassSetterThrew = true;
+                }
+                bool storageParametersSetterThrew = false;
+                try
+                {
+                    attribute.StorageParameters = "lists = 1";
+                }
+                catch (NotSupportedException)
+                {
+                    storageParametersSetterThrew = true;
                 }
                 IndexDefinition definition = attribute.GetIndexDefinition("VectorTestTable", "Embedding");
                 return new VectorSurfaceOutcome(
@@ -82,7 +101,10 @@ public class VectorColumnAttributeShould : UnitTestMenuContainer
                     hnsw.AccessMethod,
                     hnsw.OperatorClass,
                     hnsw.StorageParameters,
-                    setterThrew,
+                    cosine.OperatorClass,
+                    accessMethodSetterThrew,
+                    operatorClassSetterThrew,
+                    storageParametersSetterThrew,
                     definition);
             })
         .TheTest
@@ -94,7 +116,10 @@ public class VectorColumnAttributeShould : UnitTestMenuContainer
             because.ItsTrue("hnsw derives from the method", "hnsw".Equals(outcome.HnswAccessMethod));
             because.ItsTrue("inner product selects the ip operator class", "vector_ip_ops".Equals(outcome.HnswOperatorClass));
             because.ItsTrue("hnsw declares no storage parameters", outcome.HnswStorageParameters == null);
-            because.ItsTrue("assigning the derived access method throws", outcome.SetterThrew);
+            because.ItsTrue("the default distance selects the cosine operator class", "vector_cosine_ops".Equals(outcome.CosineOperatorClass));
+            because.ItsTrue("assigning the derived access method throws", outcome.AccessMethodSetterThrew);
+            because.ItsTrue("assigning the derived operator class throws", outcome.OperatorClassSetterThrew);
+            because.ItsTrue("assigning the derived storage parameters throws", outcome.StorageParametersSetterThrew);
             because.ItsTrue("the resolved definition carries the vector options", outcome.Definition.HasAccessMethodOptions && "ivfflat".Equals(outcome.Definition.AccessMethod));
             because.ItsTrue("the resolved definition derives the index name", outcome.Definition.Name.Equals("ix_VectorTestTable_Embedding"));
         })
@@ -128,6 +153,9 @@ public class VectorColumnAttributeShould : UnitTestMenuContainer
         string? HnswAccessMethod,
         string? HnswOperatorClass,
         string? HnswStorageParameters,
-        bool SetterThrew,
+        string? CosineOperatorClass,
+        bool AccessMethodSetterThrew,
+        bool OperatorClassSetterThrew,
+        bool StorageParametersSetterThrew,
         IndexDefinition Definition);
 }

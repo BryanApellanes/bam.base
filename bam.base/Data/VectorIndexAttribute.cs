@@ -9,6 +9,12 @@ namespace Bam.Data
     /// Note: ivfflat recall depends on the data present when the index is created — create the index
     /// after loading representative data, or reindex after bulk loads. Approximate vector indexes skip
     /// rows whose vector is null; pair similarity queries with a not-null filter on the column.
+    /// The inherited <see cref="IndexAttribute.AccessMethod"/>, <see cref="IndexAttribute.OperatorClass"/>,
+    /// and <see cref="IndexAttribute.StorageParameters"/> setters throw <see cref="NotSupportedException"/>;
+    /// a declaration that assigns them (e.g. <c>[VectorIndex(AccessMethod = "btree")]</c>) compiles but
+    /// fails when reflection materializes the attribute. hnsw storage parameters (<c>m</c>,
+    /// <c>ef_construction</c>) are not yet expressible through this specialization — use the general
+    /// <see cref="IndexAttribute"/> if they are required.
     /// </summary>
     [AttributeUsage(AttributeTargets.Property)]
     public class VectorIndexAttribute : IndexAttribute
@@ -25,8 +31,9 @@ namespace Bam.Data
         public VectorDistance Distance { get; set; } = VectorDistance.Cosine;
 
         /// <summary>
-        /// Gets or sets the ivfflat list count (<c>WITH (lists = N)</c>). Ignored by other methods.
-        /// Defaults to 100.
+        /// Gets or sets the ivfflat list count (<c>WITH (lists = N)</c>). Silently ignored when
+        /// <see cref="Method"/> is <see cref="VectorIndexMethod.Hnsw"/> — hnsw declares no storage
+        /// parameters. Defaults to 100.
         /// </summary>
         public int Lists { get; set; } = 100;
 
@@ -42,7 +49,7 @@ namespace Bam.Data
             }
             set
             {
-                throw new InvalidOperationException($"{nameof(VectorIndexAttribute)} derives {nameof(AccessMethod)} from {nameof(Method)}; set {nameof(Method)} instead.");
+                throw new NotSupportedException($"{nameof(VectorIndexAttribute)} derives {nameof(AccessMethod)} from {nameof(Method)}; set {nameof(Method)} instead.");
             }
         }
 
@@ -68,7 +75,7 @@ namespace Bam.Data
             }
             set
             {
-                throw new InvalidOperationException($"{nameof(VectorIndexAttribute)} derives {nameof(OperatorClass)} from {nameof(Distance)}; set {nameof(Distance)} instead.");
+                throw new NotSupportedException($"{nameof(VectorIndexAttribute)} derives {nameof(OperatorClass)} from {nameof(Distance)}; set {nameof(Distance)} instead.");
             }
         }
 
@@ -85,7 +92,7 @@ namespace Bam.Data
             }
             set
             {
-                throw new InvalidOperationException($"{nameof(VectorIndexAttribute)} derives {nameof(StorageParameters)} from {nameof(Lists)}; set {nameof(Lists)} instead.");
+                throw new NotSupportedException($"{nameof(VectorIndexAttribute)} derives {nameof(StorageParameters)} from {nameof(Lists)}; set {nameof(Lists)} instead.");
             }
         }
     }

@@ -14,9 +14,13 @@ namespace Bam.Data
         /// <param name="order">The sort direction; defaults to <see cref="SortOrder.Unspecified"/>.</param>
         public IndexColumn(string columnName, SortOrder order = SortOrder.Unspecified)
         {
-            if (string.IsNullOrEmpty(columnName))
+            if (columnName == null)
             {
                 throw new ArgumentNullException(nameof(columnName));
+            }
+            if (columnName.Length == 0)
+            {
+                throw new ArgumentException("columnName is required.", nameof(columnName));
             }
             this.ColumnName = columnName;
             this.Order = order;
