@@ -21,6 +21,7 @@ namespace Bam.Data
         string GetKeyColumnDefinition(KeyColumnAttribute keyColumn);
         void WriteAddForeignKey(string tableName, string nameOfReference, string nameOfColumn, string referencedTable, string referencedKey);
         void WriteCreateTable(string tableName, string columnDefinitions, dynamic[]? fks = null);
+        ISchemaWriter WriteCreateIndexes(Type daoType);
         ISchemaWriter WriteDropTable(string tableName);
         bool WriteSchemaScript(Assembly assembly);
         bool WriteSchemaScript(Type type);
