@@ -58,6 +58,76 @@ public class VectorColumnAttributeShould : UnitTestMenuContainer
     }
 
     [UnitTest]
+    public void DeriveGeneralIndexSurfaceFromVectorSettings()
+    {
+        When.A<VectorIndexAttribute>("derives the general index surface from its vector settings",
+            new VectorIndexAttribute { Distance = VectorDistance.Euclidean, Lists = 50 },
+            (attribute) =>
+            {
+                VectorIndexAttribute hnsw = new VectorIndexAttribute { Method = VectorIndexMethod.Hnsw, Distance = VectorDistance.InnerProduct };
+                VectorIndexAttribute cosine = new VectorIndexAttribute();
+                bool accessMethodSetterThrew = false;
+                try
+                {
+                    attribute.AccessMethod = "btree";
+                }
+                catch (NotSupportedException)
+                {
+                    accessMethodSetterThrew = true;
+                }
+                bool operatorClassSetterThrew = false;
+                try
+                {
+                    attribute.OperatorClass = "jsonb_path_ops";
+                }
+                catch (NotSupportedException)
+                {
+                    operatorClassSetterThrew = true;
+                }
+                bool storageParametersSetterThrew = false;
+                try
+                {
+                    attribute.StorageParameters = "lists = 1";
+                }
+                catch (NotSupportedException)
+                {
+                    storageParametersSetterThrew = true;
+                }
+                IndexDefinition definition = attribute.GetIndexDefinition("VectorTestTable", "Embedding");
+                return new VectorSurfaceOutcome(
+                    attribute.AccessMethod,
+                    attribute.OperatorClass,
+                    attribute.StorageParameters,
+                    hnsw.AccessMethod,
+                    hnsw.OperatorClass,
+                    hnsw.StorageParameters,
+                    cosine.OperatorClass,
+                    accessMethodSetterThrew,
+                    operatorClassSetterThrew,
+                    storageParametersSetterThrew,
+                    definition);
+            })
+        .TheTest
+        .ShouldPass<VectorSurfaceOutcome>((because, outcome) =>
+        {
+            because.ItsTrue("ivfflat derives from the default method", "ivfflat".Equals(outcome.IvfFlatAccessMethod));
+            because.ItsTrue("euclidean selects the l2 operator class", "vector_l2_ops".Equals(outcome.IvfFlatOperatorClass));
+            because.ItsTrue("ivfflat carries its list count as storage parameters", "lists = 50".Equals(outcome.IvfFlatStorageParameters));
+            because.ItsTrue("hnsw derives from the method", "hnsw".Equals(outcome.HnswAccessMethod));
+            because.ItsTrue("inner product selects the ip operator class", "vector_ip_ops".Equals(outcome.HnswOperatorClass));
+            because.ItsTrue("hnsw declares no storage parameters", outcome.HnswStorageParameters == null);
+            because.ItsTrue("the default distance selects the cosine operator class", "vector_cosine_ops".Equals(outcome.CosineOperatorClass));
+            because.ItsTrue("assigning the derived access method throws", outcome.AccessMethodSetterThrew);
+            because.ItsTrue("assigning the derived operator class throws", outcome.OperatorClassSetterThrew);
+            because.ItsTrue("assigning the derived storage parameters throws", outcome.StorageParametersSetterThrew);
+            because.ItsTrue("the resolved definition carries the vector options", outcome.Definition.HasAccessMethodOptions && "ivfflat".Equals(outcome.Definition.AccessMethod));
+            because.ItsTrue("the resolved definition derives the index name", outcome.Definition.Name.Equals("ix_VectorTestTable_Embedding"));
+        })
+        .SoBeHappy()
+        .UnlessItFailed();
+    }
+
+    [UnitTest]
     public void CarryVectorIndexDeclarationDefaults()
     {
         When.A<VectorIndexAttribute>("carries vector index declaration defaults",
@@ -75,4 +145,17 @@ public class VectorColumnAttributeShould : UnitTestMenuContainer
         .SoBeHappy()
         .UnlessItFailed();
     }
+
+    private sealed record VectorSurfaceOutcome(
+        string? IvfFlatAccessMethod,
+        string? IvfFlatOperatorClass,
+        string? IvfFlatStorageParameters,
+        string? HnswAccessMethod,
+        string? HnswOperatorClass,
+        string? HnswStorageParameters,
+        string? CosineOperatorClass,
+        bool AccessMethodSetterThrew,
+        bool OperatorClassSetterThrew,
+        bool StorageParametersSetterThrew,
+        IndexDefinition Definition);
 }
