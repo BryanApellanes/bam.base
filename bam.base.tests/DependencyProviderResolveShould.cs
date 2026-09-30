@@ -115,18 +115,22 @@ namespace Bam.Tests
         {
             After.Setup(reg =>
             {
-                reg.For<ServiceRegistry>().Use(ServiceRegistry.Create().For<ICountedClass>().Use<CountedClass>());
+                ServiceRegistry registry = ServiceRegistry.Create().For<ICountedClass>().Use<CountedClass>();
+                registry.Set<INeverResolved>(() => null!);
+                reg.For<ServiceRegistry>().Use(registry);
             })
             .When<ServiceRegistry>("is asked what it contains", registry =>
             {
                 bool registered = false;
                 bool unregistered = true;
+                bool nullFactory = false;
                 int constructed = Constructions(() =>
                 {
                     registered = registry.Contains<ICountedClass>() && registry.Contains(typeof(ICountedClass));
                     unregistered = registry.Contains<ITestClass>();
+                    nullFactory = registry.Contains<INeverResolved>();
                 });
-                return new ContainsOutcome(registered, unregistered, constructed);
+                return new ContainsOutcome(registered, unregistered, constructed, nullFactory);
             })
             .TheTest
             .ShouldPass<ContainsOutcome>((because, outcome) =>
@@ -134,6 +138,7 @@ namespace Bam.Tests
                 because.ItsTrue("a registered factory is contained", outcome.Registered);
                 because.ItsTrue("an unregistered type is not", !outcome.Unregistered);
                 because.ItsTrue("nothing was constructed to find out", outcome.Constructed == 0, $"constructed: {outcome.Constructed}");
+                because.ItsTrue("a factory that would return null is still contained: contained means registered", outcome.NullFactory);
             })
             .SoBeHappy()
             .UnlessItFailed();
@@ -204,6 +209,6 @@ namespace Bam.Tests
 
         private sealed record OverloadOutcome(int ByType, int ByTryGet, int ByTryGetType, int ByCtorParams, int ByCtorTypes, int ByTypeAndCtorTypes, int ByDefault);
 
-        private sealed record ContainsOutcome(bool Registered, bool Unregistered, int Constructed);
+        private sealed record ContainsOutcome(bool Registered, bool Unregistered, int Constructed, bool NullFactory);
     }
 }

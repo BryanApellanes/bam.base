@@ -23,3 +23,11 @@ namespace Bam.Tests.TestClasses
         public int Id { get; }
     }
 }
+
+namespace Bam.Tests.TestClasses
+{
+    /// <summary>Registered with a factory that returns null, to show that contained means registered.</summary>
+    public interface INeverResolved
+    {
+    }
+}

@@ -357,7 +357,8 @@ namespace Bam.DependencyInjection
         }
 
         // A registration that is a factory runs every time the indexer reads it, so whatever resolves a
-        // service reads the indexer once and hands the value here.
+        // service reads the indexer once and hands the value here. By then a stored delegate has already
+        // been invoked, so the two delegate branches only apply to a factory that returns a factory.
         private static T Unwrap<T>(object resolved)
         {
             if (resolved is Func<T> f)
@@ -870,7 +871,8 @@ namespace Bam.DependencyInjection
         }
 
         /// <summary>
-        /// Determines whether an instance or factory is registered for type T.
+        /// Determines whether an instance or factory is registered for type T. Nothing is resolved to find
+        /// out, so a registered factory is not invoked.
         /// </summary>
         /// <typeparam name="T">The type to check for.</typeparam>
         /// <returns>True if type T is registered; otherwise false.</returns>
