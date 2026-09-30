@@ -356,19 +356,21 @@ namespace Bam.DependencyInjection
             return ctorParams;
         }
 
-        private T GetInternal<T>()
+        // A registration that is a factory runs every time the indexer reads it, so whatever resolves a
+        // service reads the indexer once and hands the value here.
+        private static T Unwrap<T>(object resolved)
         {
-            if (this[typeof(T)] is Func<T> f)
+            if (resolved is Func<T> f)
             {
                 return f();
             }
-            else if (this[typeof(T)] is Func<Type, T> fp)
+            else if (resolved is Func<Type, T> fp)
             {
                 return fp(typeof(T));
             }
             else
             {
-                return (T)this[typeof(T)];
+                return (T)resolved;
             }
         }
         
@@ -434,7 +436,13 @@ namespace Bam.DependencyInjection
         /// <returns>The resolved or newly constructed instance.</returns>
         public virtual object Get(Type type)
         {
-            return Get(type, GetCtorParams(type).ToArray());
+            object resolved = this[type];
+            if (resolved != null)
+            {
+                return resolved;
+            }
+
+            return Construct(type, GetCtorParams(type).ToArray());
         }
 
         /// <summary>
@@ -475,12 +483,13 @@ namespace Bam.DependencyInjection
         /// <returns>The resolved or newly constructed instance.</returns>
         public object Get(Type type, params Type[] ctorParamTypes)
         {
-            if (this[type] == null)
+            object resolved = this[type];
+            if (resolved == null)
             {
-                Construct(type, ctorParamTypes);
+                resolved = Construct(type, ctorParamTypes);
             }
 
-            return this[type];
+            return resolved;
         }
 
         /// <summary>
@@ -493,13 +502,14 @@ namespace Bam.DependencyInjection
         /// <returns>T</returns>
         public T Get<T>(params Type[] ctorParamTypes)
         {
-            if (this[typeof(T)] == null)
+            object resolved = this[typeof(T)];
+            if (resolved == null)
             {
                 return Construct<T>(ctorParamTypes);
             }
             else
             {
-                return GetInternal<T>();
+                return Unwrap<T>(resolved);
             }
         }
 
@@ -546,16 +556,13 @@ namespace Bam.DependencyInjection
         /// <returns>T</returns>
         public virtual T Get<T>()
         {
-            if (this[typeof(T)] == null)
+            object resolved = this[typeof(T)];
+            if (resolved == null)
             {
-                T getInternal = GetInternal<T>();
-                if(getInternal == null)
-                {
-                    this[typeof(T)] = Construct<T>()!;
-                }
+                return Construct<T>();
             }
 
-            return GetInternal<T>();
+            return Unwrap<T>(resolved);
         }
         
         /// <summary>
@@ -570,12 +577,14 @@ namespace Bam.DependencyInjection
         /// <returns>T</returns>
         public T Get<T>(T setToIfNull)
         {
-            if (this[typeof(T)] == null)
+            object resolved = this[typeof(T)];
+            if (resolved == null)
             {
                 this[typeof(T)] = setToIfNull!;
+                resolved = this[typeof(T)];
             }
 
-            return GetInternal<T>();
+            return Unwrap<T>(resolved);
         }
         /// <summary>
         /// Gets an object of type T if it has been instantiated otherwise
@@ -586,13 +595,14 @@ namespace Bam.DependencyInjection
         /// <returns>T</returns>
         public virtual T Get<T>(params object[] ctorParams)
         {
-            if (this[typeof(T)] == null)
+            object resolved = this[typeof(T)];
+            if (resolved == null)
             {
                 return Construct<T>(ctorParams);
             }
             else
             {
-                return (T)this[typeof(T)];
+                return (T)resolved;
             }
         }
 
@@ -604,13 +614,14 @@ namespace Bam.DependencyInjection
         /// <returns></returns>
         public virtual object Get(Type type, params object[] ctorParams)
         {
-            if (this[type] == null)
+            object resolved = this[type];
+            if (resolved == null)
             {
                 return Construct(type, ctorParams);
             }
             else
             {
-                return this[type];
+                return resolved;
             }
         }
 
@@ -869,13 +880,14 @@ namespace Bam.DependencyInjection
         }
 
         /// <summary>
-        /// Determines whether an instance or factory is registered for the specified type.
+        /// Determines whether an instance or factory is registered for the specified type. Nothing is resolved
+        /// to find out, so a registered factory is not invoked.
         /// </summary>
         /// <param name="type">The type to check for.</param>
         /// <returns>True if the type is registered; otherwise false.</returns>
         public bool Contains(Type type)
         {
-            return this[type] != null;
+            return _typeInstanceDictionary.TryGetValue(type, out object? registered) && registered != null;
         }
 
         /// <summary>
