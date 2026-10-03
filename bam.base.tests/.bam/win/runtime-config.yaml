@@ -1,6 +1,0 @@
-ReferenceAssemblies: C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\10.0.12\ref\net10.0
-GenDir: C:\Users\bryan\.claude\workspaces\bam-base-15-layout\bam.base\bam.base.tests\.bam\gen\win
-BamProfileDir: C:\Users\bryan\.bam
-BamDir: C:\Users\bryan\.claude\workspaces\bam-base-15-layout\bam.base\bam.base.tests\.bam
-ProcessProfileDir: C:\Users\bryan
-NugetPackageRoot: C:\Users\bryan\.bam\nupkg
