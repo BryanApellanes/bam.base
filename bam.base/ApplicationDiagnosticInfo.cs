@@ -24,7 +24,7 @@ namespace Bam
             Utc = DateTime.UtcNow;
             ThreadHashCode = Thread.CurrentThread.GetHashCode();
             ThreadId = Thread.CurrentThread.ManagedThreadId;
-            ProcessId = Process.GetCurrentProcess().Id;
+            ProcessId = Environment.ProcessId;
         }
 
         public ApplicationDiagnosticInfo(LogEvent logEvent)
@@ -102,9 +102,20 @@ namespace Bam
             }
         }
 
+        /// <summary>
+        /// Formats <see cref="NamedMessageFormat"/>. The named tokens are filled in first and the message is inserted
+        /// last, so token-like text inside the message (for example <c>{ThreadId}</c> in a logged request path) is
+        /// written as it is and never substituted.
+        /// </summary>
         public override string ToString()
         {
-            return NamedMessageFormat.NamedFormat(this);
+            const string messageToken = "{Message}";
+            string[] parts = (NamedMessageFormat ?? string.Empty).Split(messageToken);
+            for (int index = 0; index < parts.Length; index++)
+            {
+                parts[index] = parts[index].NamedFormat(this);
+            }
+            return string.Join(Message ?? string.Empty, parts);
         }
     }
 }

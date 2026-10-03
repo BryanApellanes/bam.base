@@ -135,11 +135,46 @@ namespace Bam.Logging
             return this;
         }
 
+        /// <summary>
+        /// The most events that may wait to be committed. When the queue is full, new events are dropped and
+        /// counted in <see cref="DroppedEventCount"/> instead of growing memory without bound behind a slow sink.
+        /// Zero or less means unbounded. Default 10,000.
+        /// </summary>
+        public int MaxQueueLength { get; set; } = 10000;
+
+        long _droppedEventCount;
+
+        /// <summary>The number of events dropped because the queue was full.</summary>
+        public long DroppedEventCount => Interlocked.Read(ref _droppedEventCount);
+
+        int _pendingEventCount;
+
+        /// <summary>The number of events queued and not yet taken by the commit thread.</summary>
+        public int PendingEventCount => Volatile.Read(ref _pendingEventCount);
+
+        /// <summary>
+        /// Whether an event without an exception records the calling thread's stack trace. Capturing a stack trace
+        /// with file information on every event is expensive and leaks source paths into logs, so the default is
+        /// false; events with an exception always carry the exception's stack trace.
+        /// </summary>
+        public bool CaptureStackTraceWithoutException { get; set; }
+
         protected virtual void QueueLogEvent(LogEvent logEvent)
         {
             if (!_loggingThreadStarted)
             {
                 StartLoggingThread();
+            }
+            int limit = MaxQueueLength;
+            if (limit > 0 && Interlocked.Increment(ref _pendingEventCount) > limit)
+            {
+                Interlocked.Decrement(ref _pendingEventCount);
+                Interlocked.Increment(ref _droppedEventCount);
+                return;
+            }
+            if (limit <= 0)
+            {
+                Interlocked.Increment(ref _pendingEventCount);
             }
             _logEventQueue.Enqueue(logEvent);
             _waitForEnqueueLogEvent.Set();
@@ -157,6 +192,7 @@ namespace Bam.Logging
                     {
                         if (_logEventQueue.TryDequeue(out LogEvent? logEvent))
                         {
+                            Interlocked.Decrement(ref _pendingEventCount);
                             if (logEvent != null && (int)logEvent.Severity <= (int)Verbosity)
                             {
                                 CommitLogEvent(logEvent);
@@ -540,7 +576,11 @@ namespace Bam.Logging
 
         protected virtual void HandleStackTrace(Exception ex, StringBuilder message, StringBuilder stack)
         {
-			Args.SetMessageAndStackTrace(ex, message, stack);
+            if (ex is null && !CaptureStackTraceWithoutException)
+            {
+                return;
+            }
+			Args.SetMessageAndStackTrace(ex!, message, stack);
         }
 
         /// <summary>
