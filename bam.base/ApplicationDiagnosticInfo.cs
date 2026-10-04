@@ -111,9 +111,18 @@ namespace Bam
         {
             const string messageToken = "{Message}";
             string[] parts = (NamedMessageFormat ?? string.Empty).Split(messageToken);
+            // Read the properties once, then fill every part from the same values.
+            Dictionary<string, string?> values = new Dictionary<string, string?>(StringComparer.Ordinal);
+            foreach (System.Reflection.PropertyInfo property in GetType().GetProperties())
+            {
+                if (property.Name != nameof(Message) && property.Name != nameof(NamedMessageFormat) && property.GetIndexParameters().Length == 0)
+                {
+                    values[property.Name] = property.GetValue(this)?.ToString();
+                }
+            }
             for (int index = 0; index < parts.Length; index++)
             {
-                parts[index] = parts[index].NamedFormat(this);
+                parts[index] = parts[index].NamedFormat(values);
             }
             return string.Join(Message ?? string.Empty, parts);
         }

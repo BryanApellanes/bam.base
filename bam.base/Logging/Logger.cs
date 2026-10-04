@@ -165,11 +165,21 @@ namespace Bam.Logging
             {
                 StartLoggingThread();
             }
+            // Events below Verbosity would be discarded by the commit thread anyway; filtering them here keeps them
+            // from taking queue slots, so a burst of chatty events can never push out an error. The commit-side
+            // check stays so a runtime Verbosity change still applies to events already queued.
+            if ((int)logEvent.Severity > (int)Verbosity)
+            {
+                return;
+            }
             int limit = MaxQueueLength;
             if (limit > 0 && Interlocked.Increment(ref _pendingEventCount) > limit)
             {
                 Interlocked.Decrement(ref _pendingEventCount);
-                Interlocked.Increment(ref _droppedEventCount);
+                if (Interlocked.Increment(ref _droppedEventCount) == 1)
+                {
+                    Trace.WriteLine($"{GetType().Name}: log queue full ({limit} pending); dropping events. See DroppedEventCount.");
+                }
                 return;
             }
             if (limit <= 0)

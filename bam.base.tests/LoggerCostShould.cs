@@ -20,7 +20,7 @@ public class LoggerCostShould : UnitTestMenuContainer
             logger =>
             {
                 logger.AddEntry("plain information", LogEventType.Information);
-                logger.AddEntry("failure", LogEventType.Error, new InvalidOperationException("boom", new Exception("inner")));
+                logger.AddEntry("failure", LogEventType.Error, Thrown());
                 RecordingLogger opted = new RecordingLogger { CaptureStackTraceWithoutException = true };
                 opted.AddEntry("traced information", LogEventType.Information);
                 LogEvent? plain = logger.WaitFor(entry => entry.MessageSignature == "plain information");
@@ -73,6 +73,73 @@ public class LoggerCostShould : UnitTestMenuContainer
     }
 
     [UnitTest]
+    public void NeverLetEventsBelowVerbosityCrowdOutErrors()
+    {
+        When.A<RecordingLogger>("queues only events that will be committed",
+            () => new RecordingLogger { MaxQueueLength = 5, Verbosity = VerbosityLevel.Warning },
+            logger =>
+            {
+                logger.Block();
+                logger.AddEntry("first warning", LogEventType.Warning);
+                SpinWait.SpinUntil(() => logger.PendingEventCount == 0 && logger.Committing, TimeSpan.FromSeconds(5));
+                for (int index = 0; index < 20; index++)
+                {
+                    logger.AddEntry("chatty {0}", LogEventType.Information, index.ToString());
+                }
+                logger.AddEntry("the error", LogEventType.Error);
+                long dropped = logger.DroppedEventCount;
+                logger.Release();
+                LogEvent? error = logger.WaitFor(entry => entry.MessageSignature == "the error");
+                logger.StopLoggingThread();
+                return new VerbosityOutcome(error is not null, dropped, logger.Committed.Count(entry => entry.Severity == LogEventType.Information));
+            })
+            .TheTest
+            .ShouldPass<VerbosityOutcome>((because, outcome) =>
+            {
+                because.ItsTrue("the error commits behind a burst of information events", outcome.ErrorCommitted);
+                because.ItsTrue("filtered events are not counted as drops", outcome.Dropped == 0);
+                because.ItsTrue("no information event was queued", outcome.InformationCommitted == 0);
+            })
+            .SoBeHappy()
+            .UnlessItFailed();
+    }
+
+    [UnitTest]
+    public void AllocateLittleForAnInformationEvent()
+    {
+        When.A<RecordingLogger>("measures what queuing an information event allocates",
+            () => new RecordingLogger(),
+            logger =>
+            {
+                RecordingLogger traced = new RecordingLogger { CaptureStackTraceWithoutException = true };
+                logger.Block();
+                traced.Block();
+                for (int index = 0; index < 50; index++)
+                {
+                    logger.AddEntry("warm {0}", LogEventType.Information, index.ToString());
+                    traced.AddEntry("warm {0}", LogEventType.Information, index.ToString());
+                }
+                long plain = Allocated(() => logger.AddEntry("measured {0}", LogEventType.Information, "value"));
+                long withTrace = Allocated(() => traced.AddEntry("measured {0}", LogEventType.Information, "value"));
+                logger.Release();
+                traced.Release();
+                logger.StopLoggingThread();
+                traced.StopLoggingThread();
+                return new AllocationOutcome(plain, withTrace);
+            })
+            .TheTest
+            .ShouldPass<AllocationOutcome>((because, outcome) =>
+            {
+                // Measured at about 6.5 KB, mostly the diagnostic header; capturing a stack trace costs about 15 times that.
+                // The bound catches a stack trace or a Process object creeping back onto the information path.
+                because.ItsTrue($"an information event allocates under 12 KB ({outcome.Plain} bytes)", outcome.Plain < 12288);
+                because.ItsTrue($"capturing a stack trace costs clearly more ({outcome.WithTrace} bytes)", outcome.WithTrace > outcome.Plain * 2);
+            })
+            .SoBeHappy()
+            .UnlessItFailed();
+    }
+
+    [UnitTest]
     public void WriteTokenLikeMessageTextAsItIs()
     {
         When.A<ApplicationDiagnosticInfo>("formats a message containing named tokens",
@@ -89,6 +156,25 @@ public class LoggerCostShould : UnitTestMenuContainer
             .UnlessItFailed();
     }
 
+    private static long Allocated(Action action)
+    {
+        long before = GC.GetAllocatedBytesForCurrentThread();
+        action();
+        return GC.GetAllocatedBytesForCurrentThread() - before;
+    }
+
+    private static Exception Thrown()
+    {
+        try
+        {
+            throw new InvalidOperationException("boom", new Exception("inner"));
+        }
+        catch (InvalidOperationException exception)
+        {
+            return exception;
+        }
+    }
+
     /// <summary>A logger that records committed events and can hold its commit thread.</summary>
     public sealed class RecordingLogger : Logger
     {
@@ -96,13 +182,16 @@ public class LoggerCostShould : UnitTestMenuContainer
         private readonly List<LogEvent> _committed = new List<LogEvent>();
         private volatile bool _committing;
 
+        /// <summary>Creates the logger with no commit delay.</summary>
         public RecordingLogger()
         {
             CommitCycleDelay = 0;
         }
 
+        /// <summary>Whether the commit thread is inside <see cref="CommitLogEvent"/>.</summary>
         public bool Committing => _committing;
 
+        /// <summary>The events committed so far.</summary>
         public IReadOnlyList<LogEvent> Committed
         {
             get
@@ -114,10 +203,14 @@ public class LoggerCostShould : UnitTestMenuContainer
             }
         }
 
+        /// <summary>Holds the commit thread at the next event.</summary>
         public void Block() => _gate.Reset();
 
+        /// <summary>Lets the commit thread continue.</summary>
         public void Release() => _gate.Set();
 
+        /// <summary>Waits up to five seconds for a committed event that matches.</summary>
+        /// <param name="predicate">The match.</param>
         public LogEvent? WaitFor(Func<LogEvent, bool> predicate)
         {
             LogEvent? found = null;
@@ -125,6 +218,7 @@ public class LoggerCostShould : UnitTestMenuContainer
             return found;
         }
 
+        /// <inheritdoc />
         public override void CommitLogEvent(LogEvent logEvent)
         {
             _committing = true;
@@ -140,6 +234,10 @@ public class LoggerCostShould : UnitTestMenuContainer
     private sealed record StackOutcome(string? Plain, string? Failure, string? Traced);
 
     private sealed record QueueOutcome(int Pending, long Dropped, int CommittedAfterRelease = 0);
+
+    private sealed record VerbosityOutcome(bool ErrorCommitted, long Dropped, int InformationCommitted);
+
+    private sealed record AllocationOutcome(long Plain, long WithTrace);
 
     private sealed record FormatOutcome(string Text, int ProcessId);
 }
