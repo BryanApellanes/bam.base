@@ -194,7 +194,10 @@ namespace Bam
         
         /// <summary>
         /// Gets or sets a configuration value by key. On get, if the key is not found and a default is provided,
-        /// the default is persisted to the config file. On set, the value is stored and the config file is saved.
+        /// the default is kept in <see cref="AppSettings"/> for later reads but not written anywhere: reading
+        /// configuration never touches the disk or the environment (bam.base#22), so a read-only or missing
+        /// <see cref="BamHome"/> still yields the default. <see cref="Save"/> persists it. On set, the value is
+        /// stored and the config file is saved.
         /// </summary>
         /// <param name="key">The configuration key.</param>
         /// <param name="defaultValue">The default value to use if the key is not found.</param>
@@ -210,8 +213,7 @@ namespace Bam
 
                 if (!string.IsNullOrEmpty(defaultValue))
                 {
-                    AppSettings.Add(key, defaultValue);
-                    Write(AppSettings);
+                    AppSettings[key] = defaultValue;
                 }
 
                 return defaultValue;
@@ -305,13 +307,13 @@ namespace Bam
         }
 
         /// <summary>
-        /// Reads application settings from the specified configuration file, creating it if it does not exist.
+        /// Reads application settings from the specified configuration file. A missing file reads as empty and is not
+        /// created; <see cref="Save"/> and <see cref="Write"/> create it.
         /// </summary>
         /// <param name="configFile">The configuration file to read from.</param>
-        /// <returns>A dictionary of key-value settings, or an empty dictionary if the file is empty.</returns>
+        /// <returns>A dictionary of key-value settings, or an empty dictionary if the file is missing or empty.</returns>
         public static Dictionary<string, string> Read(FileInfo configFile)
         {
-            configFile = EnsureFile(configFile.FullName);
             return configFile.FromYamlFile<Dictionary<string, string>>() ?? new Dictionary<string, string>();            
         }
 
@@ -426,7 +428,7 @@ namespace Bam
         }
         
         /// <summary>
-        /// Gets the BAM home configuration file for the specified application name provider, creating the file if it does not exist.
+        /// Gets the BAM home configuration file for the specified application name provider. The file is not created.
         /// </summary>
         /// <param name="applicationNameProvider">Optional application name provider. Defaults to <see cref="ProcessApplicationNameProvider.Current"/>.</param>
         /// <returns>The <see cref="FileInfo"/> for the configuration file.</returns>
@@ -453,7 +455,8 @@ namespace Bam
         }
 
         /// <summary>
-        /// Gets the BAM profile configuration file for the specified application name, creating the file if it does not exist.
+        /// Gets the BAM profile configuration file for the specified application name. The file is not created; reading a
+        /// missing file gives empty settings.
         /// </summary>
         /// <param name="appName">The application name used to construct the file path.</param>
         /// <returns>The <see cref="FileInfo"/> for the profile configuration file.</returns>
@@ -465,13 +468,12 @@ namespace Bam
                 ? Path.Combine(BamProfile.ConfigPath, appName, $"{appName}.appsettings.yaml")
                 : Path.Combine(BamProfile.ConfigPath, assemblyName, $"{assemblyName}.appsettings.yaml");
             Log.Trace("config file path = {0}", path);
-            FileInfo configFile = EnsureFile(path);
-
-            return configFile;
+            return new FileInfo(path);
         }
         
         /// <summary>
-        /// Gets the BAM home configuration file for the specified application name, creating the file if it does not exist.
+        /// Gets the BAM home configuration file for the specified application name, under <see cref="BamHome.ConfigPath"/>.
+        /// The file is not created; reading a missing file gives empty settings.
         /// </summary>
         /// <param name="appName">The application name used to construct the file path.</param>
         /// <returns>The <see cref="FileInfo"/> for the home configuration file.</returns>
@@ -483,9 +485,7 @@ namespace Bam
                 ? Path.Combine(BamHome.ConfigPath, appName, $"{appName}.appsettings.yaml")
                 : Path.Combine(BamHome.ConfigPath, assemblyName, $"{assemblyName}.appsettings.yaml");
             Log.Trace("config file path = {0}", path);
-            FileInfo configFile = EnsureFile(path);
-
-            return configFile;
+            return new FileInfo(path);
         }
         
         /// <summary>

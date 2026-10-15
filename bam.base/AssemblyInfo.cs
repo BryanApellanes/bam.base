@@ -32,3 +32,4 @@ using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("bam.caching")]
 [assembly: InternalsVisibleTo("bam.commandline")]
 [assembly: InternalsVisibleTo("bam.console")]
+[assembly: InternalsVisibleTo("bam.base.tests")]

@@ -87,6 +87,16 @@ namespace Bam
             {
                 directoryPath = new FileInfo(directoryPath)!.Directory!.FullName;
             }
+            else if (!Directory.Exists(directoryPath))
+            {
+                // A file that does not exist yet: watch the directory it will be created in, when that exists,
+                // so a configuration file written later is still seen (bam.base#22 no longer creates it on read).
+                string? parent = Path.GetDirectoryName(directoryPath);
+                if (!string.IsNullOrEmpty(parent) && Directory.Exists(parent))
+                {
+                    directoryPath = parent;
+                }
+            }
             if (!_watchers.ContainsKey(directoryPath))
             {
                 try
