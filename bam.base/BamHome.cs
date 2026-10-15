@@ -1,7 +1,8 @@
 ﻿namespace Bam
 {
     /// <summary>
-    /// Paths rooted in the root of the bam installation. (/opt/bam on *nix, c:bam/opt on windows)
+    /// Paths rooted in the root of the bam installation: the <c>BAM_HOME</c> environment variable when it is set,
+    /// otherwise /opt/bam on *nix and c:/opt/bam on Windows.
     /// </summary>
     public static class BamHome
     {
@@ -18,9 +19,22 @@
         public static string Local => System.IO.Path.Combine(Path, "local");
         
         /// <summary>
-        /// The path segments for BamHome, on Windows c:/opt/bam, otherwise /opt/bam
+        /// The path segments for BamHome: the full path in the <c>BAM_HOME</c> environment variable when it is set to
+        /// a rooted path, otherwise c:/opt/bam on Windows and /opt/bam elsewhere. A relative <c>BAM_HOME</c> is ignored,
+        /// so the root never depends on the working directory.
         /// </summary>
-        public static string[] PathSegments => [SystemRoot, "opt", "bam"];
+        public static string[] PathSegments
+        {
+            get
+            {
+                string? configured = BamEnvironmentVariables.Get(BamEnvironmentVariables.BAM_HOME);
+                if (!string.IsNullOrWhiteSpace(configured) && System.IO.Path.IsPathRooted(configured))
+                {
+                    return [System.IO.Path.GetFullPath(configured)];
+                }
+                return [SystemRoot, "opt", "bam"];
+            }
+        }
 
         public static string Public => System.IO.Path.Combine(Path, "public");
         

@@ -21,11 +21,26 @@ namespace Bam
             EnsureDirectoryExists(RecipesPath);
         }
 
-        private static void EnsureDirectoryExists(string path)
+        /// <summary>
+        /// Creates a profile directory when it is missing. Best effort: a read-only or absent home directory is
+        /// traced, not thrown, so code that only reads Bam configuration still starts (bam.base#22).
+        /// </summary>
+        /// <param name="path">The directory to create.</param>
+        /// <returns>True when the directory exists afterwards.</returns>
+        internal static bool EnsureDirectoryExists(string path)
         {
-            if (!Directory.Exists(path))
+            try
             {
-                Directory.CreateDirectory(path);
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                }
+                return true;
+            }
+            catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException || ex is NotSupportedException || ex is ArgumentException)
+            {
+                System.Diagnostics.Trace.WriteLine($"Bam profile directory '{path}' is not available: {ex.Message}");
+                return false;
             }
         }
         /// <summary>
