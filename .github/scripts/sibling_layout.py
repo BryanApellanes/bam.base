@@ -66,7 +66,11 @@ def main():
                 sys.exit(f"{relative} is referenced, but bamtk records no submodule named {repo}; cannot pin it")
             sha = tree[2]
             run("git", "init", "--quiet", target)
-            run("git", "fetch", "--quiet", "--depth", "1", OWNER_URL.format(repo), sha, cwd=target)
+            fetched = subprocess.run(["git", "fetch", "--quiet", "--depth", "1", OWNER_URL.format(repo), sha],
+                                     cwd=target, capture_output=True, text=True)
+            if fetched.returncode != 0:
+                sys.exit(f"cannot fetch {repo} @ {sha} for {os.path.relpath(project, parent)}: {fetched.stderr.strip()}. "
+                         "This workflow fetches without a token; if the repo is private it must not be in the build graph.")
             run("git", "checkout", "--quiet", "FETCH_HEAD", cwd=target)
             print(f"{repo} @ {sha}")
         if not os.path.isfile(project):
