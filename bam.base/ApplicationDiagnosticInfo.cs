@@ -2,7 +2,9 @@
 	Copyright © Bryan Apellanes 2015  
 */
 
+using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Reflection;
 using Bam.Logging;
 
 namespace Bam
@@ -107,18 +109,25 @@ namespace Bam
         /// last, so token-like text inside the message (for example <c>{ThreadId}</c> in a logged request path) is
         /// written as it is and never substituted.
         /// </summary>
+        private static readonly ConcurrentDictionary<Type, PropertyInfo[]> FormatProperties = new ConcurrentDictionary<Type, PropertyInfo[]>();
+
         public override string ToString()
         {
+            if (GetType() == typeof(ApplicationDiagnosticInfo) && string.Equals(NamedMessageFormat, DefaultMessageFormat, StringComparison.Ordinal))
+            {
+                // The default format, written directly: the same text the general path produces, without reflection.
+                return $"Thread=#{ThreadHashCode}({ThreadId})~~App={ApplicationName}~~PID={ProcessId}~~Utc={UtcShortDate}::{UtcShortTime}~~Local={LocalShortDate}::{LocalShortTime}~~{Message}";
+            }
             const string messageToken = "{Message}";
             string[] parts = (NamedMessageFormat ?? string.Empty).Split(messageToken);
             // Read the properties once, then fill every part from the same values.
             Dictionary<string, string?> values = new Dictionary<string, string?>(StringComparer.Ordinal);
-            foreach (System.Reflection.PropertyInfo property in GetType().GetProperties())
+            PropertyInfo[] properties = FormatProperties.GetOrAdd(GetType(), type => type.GetProperties()
+                .Where(property => property.Name != nameof(Message) && property.Name != nameof(NamedMessageFormat) && property.GetIndexParameters().Length == 0)
+                .ToArray());
+            foreach (PropertyInfo property in properties)
             {
-                if (property.Name != nameof(Message) && property.Name != nameof(NamedMessageFormat) && property.GetIndexParameters().Length == 0)
-                {
-                    values[property.Name] = property.GetValue(this)?.ToString();
-                }
+                values[property.Name] = property.GetValue(this)?.ToString();
             }
             for (int index = 0; index < parts.Length; index++)
             {
