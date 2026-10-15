@@ -142,7 +142,23 @@ namespace Bam.Logging
         /// </summary>
         public int MaxQueueLength { get; set; } = 10000;
 
+        /// <summary>
+        /// How many Error and Fatal events may wait beyond <see cref="MaxQueueLength"/>, so a flood of lower-severity
+        /// events at or above <see cref="Verbosity"/> cannot crowd out an error. Default 1,000; zero or less gives
+        /// errors no extra room.
+        /// </summary>
+        public int ErrorQueueHeadroom { get; set; } = 1000;
+
+        /// <summary>
+        /// The message signature of the summary the commit thread writes once a backlog that dropped events has
+        /// drained: the number of events dropped and the UTC time of the first drop. Read-only rather than const,
+        /// so code that compares against it picks up a change in wording.
+        /// </summary>
+        public static readonly string DroppedEventsSummarySignature = "{0} log events were dropped because the log queue was full, starting at {1} UTC";
+
         long _droppedEventCount;
+        long _droppedSinceSummary;
+        long _firstDropTicks;
 
         /// <summary>The number of events dropped because the queue was full.</summary>
         public long DroppedEventCount => Interlocked.Read(ref _droppedEventCount);
@@ -173,9 +189,17 @@ namespace Bam.Logging
                 return;
             }
             int limit = MaxQueueLength;
+            if (limit > 0 && (int)logEvent.Severity <= (int)LogEventType.Error && logEvent.Severity != LogEventType.None && ErrorQueueHeadroom > 0)
+            {
+                limit = (int)Math.Min(int.MaxValue, (long)limit + ErrorQueueHeadroom);
+            }
             if (limit > 0 && Interlocked.Increment(ref _pendingEventCount) > limit)
             {
                 Interlocked.Decrement(ref _pendingEventCount);
+                if (Interlocked.Increment(ref _droppedSinceSummary) == 1)
+                {
+                    Interlocked.CompareExchange(ref _firstDropTicks, DateTime.UtcNow.Ticks, 0);
+                }
                 if (Interlocked.Increment(ref _droppedEventCount) == 1)
                 {
                     Trace.WriteLine($"{GetType().Name}: log queue full ({limit} pending); dropping events. See DroppedEventCount.");
@@ -209,12 +233,49 @@ namespace Bam.Logging
                             }
                         }
                     }
+                    CommitDropSummary();
                 }
                 catch (Exception ex)
                 {
                     Trace.WriteLine($"Exception in logging commit thread: {ex.Message}");
                 }
             }
+        }
+
+        /// <summary>
+        /// Once the backlog has drained, commits one summary saying how many events were dropped since the last
+        /// summary and when the first of them was, so the loss is recorded in the log itself. The summary is a
+        /// Warning, or carries <see cref="Verbosity"/>'s own severity when that is Error or Fatal, because in that
+        /// configuration every dropped event was an error and a Warning would be filtered out. It is committed
+        /// directly, so <see cref="EntryAdded"/> and the per-severity events do not see it.
+        /// </summary>
+        /// <remarks>
+        /// The count and the first-drop time are two separate fields. A drop that lands while a summary is being
+        /// taken can be counted in the next summary with this summary's start time, or with the commit time; the
+        /// count is always exact, only the "starting at" time can be off by that one race.
+        /// </remarks>
+        private void CommitDropSummary()
+        {
+            long dropped = Interlocked.Exchange(ref _droppedSinceSummary, 0);
+            if (dropped == 0)
+            {
+                return;
+            }
+            long firstTicks = Interlocked.Exchange(ref _firstDropTicks, 0);
+            if (Verbosity == VerbosityLevel.None)
+            {
+                return;
+            }
+            LogEventType severity = (int)LogEventType.Warning > (int)Verbosity ? (LogEventType)(int)Verbosity : LogEventType.Warning;
+            DateTime since = firstTicks == 0 ? DateTime.UtcNow : new DateTime(firstTicks, DateTimeKind.Utc);
+            CommitLogEvent(CreateLogEvent(
+                DroppedEventsSummarySignature,
+                UserUtil.GetCurrentUser(true),
+                "Application",
+                severity,
+                null!,
+                dropped.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                since.ToString("yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture)));
         }
 
         /// <summary>
@@ -257,23 +318,32 @@ namespace Bam.Logging
         /// </summary>
         public virtual bool IsNull { get { return false; } }
 
+        static readonly string CachedMachineName = Environment.MachineName;
+
         string appName = null!;
+        long appNameRetryAt;
         /// <summary>
         /// Gets or sets the application name used in log entries. Resolved from configuration or <see cref="ApplicationNameProvider"/> if not explicitly set.
+        /// While it resolves to the default name, it is looked up again at most every ten seconds, so configuration
+        /// that loads late is still picked up without a configuration read on every access.
         /// </summary>
         public string ApplicationName
         {
             get
             {
-                if (string.IsNullOrEmpty(appName) || appName.Equals(DefaultConfiguration.DefaultApplicationName))
+                string current = appName;
+                if (string.IsNullOrEmpty(current) || (current.Equals(DefaultConfiguration.DefaultApplicationName) && Environment.TickCount64 >= Volatile.Read(ref appNameRetryAt)))
                 {
-                    appName = DefaultConfiguration.GetAppSetting("ApplicationName", ApplicationNameProvider.Default?.GetApplicationName() ?? DefaultConfiguration.DefaultApplicationName);
+                    current = DefaultConfiguration.GetAppSetting("ApplicationName", ApplicationNameProvider.Default?.GetApplicationName() ?? DefaultConfiguration.DefaultApplicationName);
+                    Volatile.Write(ref appNameRetryAt, Environment.TickCount64 + 10000);
+                    appName = current;
                 }
-                return appName;
+                return current;
             }
             set
             {
                 appName = value;
+                Volatile.Write(ref appNameRetryAt, 0);
             }
         }
 
@@ -398,14 +468,7 @@ namespace Bam.Logging
 
         private void AddEntry(string messageSignature, string user, int verbosity, params string?[] variableMessageValues)
         {
-            if ((LogEventType)verbosity == LogEventType.Error)
-            {
-                AddEntry(messageSignature, user, new Exception("A custom error event has been logged"), variableMessageValues);
-            }
-            else
-            {
-                AddEntry(messageSignature, user, "Application", verbosity, variableMessageValues);
-            }
+            AddEntry(messageSignature, user, "Application", verbosity, variableMessageValues);
         }
 
         private void AddEntry(string messageSignature, string user, Exception ex, params string?[] variableMessageValues)
@@ -427,12 +490,9 @@ namespace Bam.Logging
 
         private void AddEntry(string messageSignature, string user, string category, int verbosity, params string?[] variableMessageValues)
         {
-            Exception ex = null!;
-            if ((LogEventType)verbosity == LogEventType.Error)
-            {
-                ex = new Exception("A custom error event has been logged");
-            }
-            LogEvent ev = CreateLogEvent(messageSignature, user, category, (LogEventType)verbosity, ex!, variableMessageValues);
+            // An Error logged without an exception carries no stack trace unless CaptureStackTraceWithoutException
+            // asks for one: a synthetic exception here would have no trace of its own and force a costly capture.
+            LogEvent ev = CreateLogEvent(messageSignature, user, category, (LogEventType)verbosity, null!, variableMessageValues);
 
             QueueLogEvent(ev);
 
@@ -537,14 +597,15 @@ namespace Bam.Logging
 
         protected internal virtual LogEvent CreateLogEvent(string messageSignature, string user, string category, LogEventType type, Exception ex, params string?[] messageVariableValues)
         {
+            string applicationName = this.ApplicationName;
             LogEvent ev = new LogEvent
             {
                 MessageSignature = messageSignature,
                 MessageVariableValues = messageVariableValues,
-                EventID = GetEventId(this.ApplicationName, messageSignature),
+                EventID = GetEventId(applicationName, messageSignature),
                 Time = DateTime.UtcNow,
                 Category = category,
-                Computer = Environment.MachineName
+                Computer = CachedMachineName
             };
             if (messageVariableValues.Length > 0)
             {
@@ -570,7 +631,7 @@ namespace Bam.Logging
             ev.Message = message.ToString();
             ev.StackTrace = stack.ToString();
 
-            ev.Source = this.ApplicationName;
+            ev.Source = applicationName;
             ev.User = user;
 
             ev.Severity = type;

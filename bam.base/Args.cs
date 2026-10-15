@@ -177,6 +177,66 @@ namespace Bam
 		}
 
         /// <summary>
+        /// Writes C0 control characters and DEL as visible escapes (CR as <c>\r</c>, LF as <c>\n</c>, tab as <c>\t</c>,
+        /// any other as <c>\uXXXX</c>), so text taken from an exception message cannot start what looks like a new
+        /// record in a line-based log. Text without control characters is returned as is. A backslash is not escaped,
+        /// so a message that already contains the two characters <c>\r</c> reads the same as an escaped CR; that does
+        /// not let it forge a record. Unicode line separators (U+0085, U+2028, U+2029) pass through: they do not break
+        /// a line for line-based readers, but a JavaScript viewer may render them as breaks.
+        /// </summary>
+        /// <param name="text">The text to escape, or null.</param>
+        /// <returns>The escaped text, or an empty string for null.</returns>
+        public static string EscapeControlCharacters(string? text)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return string.Empty;
+            }
+            int first = -1;
+            for (int index = 0; index < text.Length; index++)
+            {
+                if (char.IsControl(text[index]) && text[index] < 0x80)
+                {
+                    first = index;
+                    break;
+                }
+            }
+            if (first < 0)
+            {
+                return text;
+            }
+            StringBuilder escaped = new StringBuilder(text.Length + 8);
+            escaped.Append(text, 0, first);
+            for (int index = first; index < text.Length; index++)
+            {
+                char c = text[index];
+                switch (c)
+                {
+                    case '\r':
+                        escaped.Append("\\r");
+                        break;
+                    case '\n':
+                        escaped.Append("\\n");
+                        break;
+                    case '\t':
+                        escaped.Append("\\t");
+                        break;
+                    default:
+                        if (char.IsControl(c) && c < 0x80)
+                        {
+                            escaped.Append("\\u").Append(((int)c).ToString("X4", System.Globalization.CultureInfo.InvariantCulture));
+                        }
+                        else
+                        {
+                            escaped.Append(c);
+                        }
+                        break;
+                }
+            }
+            return escaped.ToString();
+        }
+
+        /// <summary>
         /// Appends the message and stack trace from the exception and its inner exception to the provided StringBuilders.
         /// If the exception or its stack trace is null, the current stack trace is captured instead.
         /// </summary>
@@ -187,7 +247,7 @@ namespace Bam
 		{
 			if (ex != null)
 			{
-				message.AppendFormat("\r\n{0}\r\n", ex.Message);
+				message.AppendFormat("\r\n{0}\r\n", EscapeControlCharacters(ex.Message));
 				if (ex.StackTrace != null)
 				{
 					stack.AppendFormat("\r\n{0}\r\n", ex.StackTrace);
@@ -199,7 +259,7 @@ namespace Bam
 
 				if (ex.InnerException != null)
 				{
-					message.AppendFormat("\r\n{0}\r\n", ex.InnerException.Message);
+					message.AppendFormat("\r\n{0}\r\n", EscapeControlCharacters(ex.InnerException.Message));
 					if (ex.InnerException.StackTrace != null)
 					{
 						stack.AppendFormat("\r\n{0}\r\n", ex.InnerException.StackTrace);
