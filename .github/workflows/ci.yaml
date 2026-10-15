@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  push:
+    branches: [bam_base]
+  pull_request:
+    branches: [bam_base]
+  workflow_dispatch:
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out bam.base
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          path: bam.base
+          persist-credentials: false
+
+      - name: Fetch sibling framework repos at the commits bamtk records
+        # The test projects reference siblings as ..\..\<repo>; bamtk's gitlinks pin which commit of each. The script
+        # follows only the ProjectReference graph the build needs, which stays inside public repos; a few bamtk
+        # submodules are private (bam.openapi, bamid, bambot, bake), and if one ever enters the graph the step fails
+        # naming it. No token is used, on purpose: this workflow runs pull-request code.
+        run: python3 bam.base/.github/scripts/sibling_layout.py bam.base
+
+      - name: Set up .NET 10
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Build test projects
+        run: |
+          dotnet build bam.base/bam.base.tests/bam.base.tests.csproj -c Debug
+          dotnet build bam.base/bam.base.transformers.tests/bam.base.transformers.tests.csproj -c Debug
+
+      - name: Unit tests
+        # bam.test exits 0 even when tests fail (BryanApellanes/bam.test#5), so the summary line decides: at least one
+        # test passed and none failed. A missing summary, or one with no passes, fails the job too.
+        env:
+          BAM_ARG_STYLE: Posix
+        run: |
+          status=0
+          for project in bam.base.tests bam.base.transformers.tests; do
+            dir="bam.base/$project/bin/Debug/net10.0"
+            log="$RUNNER_TEMP/$project.log"
+            (cd "$dir" && dotnet "$project.dll" --ut) > "$log" 2>&1 || true
+            summary=$(grep -o 'Test Summary: [0-9]* passed, [0-9]* failed, [0-9]* skipped' "$log" | tail -1)
+            echo "$project: ${summary:-no summary}"
+            if [ -z "$summary" ] || ! echo "$summary" | grep -qE ': [1-9][0-9]* passed, 0 failed'; then
+              grep -B3 -A6 'FAILED$' "$log" | grep -v '^\[Time' || tail -50 "$log"
+              status=1
+            fi
+          done
+          exit $status
