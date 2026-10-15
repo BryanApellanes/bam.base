@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+    branches: [bam_base]
+  pull_request:
+    branches: [bam_base]
+  workflow_dispatch:
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out bam.base
+        uses: actions/checkout@v4
+        with:
+          path: bam.base
+          persist-credentials: false
+
+      - name: Fetch sibling framework repos at the commits bamtk records
+        # The test projects reference siblings as ..\..\<repo>; bamtk's gitlinks pin which commit of each.
+        # Every framework repo is public, so no token is used.
+        run: python3 bam.base/.github/scripts/sibling_layout.py bam.base
+
+      - name: Set up .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Build test projects
+        run: |
+          dotnet build bam.base/bam.base.tests/bam.base.tests.csproj -c Debug
+          dotnet build bam.base/bam.base.transformers.tests/bam.base.transformers.tests.csproj -c Debug
+
+      - name: Unit tests
+        # bam.test exits 0 even when tests fail (BryanApellanes/bam.test#5), so the summary line decides.
+        env:
+          BAM_ARG_STYLE: Posix
+        run: |
+          status=0
+          for project in bam.base.tests bam.base.transformers.tests; do
+            dir="bam.base/$project/bin/Debug/net10.0"
+            log="$RUNNER_TEMP/$project.log"
+            (cd "$dir" && dotnet "$project.dll" --ut) > "$log" 2>&1 || true
+            summary=$(grep -o 'Test Summary: [0-9]* passed, [0-9]* failed, [0-9]* skipped' "$log" | tail -1)
+            echo "$project: ${summary:-no summary}"
+            if [ -z "$summary" ] || ! echo "$summary" | grep -q ' 0 failed'; then
+              grep -B3 -A6 'FAILED$' "$log" | grep -v '^\[Time' || tail -50 "$log"
+              status=1
+            fi
+          done
+          exit $status
