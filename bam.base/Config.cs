@@ -194,7 +194,10 @@ namespace Bam
         
         /// <summary>
         /// Gets or sets a configuration value by key. On get, if the key is not found and a default is provided,
-        /// the default is persisted to the config file. On set, the value is stored and the config file is saved.
+        /// the default is kept in <see cref="AppSettings"/> for later reads but not written anywhere: reading
+        /// configuration never touches the disk or the environment (bam.base#22), so a read-only or missing
+        /// <see cref="BamHome"/> still yields the default. <see cref="Save"/> persists it. On set, the value is
+        /// stored and the config file is saved.
         /// </summary>
         /// <param name="key">The configuration key.</param>
         /// <param name="defaultValue">The default value to use if the key is not found.</param>
@@ -210,8 +213,7 @@ namespace Bam
 
                 if (!string.IsNullOrEmpty(defaultValue))
                 {
-                    AppSettings.Add(key, defaultValue);
-                    Write(AppSettings);
+                    AppSettings[key] = defaultValue;
                 }
 
                 return defaultValue;

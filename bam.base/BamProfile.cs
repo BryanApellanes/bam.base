@@ -39,6 +39,7 @@ namespace Bam
             }
             catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException || ex is NotSupportedException || ex is ArgumentException)
             {
+                // Trace rather than Log: this runs inside BamProfile's static constructor, before logging may exist.
                 System.Diagnostics.Trace.WriteLine($"Bam profile directory '{path}' is not available: {ex.Message}");
                 return false;
             }

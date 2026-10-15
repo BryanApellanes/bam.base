@@ -19,16 +19,17 @@
         public static string Local => System.IO.Path.Combine(Path, "local");
         
         /// <summary>
-        /// The path segments for BamHome: the full path in the <c>BAM_HOME</c> environment variable when it is set to
-        /// a rooted path, otherwise c:/opt/bam on Windows and /opt/bam elsewhere. A relative <c>BAM_HOME</c> is ignored,
-        /// so the root never depends on the working directory.
+        /// The path segments for BamHome: the path in the <c>BAM_HOME</c> environment variable when it is fully
+        /// qualified, otherwise c:/opt/bam on Windows and /opt/bam elsewhere. A relative <c>BAM_HOME</c>, including a
+        /// Windows drive-relative (<c>C:bam</c>) or rootless (<c>\bam</c>) one, is ignored, so the root never depends
+        /// on the working directory or the current drive.
         /// </summary>
         public static string[] PathSegments
         {
             get
             {
                 string? configured = BamEnvironmentVariables.Get(BamEnvironmentVariables.BAM_HOME);
-                if (!string.IsNullOrWhiteSpace(configured) && System.IO.Path.IsPathRooted(configured))
+                if (!string.IsNullOrWhiteSpace(configured) && System.IO.Path.IsPathFullyQualified(configured))
                 {
                     return [System.IO.Path.GetFullPath(configured)];
                 }
