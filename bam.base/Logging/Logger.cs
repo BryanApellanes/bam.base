@@ -150,10 +150,11 @@ namespace Bam.Logging
         public int ErrorQueueHeadroom { get; set; } = 1000;
 
         /// <summary>
-        /// The message signature of the warning the commit thread writes once a backlog that dropped events has
-        /// drained: the number of events dropped and the UTC time of the first drop.
+        /// The message signature of the summary the commit thread writes once a backlog that dropped events has
+        /// drained: the number of events dropped and the UTC time of the first drop. Read-only rather than const,
+        /// so code that compares against it picks up a change in wording.
         /// </summary>
-        public const string DroppedEventsSummarySignature = "{0} log events were dropped because the log queue was full, starting at {1} UTC";
+        public static readonly string DroppedEventsSummarySignature = "{0} log events were dropped because the log queue was full, starting at {1} UTC";
 
         long _droppedEventCount;
         long _droppedSinceSummary;
@@ -242,9 +243,17 @@ namespace Bam.Logging
         }
 
         /// <summary>
-        /// Once the backlog has drained, commits one warning saying how many events were dropped since the last
-        /// summary and when the first of them was, so the loss is recorded in the log itself.
+        /// Once the backlog has drained, commits one summary saying how many events were dropped since the last
+        /// summary and when the first of them was, so the loss is recorded in the log itself. The summary is a
+        /// Warning, or carries <see cref="Verbosity"/>'s own severity when that is Error or Fatal, because in that
+        /// configuration every dropped event was an error and a Warning would be filtered out. It is committed
+        /// directly, so <see cref="EntryAdded"/> and the per-severity events do not see it.
         /// </summary>
+        /// <remarks>
+        /// The count and the first-drop time are two separate fields. A drop that lands while a summary is being
+        /// taken can be counted in the next summary with this summary's start time, or with the commit time; the
+        /// count is always exact, only the "starting at" time can be off by that one race.
+        /// </remarks>
         private void CommitDropSummary()
         {
             long dropped = Interlocked.Exchange(ref _droppedSinceSummary, 0);
@@ -253,13 +262,18 @@ namespace Bam.Logging
                 return;
             }
             long firstTicks = Interlocked.Exchange(ref _firstDropTicks, 0);
-            if ((int)LogEventType.Warning > (int)Verbosity)
+            if (Verbosity == VerbosityLevel.None)
             {
                 return;
             }
+            LogEventType severity = (int)LogEventType.Warning > (int)Verbosity ? (LogEventType)(int)Verbosity : LogEventType.Warning;
             DateTime since = firstTicks == 0 ? DateTime.UtcNow : new DateTime(firstTicks, DateTimeKind.Utc);
-            CommitLogEvent(CreateWarningEvent(
+            CommitLogEvent(CreateLogEvent(
                 DroppedEventsSummarySignature,
+                UserUtil.GetCurrentUser(true),
+                "Application",
+                severity,
+                null!,
                 dropped.ToString(System.Globalization.CultureInfo.InvariantCulture),
                 since.ToString("yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture)));
         }
@@ -311,7 +325,7 @@ namespace Bam.Logging
         /// <summary>
         /// Gets or sets the application name used in log entries. Resolved from configuration or <see cref="ApplicationNameProvider"/> if not explicitly set.
         /// While it resolves to the default name, it is looked up again at most every ten seconds, so configuration
-        /// that loads late is still picked up without a configuration read on every event.
+        /// that loads late is still picked up without a configuration read on every access.
         /// </summary>
         public string ApplicationName
         {

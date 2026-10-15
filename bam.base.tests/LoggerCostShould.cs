@@ -177,6 +177,37 @@ public class LoggerCostShould : UnitTestMenuContainer
     }
 
     [UnitTest]
+    public void RecordDroppedErrorsWhenOnlyErrorsAreLogged()
+    {
+        When.A<RecordingLogger>("drops a burst of errors with Verbosity at Error",
+            () => new RecordingLogger { MaxQueueLength = 3, ErrorQueueHeadroom = 0, Verbosity = VerbosityLevel.Error },
+            logger =>
+            {
+                logger.Block();
+                logger.AddEntry("first error", LogEventType.Error);
+                SpinWait.SpinUntil(() => logger.PendingEventCount == 0 && logger.Committing, TimeSpan.FromSeconds(5));
+                for (int index = 0; index < 8; index++)
+                {
+                    logger.AddEntry("error {0}", LogEventType.Error, index.ToString());
+                }
+                logger.Release();
+                LogEvent? summary = logger.WaitFor(entry => entry.MessageSignature == Logger.DroppedEventsSummarySignature);
+                logger.StopLoggingThread();
+                int summaries = logger.Committed.Count(entry => entry.MessageSignature == Logger.DroppedEventsSummarySignature);
+                return new ErrorsOnlyOutcome(summaries, summary?.Severity, summary?.MessageVariableValues?.FirstOrDefault());
+            })
+            .TheTest
+            .ShouldPass<ErrorsOnlyOutcome>((because, outcome) =>
+            {
+                because.ItsTrue("the loss is still recorded", outcome.Summaries == 1);
+                because.ItsTrue("at the logger's own severity, so Verbosity does not filter it", outcome.Severity == LogEventType.Error);
+                because.ItsTrue("with the number of errors dropped", outcome.Count == "5");
+            })
+            .SoBeHappy()
+            .UnlessItFailed();
+    }
+
+    [UnitTest]
     public void RecordNoStackTraceForAnErrorLoggedWithoutAnException()
     {
         When.A<RecordingLogger>("logs errors with and without exceptions",
@@ -394,6 +425,8 @@ public class LoggerCostShould : UnitTestMenuContainer
     public sealed class FormatProbe : ApplicationDiagnosticInfo
     {
     }
+
+    private sealed record ErrorsOnlyOutcome(int Summaries, LogEventType? Severity, string? Count);
 
     private sealed record HeadroomOutcome(bool ErrorCommitted, bool FatalCommitted, long Dropped);
 

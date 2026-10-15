@@ -179,7 +179,10 @@ namespace Bam
         /// <summary>
         /// Writes C0 control characters and DEL as visible escapes (CR as <c>\r</c>, LF as <c>\n</c>, tab as <c>\t</c>,
         /// any other as <c>\uXXXX</c>), so text taken from an exception message cannot start what looks like a new
-        /// record in a line-based log. Text without control characters is returned as is.
+        /// record in a line-based log. Text without control characters is returned as is. A backslash is not escaped,
+        /// so a message that already contains the two characters <c>\r</c> reads the same as an escaped CR; that does
+        /// not let it forge a record. Unicode line separators (U+0085, U+2028, U+2029) pass through: they do not break
+        /// a line for line-based readers, but a JavaScript viewer may render them as breaks.
         /// </summary>
         /// <param name="text">The text to escape, or null.</param>
         /// <returns>The escaped text, or an empty string for null.</returns>
