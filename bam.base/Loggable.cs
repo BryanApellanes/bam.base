@@ -4,6 +4,7 @@
 
 using Newtonsoft.Json;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Xml.Serialization;
 using YamlDotNet.Serialization;
 using EventInfo = System.Reflection.EventInfo;
@@ -18,28 +19,41 @@ namespace Bam.Logging
 	[Serializable]
     public abstract class Loggable: ILoggable
     {
-        private static HashSet<Loggable> _allInstances = new HashSet<Loggable>();
+        // Thread-safe, keyed by reference (a derived type's Equals and GetHashCode are never called, and its constructor
+        // has not run yet when this one does), and weak, so tracking an instance does not keep it alive.
+        private static readonly ConditionalWeakTable<Loggable, object> _allInstances = new ConditionalWeakTable<Loggable, object>();
+
+        private static readonly object _tracked = new object();
 
         protected Loggable()
         {
             this._subscribers = new HashSet<ILogger>();
             this.LogVerbosity = VerbosityLevel.Custom;
-            _allInstances.Add(this);
+            _allInstances.AddOrUpdate(this, _tracked);
         }
 
         /// <summary>
-        /// Sets the log verbosity level on all Loggable instances created so far.
+        /// Sets the log verbosity level on all Loggable instances created so far that are still alive.
         /// </summary>
         /// <param name="level">The verbosity level to apply to all instances.</param>
         public static void SetGlobalVerbosity(VerbosityLevel level)
         {
-            _allInstances.Each(l=> l.LogVerbosity = level);
+            foreach (Loggable loggable in Snapshot())
+            {
+                loggable.LogVerbosity = level;
+            }
         }
 
         /// <summary>
-        /// Gets all Loggable instances that have been created.
+        /// Gets the Loggable instances that have been created and are still alive. Tracking an instance does not keep it
+        /// alive.
         /// </summary>
-        public static IEnumerable<ILoggable> AllInstances => _allInstances.ToArray();
+        public static IEnumerable<ILoggable> AllInstances => Snapshot();
+
+        private static Loggable[] Snapshot()
+        {
+            return _allInstances.Select(entry => entry.Key).ToArray();
+        }
 
         /// <summary>
         /// Gets a string identifying this Loggable instance by type name and optional identifier tag.
