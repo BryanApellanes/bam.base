@@ -113,7 +113,21 @@ public class Base64UrlEncoderShould : UnitTestMenuContainer
         })
         .When<Base64UrlEncoder>("decodes inputs that no byte sequence produces", (encoder, reg) =>
         {
-            return new RejectionOutcome(Rejects(encoder, "Z"), Rejects(encoder, "Zm9vY"), Rejects(encoder, "Zm9v!g"), Rejects(encoder, "Zm9vYg"));
+            return new RejectionOutcome(
+                Rejects(encoder, "Z"),
+                Rejects(encoder, "Zm9vY"),
+                Rejects(encoder, "Zm9v!g"),
+                Rejects(encoder, "+/8"),
+                Rejects(encoder, "Zm9v/g"),
+                Rejects(encoder, "Zg Zg"),
+                Rejects(encoder, "Zm9v\nYg"),
+                Rejects(encoder, "="),
+                Rejects(encoder, "Zg="),
+                Rejects(encoder, "Zg==="),
+                Rejects(encoder, "Zm9vYmFy="),
+                Rejects(encoder, "Zm9vYg"),
+                Rejects(encoder, "Zg=="),
+                Rejects(encoder, ""));
         })
         .TheTest
         .ShouldPass<RejectionOutcome>((because, outcome) =>
@@ -121,7 +135,17 @@ public class Base64UrlEncoderShould : UnitTestMenuContainer
             because.ItsTrue("a single trailing character is rejected", outcome.SingleCharacter);
             because.ItsTrue("a 4n+1 length is rejected", outcome.LengthFourNPlusOne);
             because.ItsTrue("a character outside the alphabet is rejected", outcome.InvalidCharacter);
+            because.ItsTrue("the standard alphabet's + and / are rejected", outcome.StandardAlphabet);
+            because.ItsTrue("a / inside otherwise valid text is rejected", outcome.EmbeddedSlash);
+            because.ItsTrue("a space is rejected", outcome.Space);
+            because.ItsTrue("a newline is rejected", outcome.Newline);
+            because.ItsTrue("padding alone is rejected", outcome.PaddingOnly);
+            because.ItsTrue("padding that does not complete the group is rejected", outcome.ShortPadding);
+            because.ItsTrue("more than two padding characters are rejected", outcome.LongPadding);
+            because.ItsTrue("padding on a complete group is rejected", outcome.PaddingOnCompleteGroup);
             because.ItsTrue("a valid unpadded input is accepted", !outcome.Valid);
+            because.ItsTrue("a correctly padded input is accepted", !outcome.ValidPadded);
+            because.ItsTrue("the empty string decodes to no bytes", !outcome.Empty);
         })
         .SoBeHappy()
         .UnlessItFailed();
@@ -145,5 +169,6 @@ public class Base64UrlEncoderShould : UnitTestMenuContainer
     private sealed record VectorOutcome(string F, string Fo, string Foo, string Foob, string Fooba, string Foobar, string UrlSafe,
         string DecodedUnpadded, string DecodedPadded, byte[] DecodedUrlSafe);
 
-    private sealed record RejectionOutcome(bool SingleCharacter, bool LengthFourNPlusOne, bool InvalidCharacter, bool Valid);
+    private sealed record RejectionOutcome(bool SingleCharacter, bool LengthFourNPlusOne, bool InvalidCharacter, bool StandardAlphabet, bool EmbeddedSlash,
+        bool Space, bool Newline, bool PaddingOnly, bool ShortPadding, bool LongPadding, bool PaddingOnCompleteGroup, bool Valid, bool ValidPadded, bool Empty);
 }

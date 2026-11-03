@@ -20,24 +20,46 @@ public class Base64UrlEncoder : IBase64UrlEncoder
     }
 
     /// <summary>
-    /// Decodes base64url text, padded or not.
+    /// Decodes base64url text, padded or not.  Strict: only <c>A-Z</c>, <c>a-z</c>, <c>0-9</c>,
+    /// <c>-</c> and <c>_</c> are accepted (never <c>+</c>, <c>/</c> or whitespace), trailing
+    /// <c>=</c> is accepted only when it exactly completes the final group, and a length that
+    /// no byte sequence encodes to is rejected.
     /// </summary>
     /// <param name="base64">The base64url text.</param>
     /// <returns>The decoded bytes.</returns>
-    /// <exception cref="FormatException">The text is not valid base64url (including a length that no byte sequence encodes to).</exception>
+    /// <exception cref="FormatException">The text is not valid base64url.</exception>
     public byte[] Decode(string base64)
     {
         ArgumentNullException.ThrowIfNull(base64);
-        string standard = base64.Replace('-', '+').Replace('_', '/').TrimEnd('=');
-        int remainder = standard.Length % 4;
+        int end = base64.Length;
+        while (end > 0 && base64[end - 1] == '=')
+        {
+            end--;
+        }
+        int padding = base64.Length - end;
+        for (int i = 0; i < end; i++)
+        {
+            if (!IsUrlAlphabet(base64[i]))
+            {
+                throw new FormatException($"The input is not valid base64url: character at position {i} is outside the base64url alphabet.");
+            }
+        }
+        int remainder = end % 4;
         if (remainder == 1)
         {
             throw new FormatException("The input is not valid base64url: its length leaves a single trailing character, which no byte sequence encodes to.");
         }
-        if (remainder != 0)
+        int required = remainder == 0 ? 0 : 4 - remainder;
+        if (padding != 0 && padding != required)
         {
-            standard = standard.PadRight(standard.Length + (4 - remainder), '=');
+            throw new FormatException("The input is not valid base64url: its padding does not complete the final group.");
         }
+        string standard = base64.Substring(0, end).Replace('-', '+').Replace('_', '/') + new string('=', required);
         return Convert.FromBase64String(standard);
+    }
+
+    private static bool IsUrlAlphabet(char c)
+    {
+        return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '-' || c == '_';
     }
 }
