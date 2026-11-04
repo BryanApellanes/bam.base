@@ -57,6 +57,27 @@ namespace Bam.Data
         void ExecuteSql(string sqlStatement, object dbParameters);
         void ExecuteSql(string sqlStatement, params DbParameter[] dbParameters);
         void ExecuteSql<T>(ISqlStringBuilder builder) where T : IDao;
+
+        /// <summary>
+        /// Executes a schema script whose statements may fail because the objects they create already exist. A failing
+        /// statement is reported through <see cref="CommandException"/> and does not throw, where <c>ExecuteSql</c> throws
+        /// (from bam.data#28 on). Whether the statements after a failing one still run is provider-defined: providers that
+        /// run each statement as its own command (Postgres, Oracle, Firebird) go on, while SQLite stops at the first
+        /// failure. Implementations that predate the method fall back to <see cref="ExecuteSql(ISqlStringBuilder)"/>.
+        /// </summary>
+        /// <param name="builder">The schema script.</param>
+        void ExecuteSchemaScript(ISqlStringBuilder builder) => ExecuteSql(builder);
+
+        /// <summary>
+        /// Executes a schema script whose statements may fail because the objects they create already exist. A failing
+        /// statement is reported through <see cref="CommandException"/> and does not throw, where <c>ExecuteSql</c> throws
+        /// (from bam.data#28 on). Whether the statements after a failing one still run is provider-defined: providers that
+        /// run each statement as its own command (Postgres, Oracle, Firebird) go on, while SQLite stops at the first
+        /// failure. Implementations that predate the method fall back to <see cref="ExecuteSql(ISqlStringBuilder, IParameterBuilder)"/>.
+        /// </summary>
+        /// <param name="builder">The schema script.</param>
+        /// <param name="parameterBuilder">The parameter builder for creating DbParameters.</param>
+        void ExecuteSchemaScript(ISqlStringBuilder builder, IParameterBuilder parameterBuilder) => ExecuteSql(builder, parameterBuilder);
         void ExecuteStoredProcedure(string sprocName, params DbParameter[] dbParameters);
         Dictionary<EnumType, DaoType> FillEnumDictionary<EnumType, DaoType>(Dictionary<EnumType, DaoType> dictionary, string nameColumn)
             where DaoType : IDao, new()
