@@ -6,8 +6,10 @@ using Bam.Test;
 namespace Bam.Tests;
 
 /// <summary>
-/// Covers <see cref="IDatabase.ExecuteSchemaScript(ISqlStringBuilder)"/> (bam.base#40): an implementation that doesn't
-/// define it runs the script through <c>ExecuteSql</c>, so callers can move to it before every implementation has.
+/// Covers <see cref="IDatabase.ExecuteSchemaScript(ISqlStringBuilder)"/> (bam.base#40): called through
+/// <see cref="IDatabase"/>, both overloads reach <c>ExecuteSql(ISqlStringBuilder, IParameterBuilder)</c> exactly once.
+/// Against a bam.data whose <c>Database</c> doesn't define the method, that's the default interface method; from
+/// bam.data#28 on it's <c>Database</c>'s own. <see cref="ScriptOutcome.DefinedByImplementation"/> says which ran.
 /// </summary>
 [UnitTestMenu("Database schema script should")]
 public class DatabaseSchemaScriptShould : UnitTestMenuContainer
@@ -29,7 +31,8 @@ public class DatabaseSchemaScriptShould : UnitTestMenuContainer
                     asInterface.ExecuteSchemaScript(new SqlStringBuilder("CREATE TABLE SchemaScriptTable (Id INTEGER)"));
                     int afterFirst = database.Executed;
                     asInterface.ExecuteSchemaScript(new SqlStringBuilder("CREATE TABLE OtherScriptTable (Id INTEGER)"), database.ServiceProvider.Get<IParameterBuilder>());
-                    return new ScriptOutcome(afterFirst, database.Executed - afterFirst);
+                    bool defined = typeof(SQLiteDatabase).GetMethod(nameof(IDatabase.ExecuteSchemaScript), new[] { typeof(ISqlStringBuilder) }) is not null;
+                    return new ScriptOutcome(afterFirst, database.Executed - afterFirst, defined);
                 }
                 finally
                 {
@@ -39,7 +42,7 @@ public class DatabaseSchemaScriptShould : UnitTestMenuContainer
             .TheTest
             .ShouldPass<ScriptOutcome>((because, outcome) =>
             {
-                because.ItsTrue($"the one-argument script reaches ExecuteSql once ({outcome.OneArgument})", outcome.OneArgument == 1);
+                because.ItsTrue($"the one-argument script reaches ExecuteSql once ({outcome.OneArgument}, {(outcome.DefinedByImplementation ? "Database's own method" : "the interface default")})", outcome.OneArgument == 1);
                 because.ItsTrue($"the two-argument script reaches ExecuteSql once ({outcome.TwoArguments})", outcome.TwoArguments == 1);
             })
             .SoBeHappy()
@@ -85,5 +88,5 @@ public class DatabaseSchemaScriptShould : UnitTestMenuContainer
         }
     }
 
-    private sealed record ScriptOutcome(int OneArgument, int TwoArguments);
+    private sealed record ScriptOutcome(int OneArgument, int TwoArguments, bool DefinedByImplementation);
 }

@@ -59,17 +59,21 @@ namespace Bam.Data
         void ExecuteSql<T>(ISqlStringBuilder builder) where T : IDao;
 
         /// <summary>
-        /// Executes a schema script whose statements may fail because the objects they create already exist: a failing
-        /// statement is reported and the script goes on, where <c>ExecuteSql</c> throws. Implementations that predate the
-        /// method fall back to <see cref="ExecuteSql(ISqlStringBuilder)"/>.
+        /// Executes a schema script whose statements may fail because the objects they create already exist. A failing
+        /// statement is reported through <see cref="CommandException"/> and does not throw, where <c>ExecuteSql</c> throws
+        /// (from bam.data#28 on). Whether the statements after a failing one still run is provider-defined: providers that
+        /// run each statement as its own command (Postgres, Oracle, Firebird) go on, while SQLite stops at the first
+        /// failure. Implementations that predate the method fall back to <see cref="ExecuteSql(ISqlStringBuilder)"/>.
         /// </summary>
         /// <param name="builder">The schema script.</param>
         void ExecuteSchemaScript(ISqlStringBuilder builder) => ExecuteSql(builder);
 
         /// <summary>
-        /// Executes a schema script whose statements may fail because the objects they create already exist: a failing
-        /// statement is reported and the script goes on, where <c>ExecuteSql</c> throws. Implementations that predate the
-        /// method fall back to <see cref="ExecuteSql(ISqlStringBuilder, IParameterBuilder)"/>.
+        /// Executes a schema script whose statements may fail because the objects they create already exist. A failing
+        /// statement is reported through <see cref="CommandException"/> and does not throw, where <c>ExecuteSql</c> throws
+        /// (from bam.data#28 on). Whether the statements after a failing one still run is provider-defined: providers that
+        /// run each statement as its own command (Postgres, Oracle, Firebird) go on, while SQLite stops at the first
+        /// failure. Implementations that predate the method fall back to <see cref="ExecuteSql(ISqlStringBuilder, IParameterBuilder)"/>.
         /// </summary>
         /// <param name="builder">The schema script.</param>
         /// <param name="parameterBuilder">The parameter builder for creating DbParameters.</param>
