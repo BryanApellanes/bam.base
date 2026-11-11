@@ -221,6 +221,9 @@ namespace Bam.Logging
                 try
                 {
                     _waitForEnqueueLogEvent.WaitOne();
+                    // Raised before the first dequeue and lowered after the last commit of the pass, so
+                    // BlockUntilEventQueueIsEmpty can tell "queue empty" from "queue empty and committed".
+                    Volatile.Write(ref _commitPassInFlight, 1);
                     Thread.Sleep(CommitCycleDelay);
                     while (_logEventQueue.Count > 0)
                     {
@@ -238,6 +241,10 @@ namespace Bam.Logging
                 catch (Exception ex)
                 {
                     Trace.WriteLine($"Exception in logging commit thread: {ex.Message}");
+                }
+                finally
+                {
+                    Volatile.Write(ref _commitPassInFlight, 0);
                 }
             }
         }
@@ -278,22 +285,27 @@ namespace Bam.Logging
                 since.ToString("yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture)));
         }
 
+        int _commitPassInFlight;
+
         /// <summary>
-        /// Blocks the current thread until the event queue empties.
+        /// Blocks the current thread until every event queued before the call has been committed: the queue is
+        /// empty and the commit thread is not part-way through a pass.  The logger keeps running afterwards;
+        /// stopping it is <see cref="StopLoggingThread"/>'s job.  Returns at once when there is no live commit
+        /// thread (never started, or stopped), since nothing would drain the queue.  Blocks for as long as the
+        /// sink does.
         /// </summary>
         /// <param name="sleep">Additional milliseconds to sleep after the queue is empty.</param>
         public virtual void BlockUntilEventQueueIsEmpty(int sleep = 0)
         {
             try
             {
-                if (_loggingThread != null && _loggingThread.ThreadState == System.Threading.ThreadState.Running)
+                Thread? loggingThread = _loggingThread;
+                while (loggingThread != null && loggingThread.IsAlive && _keepLogging
+                    && (_logEventQueue.Count > 0 || Volatile.Read(ref _commitPassInFlight) != 0))
                 {
-                    _keepLogging = false;
-                    while (_logEventQueue.Count > 0)
-                    {
-                        _waitForEnqueueLogEvent.Set();
-                        Thread.Sleep(3);
-                    }
+                    // The commit thread lowers the in-flight flag only after its pass, and a queued event always
+                    // has a pending signal, so "empty and not in flight" means everything queued so far is committed.
+                    Thread.Sleep(1);
                 }
                 Thread.Sleep(sleep);
             }
