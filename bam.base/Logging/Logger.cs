@@ -221,6 +221,9 @@ namespace Bam.Logging
                 try
                 {
                     _waitForEnqueueLogEvent.WaitOne();
+                    // Raised before the first dequeue and lowered after the last commit of the pass, so
+                    // BlockUntilEventQueueIsEmpty can tell "queue empty" from "queue empty and committed".
+                    Volatile.Write(ref _commitPassInFlight, 1);
                     Thread.Sleep(CommitCycleDelay);
                     while (_logEventQueue.Count > 0)
                     {
@@ -229,7 +232,17 @@ namespace Bam.Logging
                             Interlocked.Decrement(ref _pendingEventCount);
                             if (logEvent != null && (int)logEvent.Severity <= (int)Verbosity)
                             {
-                                CommitLogEvent(logEvent);
+                                try
+                                {
+                                    CommitLogEvent(logEvent);
+                                }
+                                catch (Exception ex)
+                                {
+                                    // One event the sink refused must not abandon the rest of the pass: the events
+                                    // behind it would sit in the queue with no signal pending until something else
+                                    // logged, and BlockUntilEventQueueIsEmpty would wait on them forever.
+                                    Trace.WriteLine($"Exception committing a log event: {ex.Message}");
+                                }
                             }
                         }
                     }
@@ -238,6 +251,10 @@ namespace Bam.Logging
                 catch (Exception ex)
                 {
                     Trace.WriteLine($"Exception in logging commit thread: {ex.Message}");
+                }
+                finally
+                {
+                    Volatile.Write(ref _commitPassInFlight, 0);
                 }
             }
         }
@@ -278,22 +295,36 @@ namespace Bam.Logging
                 since.ToString("yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture)));
         }
 
+        int _commitPassInFlight;
+
         /// <summary>
-        /// Blocks the current thread until the event queue empties.
+        /// Blocks the current thread until every event queued before the call has been committed: the queue is
+        /// empty and the commit thread is not part-way through a pass.  The logger keeps running afterwards;
+        /// stopping it is <see cref="StopLoggingThread"/>'s job.  Returns at once when there is no live commit
+        /// thread (never started, or stopped), since nothing would drain the queue, and when called from the
+        /// commit thread itself (inside <see cref="CommitLogEvent"/>), which cannot wait for its own pass.  Blocks
+        /// for as long as the sink does; an event the sink throws on counts as handled, so a failing sink cannot
+        /// hold the caller.  A <see cref="RestartLoggingThread"/> or <see cref="StopLoggingThread"/> on another
+        /// thread during the wait ends it early.
         /// </summary>
         /// <param name="sleep">Additional milliseconds to sleep after the queue is empty.</param>
         public virtual void BlockUntilEventQueueIsEmpty(int sleep = 0)
         {
             try
             {
-                if (_loggingThread != null && _loggingThread.ThreadState == System.Threading.ThreadState.Running)
+                Thread? loggingThread = _loggingThread;
+                while (loggingThread != null && loggingThread != Thread.CurrentThread && loggingThread.IsAlive && _keepLogging
+                    && (_logEventQueue.Count > 0 || Volatile.Read(ref _commitPassInFlight) != 0))
                 {
-                    _keepLogging = false;
-                    while (_logEventQueue.Count > 0)
+                    // The commit thread raises the in-flight flag before its first dequeue and lowers it after the
+                    // last commit of the pass, so "empty and not in flight" means everything queued so far has been
+                    // handed to the sink.  A pass dequeues every event even when the sink throws, so the queue
+                    // always empties; the signal here covers a pass that ended early for any other reason.
+                    if (_logEventQueue.Count > 0)
                     {
                         _waitForEnqueueLogEvent.Set();
-                        Thread.Sleep(3);
                     }
+                    Thread.Sleep(1);
                 }
                 Thread.Sleep(sleep);
             }
