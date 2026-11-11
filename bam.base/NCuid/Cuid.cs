@@ -56,7 +56,7 @@ namespace Bam
             {
                 case RandomSource.Secure:
                     {
-                        using (var gen = new RNGCryptoServiceProvider())
+                        using (var gen = RandomNumberGenerator.Create())
                         {
                             rnd = SecureRandomBlock(gen) + SecureRandomBlock(gen);
                         }
@@ -94,7 +94,7 @@ namespace Bam
             switch (rs)
             {
                 case RandomSource.Secure:
-                    using (var gen = new RNGCryptoServiceProvider())
+                    using (var gen = RandomNumberGenerator.Create())
                     {
                         rnd = SecureRandomBlock(gen).Slice(-2);
                     }

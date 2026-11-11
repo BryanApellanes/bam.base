@@ -194,16 +194,8 @@ namespace Bam
 
             if (_threads.ContainsKey(name))
             {
-                try
-                {
-                    _threads[name].Abort();
-                    _threads[name].Join(3000);
-                }
-                catch
-                {
-                    // ignored
-                }
-
+                // A thread cannot be aborted on .NET (Thread.Abort throws PlatformNotSupportedException),
+                // so a previous thread of the same name is left to finish and only its entry is replaced.
                 _threads[name] = thread;
             }
             else
@@ -215,27 +207,16 @@ namespace Bam
         }
 
         /// <summary>
-        /// Kill the thread with the specified name.
+        /// Forget the thread with the specified name. A thread cannot be aborted on .NET
+        /// (Thread.Abort throws PlatformNotSupportedException), so a thread that is still running
+        /// is left to finish on its own; only its entry is removed.
         /// </summary>
         /// <param name="name"></param>
-        /// <param name="joinBlock"></param>
+        /// <param name="joinBlock">Unused; kept for source compatibility.</param>
         public static void Kill(string name, int joinBlock = 3000)
         {
             if (_threads.ContainsKey(name))
             {
-                Thread victim = _threads[name];
-                if (victim.ThreadState == System.Threading.ThreadState.Running)
-                {
-                    try
-                    {
-                        victim.Abort();
-                        victim.Join(joinBlock);
-                    }
-                    catch
-                    {
-                        // ignored
-                    }
-                }
                 _threads.Remove(name);
             }
         }
