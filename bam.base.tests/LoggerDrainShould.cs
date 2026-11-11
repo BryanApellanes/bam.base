@@ -116,6 +116,109 @@ public class LoggerDrainShould : UnitTestMenuContainer
         .UnlessItFailed();
     }
 
+    [UnitTest]
+    public void ReturnWhenTheSinkThrowsOnEveryEvent()
+    {
+        After.Setup(reg => reg.Set(new FailingLogger()))
+        .When<FailingLogger>("queues a burst behind a sink that always throws and blocks until the queue is empty", (logger, reg) =>
+        {
+            for (int index = 0; index < 5; index++)
+            {
+                logger.AddEntry("burst {0}", LogEventType.Warning, index.ToString());
+            }
+            Task drain = Task.Run(() => logger.BlockUntilEventQueueIsEmpty());
+            bool returned = drain.Wait(TimeSpan.FromSeconds(5));
+            long pending = logger.PendingEventCount;
+            int attempts = logger.Attempts;
+
+            // The logger is still usable: a later event reaches the sink too.
+            logger.AddEntry("after", LogEventType.Warning);
+            Task second = Task.Run(() => logger.BlockUntilEventQueueIsEmpty());
+            bool returnedAgain = second.Wait(TimeSpan.FromSeconds(5));
+            int attemptsAfter = logger.Attempts;
+            logger.StopLoggingThread();
+            return new FailingSinkOutcome(returned, pending, attempts, returnedAgain, attemptsAfter);
+        })
+        .TheTest
+        .ShouldPass<FailingSinkOutcome>((because, outcome) =>
+        {
+            because.ItsTrue("the call returns although every commit threw", outcome.Returned);
+            because.ItsTrue("nothing is left queued, pending " + outcome.Pending, outcome.Pending == 0);
+            because.ItsTrue("every event was offered to the sink, attempts " + outcome.Attempts, outcome.Attempts == 5);
+            because.ItsTrue("a second drain returns too", outcome.ReturnedAgain);
+            because.ItsTrue("the later event was offered to the sink, attempts " + outcome.AttemptsAfter, outcome.AttemptsAfter == 6);
+        })
+        .SoBeHappy()
+        .UnlessItFailed();
+    }
+
+    [UnitTest]
+    public void ReturnWhenCalledFromTheCommitThread()
+    {
+        After.Setup(reg => reg.Set(new ReentrantLogger()))
+        .When<ReentrantLogger>("has the sink flush its own logger while committing", (logger, reg) =>
+        {
+            logger.AddEntry("one", LogEventType.Warning);
+            Task drain = Task.Run(() => logger.BlockUntilEventQueueIsEmpty());
+            bool returned = drain.Wait(TimeSpan.FromSeconds(5));
+            int committed = logger.CommittedCount;
+            logger.StopLoggingThread();
+            return new ReentrantOutcome(returned, committed);
+        })
+        .TheTest
+        .ShouldPass<ReentrantOutcome>((because, outcome) =>
+        {
+            because.ItsTrue("the sink's own flush does not deadlock the commit thread", outcome.Returned);
+            because.ItsTrue("the event is committed", outcome.Committed == 1);
+        })
+        .SoBeHappy()
+        .UnlessItFailed();
+    }
+
+    /// <summary>A logger whose sink throws on every event and counts the attempts.</summary>
+    public sealed class FailingLogger : Logger
+    {
+        private int _attempts;
+
+        /// <summary>Creates the logger with a commit delay long enough for a burst to queue up behind one signal.</summary>
+        public FailingLogger()
+        {
+            CommitCycleDelay = 100;
+        }
+
+        /// <summary>How many events were offered to the sink.</summary>
+        public int Attempts => Volatile.Read(ref _attempts);
+
+        /// <inheritdoc />
+        public override void CommitLogEvent(LogEvent logEvent)
+        {
+            Interlocked.Increment(ref _attempts);
+            throw new IOException("the sink is unavailable");
+        }
+    }
+
+    /// <summary>A logger whose sink calls <see cref="Logger.BlockUntilEventQueueIsEmpty"/> on itself.</summary>
+    public sealed class ReentrantLogger : Logger
+    {
+        private int _committed;
+
+        /// <summary>Creates the logger with no commit delay.</summary>
+        public ReentrantLogger()
+        {
+            CommitCycleDelay = 0;
+        }
+
+        /// <summary>How many events the sink has finished committing.</summary>
+        public int CommittedCount => Volatile.Read(ref _committed);
+
+        /// <inheritdoc />
+        public override void CommitLogEvent(LogEvent logEvent)
+        {
+            BlockUntilEventQueueIsEmpty();
+            Interlocked.Increment(ref _committed);
+        }
+    }
+
     /// <summary>A logger whose sink takes a fixed time per event and counts what it committed.</summary>
     public sealed class SlowLogger : Logger
     {
@@ -142,6 +245,10 @@ public class LoggerDrainShould : UnitTestMenuContainer
     }
 
     private sealed record DrainOutcome(int CommittedOnReturn);
+
+    private sealed record FailingSinkOutcome(bool Returned, long Pending, int Attempts, bool ReturnedAgain, int AttemptsAfter);
+
+    private sealed record ReentrantOutcome(bool Returned, int Committed);
 
     private sealed record RunningOutcome(string Counts);
 
