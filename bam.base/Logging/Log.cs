@@ -2,6 +2,7 @@
 	Copyright © Bryan Apellanes 2015  
 */
 
+using System.Globalization;
 using System.Reflection;
 using Bam.Configuration;
 using Bam.Console;
@@ -58,11 +59,13 @@ namespace Bam.Logging
             get => _defaultLoggerLock.DoubleCheckLock(ref _defaultLogger, GetDefaultLogger);
             set
             {
-                if (_defaultLogger != null)
-                {
-                    Task.Run(() => _defaultLogger.StopLoggingThread());
-                }
+                // Stop the logger being replaced, not whatever the field holds by the time the task runs.
+                ILogger? outgoing = _defaultLogger;
                 _defaultLogger = value;
+                if (outgoing != null && !ReferenceEquals(outgoing, value))
+                {
+                    Task.Run(() => outgoing.StopLoggingThread());
+                }
             }
         }
 
@@ -87,7 +90,7 @@ namespace Bam.Logging
         /// <param name="args">Arguments to format into the message.</param>
         public static void Info(string messageSignature, params object[] args)
         {
-            Default!.AddEntry(messageSignature, LogEventType.Information, args?.Select(a => a.ToString())?.ToArray()!);
+            Default!.AddEntry(messageSignature, LogEventType.Information, FormatArguments(messageSignature, args));
         }
 
         /// <summary>
@@ -97,7 +100,7 @@ namespace Bam.Logging
         /// <param name="args">Arguments to format into the message.</param>
         public static void Warn(string messageSignature, params object[] args)
         {
-            Default!.AddEntry(messageSignature, LogEventType.Warning, args?.Select(a => a?.ToString())?.ToArray()!);
+            Default!.AddEntry(messageSignature, LogEventType.Warning, FormatArguments(messageSignature, args));
         }
 
         /// <summary>
@@ -118,7 +121,131 @@ namespace Bam.Logging
         /// <param name="args">Arguments to format into the message.</param>
         public static void Error(string messageSignature, Exception ex, params object[] args)
         {
-            Default!.AddEntry(messageSignature, ex, args?.Select(a => a.ToString())?.ToArray()!);
+            Default!.AddEntry(messageSignature, ex, FormatArguments(messageSignature, args));
+        }
+
+        /// <summary>
+        /// Turns the arguments into the strings a log event carries, applying the format spec the signature
+        /// gives each one (for example <c>{0:o}</c> or <c>{1:N2}</c>), so the logged text reads as
+        /// <see cref="string.Format(string, object[])"/> would have rendered it.  A null argument stays null.
+        /// When an index appears more than once, its first format spec is the one used.
+        /// </summary>
+        /// <param name="messageSignature">The message format string.</param>
+        /// <param name="args">The arguments to render.</param>
+        /// <returns>One string per argument.</returns>
+        private static string[] FormatArguments(string messageSignature, object?[]? args)
+        {
+            if (args == null)
+            {
+                return null!;
+            }
+            Dictionary<int, string> specs = FormatSpecsOf(messageSignature ?? string.Empty);
+            string[] values = new string[args.Length];
+            for (int i = 0; i < args.Length; i++)
+            {
+                object? arg = args[i];
+                if (arg is IFormattable formattable && specs.TryGetValue(i, out string? spec) && UsableSpec(spec))
+                {
+                    values[i] = FormatOrPlain(formattable, spec);
+                }
+                else
+                {
+                    values[i] = arg?.ToString()!;
+                }
+            }
+            return values;
+        }
+
+        // A spec may ask for a precision of 999 at most.  A spec such as {0:D99999999} would otherwise build a value of
+        // that many characters, and signatures are sometimes built from data.
+        private const int MaxSpecDigits = 3;
+
+        /// <summary>Whether a spec is safe to apply: no number in it has more than <see cref="MaxSpecDigits"/> significant digits (so 999 at most).</summary>
+        private static bool UsableSpec(string spec)
+        {
+            int run = 0;
+            for (int position = 0; position <= spec.Length; position++)
+            {
+                if (position < spec.Length && char.IsAsciiDigit(spec[position]))
+                {
+                    // Leading zeros don't count: "0000" is a custom numeric format, not a precision of zero.
+                    if (run > 0 || spec[position] != '0')
+                    {
+                        run++;
+                    }
+                    if (run > MaxSpecDigits)
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    run = 0;
+                }
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Applies a spec, falling back to the plain value when the type refuses it: logging never throws on a bad signature.
+        /// A type refuses with <see cref="FormatException"/> (a spec it doesn't know) or <see cref="ArgumentException"/>
+        /// (for example a date outside the current culture's calendar).  The plain value can be refused the same way, so the
+        /// last resort is the invariant culture.
+        /// </summary>
+        private static string FormatOrPlain(IFormattable formattable, string spec)
+        {
+            try
+            {
+                return formattable.ToString(spec, CultureInfo.CurrentCulture);
+            }
+            catch (Exception refused) when (refused is FormatException || refused is ArgumentException)
+            {
+                try
+                {
+                    return formattable.ToString()!;
+                }
+                catch (Exception plainRefused) when (plainRefused is FormatException || plainRefused is ArgumentException)
+                {
+                    return formattable.ToString(null, CultureInfo.InvariantCulture);
+                }
+            }
+        }
+
+        /// <summary>Reads the format spec of each format item in a composite format string, skipping escaped braces.</summary>
+        private static Dictionary<int, string> FormatSpecsOf(string messageSignature)
+        {
+            Dictionary<int, string> specs = new Dictionary<int, string>();
+            int position = 0;
+            while (position < messageSignature.Length)
+            {
+                char current = messageSignature[position];
+                if ((current == '{' || current == '}') && position + 1 < messageSignature.Length && messageSignature[position + 1] == current)
+                {
+                    position += 2;
+                    continue;
+                }
+                if (current != '{')
+                {
+                    position++;
+                    continue;
+                }
+                int close = messageSignature.IndexOf('}', position + 1);
+                if (close < 0)
+                {
+                    break;
+                }
+                string item = messageSignature.Substring(position + 1, close - position - 1);
+                int colon = item.IndexOf(':');
+                string head = colon < 0 ? item : item.Substring(0, colon);
+                int comma = head.IndexOf(',');
+                string index = (comma < 0 ? head : head.Substring(0, comma)).Trim();
+                if (colon >= 0 && int.TryParse(index, NumberStyles.None, CultureInfo.InvariantCulture, out int argument) && !specs.ContainsKey(argument))
+                {
+                    specs[argument] = item.Substring(colon + 1);
+                }
+                position = close + 1;
+            }
+            return specs;
         }
 
         /// <summary>
