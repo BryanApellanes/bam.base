@@ -21,13 +21,45 @@ public class ObsoleteApiReplacementsShould : UnitTestMenuContainer
     {
         When.A<Assembly>("is asked for its file",
             typeof(ObsoleteApiReplacementsShould).Assembly,
-            (assembly) => new AssemblyFileOutcome(assembly.GetFileInfo(), assembly.GetFilePath(), assembly.Location))
+            (assembly) => new AssemblyFileOutcome(assembly.GetFileInfo(), assembly.GetFilePath(), assembly.Location, assembly.TryGetFileInfo(out FileInfo? _), assembly.GetFilePathOrName()))
         .TheTest
         .ShouldPass<AssemblyFileOutcome>((because, _, outcome) =>
         {
             because.ItsTrue("the file exists", outcome.FileInfo.Exists);
             because.ItsTrue("the file is the assembly location", outcome.FileInfo.FullName.Equals(new FileInfo(outcome.Location).FullName));
             because.ItsTrue("GetFilePath agrees with GetFileInfo", outcome.FilePath.Equals(outcome.FileInfo.FullName));
+            because.ItsTrue("TryGetFileInfo reports the file", outcome.TryFound);
+            because.ItsTrue("GetFilePathOrName returns the path", outcome.PathOrName.Equals(outcome.FileInfo.FullName));
+        })
+        .SoBeHappy()
+        .UnlessItFailed();
+    }
+
+    [UnitTest]
+    public void ReportNoFileForAnAssemblyLoadedFromBytes()
+    {
+        When.A<Assembly>("was loaded from bytes, as runtime-generated Dao assemblies are",
+            () => Assembly.Load(File.ReadAllBytes(typeof(ObsoleteApiReplacementsShould).Assembly.Location)),
+            (assembly) =>
+            {
+                bool hasFile = assembly.TryGetFileInfo(out FileInfo? fileInfo);
+                bool getFileInfoThrew = false;
+                try
+                {
+                    assembly.GetFileInfo();
+                }
+                catch (InvalidOperationException)
+                {
+                    getFileInfoThrew = true;
+                }
+                return new BytesLoadedOutcome(hasFile, fileInfo, getFileInfoThrew, assembly.GetFilePathOrName(), assembly.FullName!);
+            })
+        .TheTest
+        .ShouldPass<BytesLoadedOutcome>((because, _, outcome) =>
+        {
+            because.ItsTrue("TryGetFileInfo reports no file", !outcome.HasFile && outcome.FileInfo == null);
+            because.ItsTrue("GetFileInfo throws InvalidOperationException instead of returning another assembly's path", outcome.GetFileInfoThrew);
+            because.ItsTrue("GetFilePathOrName falls back to the assembly's full name", outcome.PathOrName.Equals(outcome.FullName));
         })
         .SoBeHappy()
         .UnlessItFailed();
@@ -71,31 +103,40 @@ public class ObsoleteApiReplacementsShould : UnitTestMenuContainer
                     while (!release.IsSet)
                     {
                         // spin: the thread has to be in the Running state, not WaitSleepJoin
+                        Thread.SpinWait(1);
                     }
                 });
+                bool startedInTime = false;
                 bool threwWhileBackground = false;
-                thread.Start();
-                started.Wait(5000);
-                try
-                {
-                    thread.Abort();
-                }
-                catch (PlatformNotSupportedException)
-                {
-                    threwWhileBackground = true;
-                }
-                // NamedThread starts background threads, whose state is Background, never exactly Running.
-                thread.Thread.IsBackground = false;
                 bool threwWhileRunning = false;
                 try
                 {
-                    thread.Abort();
+                    thread.Start();
+                    startedInTime = started.Wait(5000);
+                    try
+                    {
+                        thread.Abort();
+                    }
+                    catch (PlatformNotSupportedException)
+                    {
+                        threwWhileBackground = true;
+                    }
+                    // NamedThread starts background threads, whose state is Background, never exactly Running.
+                    thread.Thread.IsBackground = false;
+                    try
+                    {
+                        thread.Abort();
+                    }
+                    catch (PlatformNotSupportedException)
+                    {
+                        threwWhileRunning = true;
+                    }
                 }
-                catch (PlatformNotSupportedException)
+                finally
                 {
-                    threwWhileRunning = true;
+                    // released on every path, so a spinning foreground thread can never keep the test host alive
+                    release.Set();
                 }
-                release.Set();
                 bool finished = thread.Thread.Join(5000);
                 bool threwAfterFinish = false;
                 try
@@ -106,11 +147,12 @@ public class ObsoleteApiReplacementsShould : UnitTestMenuContainer
                 {
                     threwAfterFinish = true;
                 }
-                return new AbortOutcome(threwWhileBackground, threwWhileRunning, finished, threwAfterFinish);
+                return new AbortOutcome(startedInTime, threwWhileBackground, threwWhileRunning, finished, threwAfterFinish);
             })
         .TheTest
         .ShouldPass<AbortOutcome>((because, _, outcome) =>
         {
+            because.ItsTrue("the thread started", outcome.Started);
             because.ItsTrue("aborting a running background thread does nothing", !outcome.ThrewWhileBackground);
             because.ItsTrue("aborting a running foreground thread throws PlatformNotSupportedException", outcome.ThrewWhileRunning);
             because.ItsTrue("the thread was left to finish on its own", outcome.Finished);
@@ -130,26 +172,40 @@ public class ObsoleteApiReplacementsShould : UnitTestMenuContainer
                 string name = $"exec-{Guid.NewGuid():N}";
                 ManualResetEventSlim firstStarted = new ManualResetEventSlim(false);
                 ManualResetEventSlim secondRan = new ManualResetEventSlim(false);
-                NamedThread first = Exec.Start(name, () =>
+                bool firstStartedInTime = false;
+                bool secondStarted = false;
+                bool firstAliveAfterReplace = false;
+                bool firstAliveAfterKill = false;
+                NamedThread? first = null;
+                try
                 {
-                    firstStarted.Set();
-                    while (!release.IsSet)
+                    first = Exec.Start(name, () =>
                     {
-                    }
-                });
-                firstStarted.Wait(5000);
-                NamedThread second = Exec.Start(name, () => secondRan.Set());
-                bool secondStarted = secondRan.Wait(5000);
-                bool firstAliveAfterReplace = first.Thread.IsAlive;
-                Exec.Kill(name);
-                bool firstAliveAfterKill = first.Thread.IsAlive;
-                release.Set();
+                        firstStarted.Set();
+                        while (!release.IsSet)
+                        {
+                            Thread.SpinWait(1);
+                        }
+                    });
+                    firstStartedInTime = firstStarted.Wait(5000);
+                    Exec.Start(name, () => secondRan.Set());
+                    secondStarted = secondRan.Wait(5000);
+                    firstAliveAfterReplace = first.Thread.IsAlive;
+                    Exec.Kill(name);
+                    firstAliveAfterKill = first.Thread.IsAlive;
+                }
+                finally
+                {
+                    // the thread Exec.Start creates is a foreground thread; release it on every path
+                    release.Set();
+                }
                 bool firstFinished = first.Thread.Join(5000);
-                return new ExecOutcome(secondStarted, firstAliveAfterReplace, firstAliveAfterKill, firstFinished);
+                return new ExecOutcome(firstStartedInTime, secondStarted, firstAliveAfterReplace, firstAliveAfterKill, firstFinished);
             })
         .TheTest
         .ShouldPass<ExecOutcome>((because, _, outcome) =>
         {
+            because.ItsTrue("the first thread started", outcome.FirstStarted);
             because.ItsTrue("a second thread of the same name starts", outcome.SecondStarted);
             because.ItsTrue("the replaced thread keeps running", outcome.FirstAliveAfterReplace);
             because.ItsTrue("Kill does not stop a running thread", outcome.FirstAliveAfterKill);
@@ -159,11 +215,13 @@ public class ObsoleteApiReplacementsShould : UnitTestMenuContainer
         .UnlessItFailed();
     }
 
-    private sealed record AssemblyFileOutcome(FileInfo FileInfo, string FilePath, string Location);
+    private sealed record AssemblyFileOutcome(FileInfo FileInfo, string FilePath, string Location, bool TryFound, string PathOrName);
+
+    private sealed record BytesLoadedOutcome(bool HasFile, FileInfo? FileInfo, bool GetFileInfoThrew, string PathOrName, string FullName);
 
     private sealed record SecureCuidOutcome(HashSet<string> Cuids, string Slug);
 
-    private sealed record AbortOutcome(bool ThrewWhileBackground, bool ThrewWhileRunning, bool Finished, bool ThrewAfterFinish);
+    private sealed record AbortOutcome(bool Started, bool ThrewWhileBackground, bool ThrewWhileRunning, bool Finished, bool ThrewAfterFinish);
 
-    private sealed record ExecOutcome(bool SecondStarted, bool FirstAliveAfterReplace, bool FirstAliveAfterKill, bool FirstFinished);
+    private sealed record ExecOutcome(bool FirstStarted, bool SecondStarted, bool FirstAliveAfterReplace, bool FirstAliveAfterKill, bool FirstFinished);
 }
