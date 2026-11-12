@@ -87,6 +87,52 @@ public class LogDefaultShould : UnitTestMenuContainer
         .UnlessItFailed();
     }
 
+    [UnitTest]
+    public void NeverThrowOnABadSpec()
+    {
+        After.Setup(reg => reg.Set(new RecordingLogger()))
+        .When<RecordingLogger>("logs specs the types refuse, and one asking for a huge precision", (logger, reg) =>
+        {
+            ILogger? original = Log.Default;
+            DateTime when = new DateTime(2026, 11, 11, 8, 30, 0, DateTimeKind.Utc);
+            Guid id = new Guid("6d1f7c3a-2b4e-4f6a-9c8d-1e2f3a4b5c6d");
+            string? thrown = null;
+            try
+            {
+                Log.Default = logger;
+                logger.StartLoggingThread();
+                try
+                {
+                    Log.Info("{0:Q}", 5);
+                    Log.Warn("{0:%}", when);
+                    Log.Error("{0:z}", new InvalidOperationException("x"), id);
+                    Log.Info("{0:D99999999}", 7);
+                    Log.Info("{0:0000}", 7);
+                }
+                catch (Exception ex)
+                {
+                    thrown = ex.GetType().Name;
+                }
+                logger.BlockUntilEventQueueIsEmpty();
+                List<string?[]> values = logger.Values();
+                return new BadSpecOutcome(thrown, string.Join("|", values.Select(v => v[0])), when.ToString(), id.ToString());
+            }
+            finally
+            {
+                Log.Default = original;
+            }
+        })
+        .TheTest
+        .ShouldPass<BadSpecOutcome>((because, outcome) =>
+        {
+            because.ItsTrue("nothing throws, got " + (outcome.Thrown ?? "nothing"), outcome.Thrown is null);
+            because.ItsTrue("each refused or oversized spec logs the plain value and a usable one still applies, got " + outcome.Values,
+                outcome.Values == "5|" + outcome.PlainDate + "|" + outcome.PlainGuid + "|7|0007");
+        })
+        .SoBeHappy()
+        .UnlessItFailed();
+    }
+
     /// <summary>A logger that records what it commits and how often it is stopped.</summary>
     public sealed class RecordingLogger : Logger
     {
@@ -136,4 +182,6 @@ public class LogDefaultShould : UnitTestMenuContainer
     private sealed record SwapOutcome(bool ReplacedStopped, int NewLoggerStops, bool NewIsDefault);
 
     private sealed record FormatOutcome(string Info, string? Warn, string? Error);
+
+    private sealed record BadSpecOutcome(string? Thrown, string Values, string PlainDate, string PlainGuid);
 }

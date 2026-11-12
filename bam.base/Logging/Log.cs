@@ -144,9 +144,9 @@ namespace Bam.Logging
             for (int i = 0; i < args.Length; i++)
             {
                 object? arg = args[i];
-                if (arg is IFormattable formattable && specs.TryGetValue(i, out string? spec))
+                if (arg is IFormattable formattable && specs.TryGetValue(i, out string? spec) && UsableSpec(spec))
                 {
-                    values[i] = formattable.ToString(spec, CultureInfo.CurrentCulture);
+                    values[i] = FormatOrPlain(formattable, spec);
                 }
                 else
                 {
@@ -154,6 +154,49 @@ namespace Bam.Logging
                 }
             }
             return values;
+        }
+
+        // A spec may ask for a precision of 999 at most.  A spec such as {0:D99999999} would otherwise build a value of
+        // that many characters, and signatures are sometimes built from data.
+        private const int MaxSpecDigits = 3;
+
+        /// <summary>Whether a spec is safe to apply: no number in it has more than <see cref="MaxSpecDigits"/> significant digits (so 999 at most).</summary>
+        private static bool UsableSpec(string spec)
+        {
+            int run = 0;
+            for (int position = 0; position <= spec.Length; position++)
+            {
+                if (position < spec.Length && char.IsAsciiDigit(spec[position]))
+                {
+                    // Leading zeros don't count: "0000" is a custom numeric format, not a precision of zero.
+                    if (run > 0 || spec[position] != '0')
+                    {
+                        run++;
+                    }
+                    if (run > MaxSpecDigits)
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    run = 0;
+                }
+            }
+            return true;
+        }
+
+        /// <summary>Applies a spec, falling back to the plain value when the type refuses the spec: logging never throws on a bad signature.</summary>
+        private static string FormatOrPlain(IFormattable formattable, string spec)
+        {
+            try
+            {
+                return formattable.ToString(spec, CultureInfo.CurrentCulture);
+            }
+            catch (FormatException)
+            {
+                return formattable.ToString()!;
+            }
         }
 
         /// <summary>Reads the format spec of each format item in a composite format string, skipping escaped braces.</summary>
