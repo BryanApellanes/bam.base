@@ -186,16 +186,28 @@ namespace Bam.Logging
             return true;
         }
 
-        /// <summary>Applies a spec, falling back to the plain value when the type refuses the spec: logging never throws on a bad signature.</summary>
+        /// <summary>
+        /// Applies a spec, falling back to the plain value when the type refuses it: logging never throws on a bad signature.
+        /// A type refuses with <see cref="FormatException"/> (a spec it doesn't know) or <see cref="ArgumentException"/>
+        /// (for example a date outside the current culture's calendar).  The plain value can be refused the same way, so the
+        /// last resort is the invariant culture.
+        /// </summary>
         private static string FormatOrPlain(IFormattable formattable, string spec)
         {
             try
             {
                 return formattable.ToString(spec, CultureInfo.CurrentCulture);
             }
-            catch (FormatException)
+            catch (Exception refused) when (refused is FormatException || refused is ArgumentException)
             {
-                return formattable.ToString()!;
+                try
+                {
+                    return formattable.ToString()!;
+                }
+                catch (Exception plainRefused) when (plainRefused is FormatException || plainRefused is ArgumentException)
+                {
+                    return formattable.ToString(null, CultureInfo.InvariantCulture);
+                }
             }
         }
 

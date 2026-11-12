@@ -133,6 +133,53 @@ public class LogDefaultShould : UnitTestMenuContainer
         .UnlessItFailed();
     }
 
+    [UnitTest]
+    public void NeverThrowOnADateTheCultureCannotShow()
+    {
+        After.Setup(reg => reg.Set(new RecordingLogger()))
+        .When<RecordingLogger>("logs a date outside the current culture's calendar, with and without a spec", (logger, reg) =>
+        {
+            ILogger? original = Log.Default;
+            System.Globalization.CultureInfo culture = System.Globalization.CultureInfo.CurrentCulture;
+            string? thrown = null;
+            try
+            {
+                Log.Default = logger;
+                logger.StartLoggingThread();
+                // The Persian calendar starts in 622: year 1 is out of its range, so formatting it throws ArgumentOutOfRangeException.
+                System.Globalization.CultureInfo.CurrentCulture = new System.Globalization.CultureInfo("fa-IR");
+                try
+                {
+                    Log.Error("{0:yyyy-MM-dd}", new InvalidOperationException("x"), default(DateTime));
+                    Log.Info("{0:o}", default(DateTime));
+                }
+                catch (Exception ex)
+                {
+                    thrown = ex.GetType().Name;
+                }
+                System.Globalization.CultureInfo.CurrentCulture = culture;
+                logger.BlockUntilEventQueueIsEmpty();
+                List<string?[]> values = logger.Values();
+                return new CultureOutcome(thrown, values.Count, values.Count > 0 ? values[0][0] : null, values.Count > 1 ? values[1][0] : null);
+            }
+            finally
+            {
+                System.Globalization.CultureInfo.CurrentCulture = culture;
+                Log.Default = original;
+            }
+        })
+        .TheTest
+        .ShouldPass<CultureOutcome>((because, outcome) =>
+        {
+            because.ItsTrue("nothing throws, got " + (outcome.Thrown ?? "nothing"), outcome.Thrown is null);
+            because.ItsTrue("both events are logged, got " + outcome.Logged, outcome.Logged == 2);
+            because.ItsTrue("the refused spec logs a value, got " + (outcome.Refused ?? "null"), !string.IsNullOrEmpty(outcome.Refused));
+            because.ItsTrue("a round-trip spec still applies, got " + (outcome.RoundTrip ?? "null"), outcome.RoundTrip == "0001-01-01T00:00:00.0000000");
+        })
+        .SoBeHappy()
+        .UnlessItFailed();
+    }
+
     /// <summary>A logger that records what it commits and how often it is stopped.</summary>
     public sealed class RecordingLogger : Logger
     {
@@ -182,6 +229,8 @@ public class LogDefaultShould : UnitTestMenuContainer
     private sealed record SwapOutcome(bool ReplacedStopped, int NewLoggerStops, bool NewIsDefault);
 
     private sealed record FormatOutcome(string Info, string? Warn, string? Error);
+
+    private sealed record CultureOutcome(string? Thrown, int Logged, string? Refused, string? RoundTrip);
 
     private sealed record BadSpecOutcome(string? Thrown, string Values, string PlainDate, string PlainGuid);
 }
