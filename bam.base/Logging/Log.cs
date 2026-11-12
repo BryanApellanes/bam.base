@@ -2,6 +2,7 @@
 	Copyright © Bryan Apellanes 2015  
 */
 
+using System.Globalization;
 using System.Reflection;
 using Bam.Configuration;
 using Bam.Console;
@@ -58,11 +59,13 @@ namespace Bam.Logging
             get => _defaultLoggerLock.DoubleCheckLock(ref _defaultLogger, GetDefaultLogger);
             set
             {
-                if (_defaultLogger != null)
-                {
-                    Task.Run(() => _defaultLogger.StopLoggingThread());
-                }
+                // Stop the logger being replaced, not whatever the field holds by the time the task runs.
+                ILogger? outgoing = _defaultLogger;
                 _defaultLogger = value;
+                if (outgoing != null && !ReferenceEquals(outgoing, value))
+                {
+                    Task.Run(() => outgoing.StopLoggingThread());
+                }
             }
         }
 
@@ -87,7 +90,7 @@ namespace Bam.Logging
         /// <param name="args">Arguments to format into the message.</param>
         public static void Info(string messageSignature, params object[] args)
         {
-            Default!.AddEntry(messageSignature, LogEventType.Information, args?.Select(a => a.ToString())?.ToArray()!);
+            Default!.AddEntry(messageSignature, LogEventType.Information, FormatArguments(messageSignature, args));
         }
 
         /// <summary>
@@ -97,7 +100,7 @@ namespace Bam.Logging
         /// <param name="args">Arguments to format into the message.</param>
         public static void Warn(string messageSignature, params object[] args)
         {
-            Default!.AddEntry(messageSignature, LogEventType.Warning, args?.Select(a => a?.ToString())?.ToArray()!);
+            Default!.AddEntry(messageSignature, LogEventType.Warning, FormatArguments(messageSignature, args));
         }
 
         /// <summary>
@@ -118,7 +121,76 @@ namespace Bam.Logging
         /// <param name="args">Arguments to format into the message.</param>
         public static void Error(string messageSignature, Exception ex, params object[] args)
         {
-            Default!.AddEntry(messageSignature, ex, args?.Select(a => a.ToString())?.ToArray()!);
+            Default!.AddEntry(messageSignature, ex, FormatArguments(messageSignature, args));
+        }
+
+        /// <summary>
+        /// Turns the arguments into the strings a log event carries, applying the format spec the signature
+        /// gives each one (for example <c>{0:o}</c> or <c>{1:N2}</c>), so the logged text reads as
+        /// <see cref="string.Format(string, object[])"/> would have rendered it.  A null argument stays null.
+        /// When an index appears more than once, its first format spec is the one used.
+        /// </summary>
+        /// <param name="messageSignature">The message format string.</param>
+        /// <param name="args">The arguments to render.</param>
+        /// <returns>One string per argument.</returns>
+        private static string[] FormatArguments(string messageSignature, object?[]? args)
+        {
+            if (args == null)
+            {
+                return null!;
+            }
+            Dictionary<int, string> specs = FormatSpecsOf(messageSignature ?? string.Empty);
+            string[] values = new string[args.Length];
+            for (int i = 0; i < args.Length; i++)
+            {
+                object? arg = args[i];
+                if (arg is IFormattable formattable && specs.TryGetValue(i, out string? spec))
+                {
+                    values[i] = formattable.ToString(spec, CultureInfo.CurrentCulture);
+                }
+                else
+                {
+                    values[i] = arg?.ToString()!;
+                }
+            }
+            return values;
+        }
+
+        /// <summary>Reads the format spec of each format item in a composite format string, skipping escaped braces.</summary>
+        private static Dictionary<int, string> FormatSpecsOf(string messageSignature)
+        {
+            Dictionary<int, string> specs = new Dictionary<int, string>();
+            int position = 0;
+            while (position < messageSignature.Length)
+            {
+                char current = messageSignature[position];
+                if ((current == '{' || current == '}') && position + 1 < messageSignature.Length && messageSignature[position + 1] == current)
+                {
+                    position += 2;
+                    continue;
+                }
+                if (current != '{')
+                {
+                    position++;
+                    continue;
+                }
+                int close = messageSignature.IndexOf('}', position + 1);
+                if (close < 0)
+                {
+                    break;
+                }
+                string item = messageSignature.Substring(position + 1, close - position - 1);
+                int colon = item.IndexOf(':');
+                string head = colon < 0 ? item : item.Substring(0, colon);
+                int comma = head.IndexOf(',');
+                string index = (comma < 0 ? head : head.Substring(0, comma)).Trim();
+                if (colon >= 0 && int.TryParse(index, NumberStyles.None, CultureInfo.InvariantCulture, out int argument) && !specs.ContainsKey(argument))
+                {
+                    specs[argument] = item.Substring(colon + 1);
+                }
+                position = close + 1;
+            }
+            return specs;
         }
 
         /// <summary>
