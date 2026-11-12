@@ -68,7 +68,7 @@ namespace Bam.Logging
         readonly object _threadLock = new object();
         bool _keepLogging = true;
         /// <summary>
-        /// Stops the background logging thread, waiting up to 3 seconds for it to finish before aborting.
+        /// Stops the background logging thread, waiting up to 3 seconds for it to finish. The thread is signalled and left to exit on its own; it is never aborted.
         /// </summary>
         /// <returns>This logger instance for method chaining.</returns>
         public virtual ILogger StopLoggingThread()
@@ -82,7 +82,8 @@ namespace Bam.Logging
                     _waitForEnqueueLogEvent.Set();
                     int wait = 3000;
                     int waited = 0;
-                    if (Exec.TakesTooLong(() =>
+                    // The thread leaves its loop on its own once _keepLogging is false; a thread cannot be aborted on .NET.
+                    Exec.TakesTooLong(() =>
                     {
                         while (_loggingThread.ThreadState != System.Threading.ThreadState.AbortRequested &&
                            _loggingThread.ThreadState != System.Threading.ThreadState.Aborted &&
@@ -95,14 +96,7 @@ namespace Bam.Logging
                                 break;
                             }
                         }
-                    }, 3500))
-                    {
-                        try
-                        {
-                            _loggingThread.Abort();
-                        }
-                        catch { } // not all ThreadStates are valid for a call to Abort
-                    }
+                    }, 3500);
                 }
             }
             return this;
