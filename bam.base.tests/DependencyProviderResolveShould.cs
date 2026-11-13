@@ -155,9 +155,10 @@ namespace Bam.Tests
                 registry.Set(typeof(ICountedClass), factory);
                 registry.Set(typeof(ITestClass), (object)instance);
                 registry.Set<INeverResolved>(() => null!);
+                registry.Set(typeof(IComparable), (object)null!);
                 reg.For<ServiceRegistry>().Use(registry);
             })
-            .When<ServiceRegistry>("reads registrations, then a factory registered again", registry =>
+            .When<ServiceRegistry>("reads registrations, a stored null and a null type, then a factory registered again", registry =>
             {
                 object? readFactory = null;
                 object? readInstance = null;
@@ -171,6 +172,19 @@ namespace Bam.Tests
                     unregistered = registry.TryGetRegistration(typeof(IDisposable), out readUnregistered);
                     nullFactory = registry.TryGetRegistration(typeof(INeverResolved), out object? ignored);
                 });
+                object? readNullValue = new object();
+                bool nullValue = registry.TryGetRegistration(typeof(IComparable), out readNullValue);
+                bool nullValueContained = registry.Contains(typeof(IComparable));
+                bool nullTypeThrows;
+                try
+                {
+                    registry.TryGetRegistration(null!, out object? unused);
+                    nullTypeThrows = false;
+                }
+                catch (ArgumentNullException)
+                {
+                    nullTypeThrows = true;
+                }
                 registry.For<ICountedClass>().Use<CountedClass>();
                 registry.TryGetRegistration(typeof(ICountedClass), out object? afterRebind);
                 return new RegistrationOutcome(
@@ -180,7 +194,11 @@ namespace Bam.Tests
                     readUnregistered is null,
                     nullFactory,
                     constructed,
-                    afterRebind is not null && !ReferenceEquals(afterRebind, factory));
+                    afterRebind is not null && !ReferenceEquals(afterRebind, factory),
+                    nullValue,
+                    readNullValue is null,
+                    nullValueContained,
+                    nullTypeThrows);
             })
             .TheTest
             .ShouldPass<RegistrationOutcome>((because, outcome) =>
@@ -192,6 +210,10 @@ namespace Bam.Tests
                 because.ItsTrue("a factory that would return null is still a registration", outcome.NullFactory);
                 because.ItsTrue("nothing was constructed to read them", outcome.Constructed == 0, $"constructed: {outcome.Constructed}");
                 because.ItsTrue("registering the type again replaces what reads back", outcome.RebindSeen);
+                because.ItsTrue("a stored null is not a registration", !outcome.NullValue);
+                because.ItsTrue("and gives null", outcome.NullValueOutIsNull);
+                because.ItsTrue("as Contains says", !outcome.NullValueContained);
+                because.ItsTrue("a null type is refused", outcome.NullTypeThrows);
             })
             .SoBeHappy()
             .UnlessItFailed();
@@ -264,6 +286,6 @@ namespace Bam.Tests
 
         private sealed record ContainsOutcome(bool Registered, bool Unregistered, int Constructed, bool NullFactory);
 
-        private sealed record RegistrationOutcome(bool SameFactory, bool SameInstance, bool Unregistered, bool UnregisteredIsNull, bool NullFactory, int Constructed, bool RebindSeen);
+        private sealed record RegistrationOutcome(bool SameFactory, bool SameInstance, bool Unregistered, bool UnregisteredIsNull, bool NullFactory, int Constructed, bool RebindSeen, bool NullValue, bool NullValueOutIsNull, bool NullValueContained, bool NullTypeThrows);
     }
 }

@@ -896,8 +896,11 @@ namespace Bam.DependencyInjection
         /// Reads the registration stored for the specified type as it is: the instance, or the factory delegate,
         /// without invoking it, so nothing is constructed and no user code runs. Comparing the result with
         /// <see cref="object.ReferenceEquals"/> tells whether a type is still bound to a registration the caller made
-        /// or has been registered again since (by <c>Set</c>, <c>For&lt;I&gt;().Use...</c>, <c>CopyFrom</c> or
-        /// <c>Include</c>).
+        /// or has been registered again since, by any write: <c>Set</c>, <c>For&lt;I&gt;().Use...</c>, <c>Construct</c>
+        /// (which stores what it constructs), <c>CopyFrom</c>/<c>CopyTypeFrom</c>, <c>Include</c> or <c>Remove</c>. A stored
+        /// null is not a registration. The read takes the provider's access lock, which serialises it against adding and
+        /// removing types; overwriting an existing type's registration is not locked, so a concurrent rebind reads as
+        /// either the old registration or the new one.
         /// </summary>
         /// <param name="type">The type whose registration to read.</param>
         /// <param name="registration">The stored instance or delegate, or null when the type has no registration.</param>
