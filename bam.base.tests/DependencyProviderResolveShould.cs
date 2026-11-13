@@ -145,6 +145,59 @@ namespace Bam.Tests
         }
 
         [UnitTest]
+        public void ReadARegistrationWithoutInvokingIt()
+        {
+            Func<object> factory = () => new CountedClass();
+            TestClass instance = new TestClass();
+            After.Setup(reg =>
+            {
+                ServiceRegistry registry = ServiceRegistry.Create();
+                registry.Set(typeof(ICountedClass), factory);
+                registry.Set(typeof(ITestClass), (object)instance);
+                registry.Set<INeverResolved>(() => null!);
+                reg.For<ServiceRegistry>().Use(registry);
+            })
+            .When<ServiceRegistry>("reads registrations, then a factory registered again", registry =>
+            {
+                object? readFactory = null;
+                object? readInstance = null;
+                object? readUnregistered = new object();
+                bool unregistered = true;
+                bool nullFactory = false;
+                int constructed = Constructions(() =>
+                {
+                    registry.TryGetRegistration(typeof(ICountedClass), out readFactory);
+                    registry.TryGetRegistration(typeof(ITestClass), out readInstance);
+                    unregistered = registry.TryGetRegistration(typeof(IDisposable), out readUnregistered);
+                    nullFactory = registry.TryGetRegistration(typeof(INeverResolved), out object? ignored);
+                });
+                registry.For<ICountedClass>().Use<CountedClass>();
+                registry.TryGetRegistration(typeof(ICountedClass), out object? afterRebind);
+                return new RegistrationOutcome(
+                    ReferenceEquals(readFactory, factory),
+                    ReferenceEquals(readInstance, instance),
+                    unregistered,
+                    readUnregistered is null,
+                    nullFactory,
+                    constructed,
+                    afterRebind is not null && !ReferenceEquals(afterRebind, factory));
+            })
+            .TheTest
+            .ShouldPass<RegistrationOutcome>((because, outcome) =>
+            {
+                because.ItsTrue("a factory reads back as the delegate that was stored", outcome.SameFactory);
+                because.ItsTrue("an instance reads back as that instance", outcome.SameInstance);
+                because.ItsTrue("an unregistered type reports false", !outcome.Unregistered);
+                because.ItsTrue("and gives null", outcome.UnregisteredIsNull);
+                because.ItsTrue("a factory that would return null is still a registration", outcome.NullFactory);
+                because.ItsTrue("nothing was constructed to read them", outcome.Constructed == 0, $"constructed: {outcome.Constructed}");
+                because.ItsTrue("registering the type again replaces what reads back", outcome.RebindSeen);
+            })
+            .SoBeHappy()
+            .UnlessItFailed();
+        }
+
+        [UnitTest]
         public void KeepASingletonSingle()
         {
             After.Setup(reg =>
@@ -210,5 +263,7 @@ namespace Bam.Tests
         private sealed record OverloadOutcome(int ByType, int ByTryGet, int ByTryGetType, int ByCtorParams, int ByCtorTypes, int ByTypeAndCtorTypes, int ByDefault);
 
         private sealed record ContainsOutcome(bool Registered, bool Unregistered, int Constructed, bool NullFactory);
+
+        private sealed record RegistrationOutcome(bool SameFactory, bool SameInstance, bool Unregistered, bool UnregisteredIsNull, bool NullFactory, int Constructed, bool RebindSeen);
     }
 }
