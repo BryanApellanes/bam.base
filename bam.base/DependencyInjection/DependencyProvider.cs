@@ -893,6 +893,34 @@ namespace Bam.DependencyInjection
         }
 
         /// <summary>
+        /// Reads the registration stored for the specified type as it is: the instance, or the factory delegate,
+        /// without invoking it, so nothing is constructed and no user code runs. Comparing the result with
+        /// <see cref="object.ReferenceEquals"/> tells whether a type is still bound to a registration the caller made
+        /// or has been registered again since, by any write: <c>Set</c>, <c>For&lt;I&gt;().Use...</c>, <c>Construct</c>
+        /// (which stores what it constructs), <c>CopyFrom</c>/<c>CopyTypeFrom</c>, <c>Include</c> or <c>Remove</c>. A stored
+        /// null is not a registration. The read takes the provider's access lock, which serialises it against adding and
+        /// removing types; overwriting an existing type's registration is not locked, so a concurrent rebind reads as
+        /// either the old registration or the new one.
+        /// </summary>
+        /// <param name="type">The type whose registration to read.</param>
+        /// <param name="registration">The stored instance or delegate, or null when the type has no registration.</param>
+        /// <returns>True when a non-null registration is stored for the type, as <see cref="Contains(Type)"/> reports.</returns>
+        public bool TryGetRegistration(Type type, out object? registration)
+        {
+            ArgumentNullException.ThrowIfNull(type);
+            lock (_accessLock)
+            {
+                if (_typeInstanceDictionary.TryGetValue(type, out object? registered) && registered != null)
+                {
+                    registration = registered;
+                    return true;
+                }
+                registration = null;
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Gets the inner instance of the type specified or
         /// null if it has not been set through a call to Set(), Get() or 
         /// Construct().
