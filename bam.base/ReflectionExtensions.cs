@@ -162,7 +162,7 @@ namespace Bam
                 MethodInfo genericMethod = method!.MakeGenericMethod(typeof(TArg));
                 return (T)genericMethod.Invoke(instance, args)!;
             }
-            catch (AmbiguousMatchException ame)
+            catch (AmbiguousMatchException)
             {
                 IEnumerable<MethodInfo> methods = instance.GetType().GetMethods().Where(mi => mi.Name.Equals(methodName) && mi.ContainsGenericParameters && mi.GetParameters().Length == args.Length);
                 T response = default(T)!;
@@ -195,7 +195,7 @@ namespace Bam
                 }
                 if (!gotOne)
                 {
-                    throw ame;
+                    throw;
                 }
                 return response!;
             }

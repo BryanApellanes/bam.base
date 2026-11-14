@@ -39,6 +39,9 @@ namespace Bam
         {
             get
             {
+                // The flag is only compared against type metadata here (the attribute set the compiler gives
+                // closure classes); nothing is serialized, so the formatter obsoletion does not apply.
+#pragma warning disable SYSLIB0050
                 return (t) => !t.IsAbstract && !t.HasCustomAttributeOfType<CompilerGeneratedAttribute>()
                               && t.Attributes != (
                                       TypeAttributes.NestedPrivate |
@@ -46,6 +49,7 @@ namespace Bam
                                       TypeAttributes.Serializable |
                                       TypeAttributes.BeforeFieldInit
                                   );
+#pragma warning restore SYSLIB0050
             }
         }
 

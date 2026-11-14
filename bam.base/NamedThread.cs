@@ -135,11 +135,18 @@ namespace Bam
             Thread.Start();
         }
 
+		/// <summary>
+		/// Throws <see cref="PlatformNotSupportedException"/> when the thread is running: a thread cannot be
+		/// aborted on .NET. This is what the call to Thread.Abort did here; the exception is now thrown
+		/// directly so the obsolete API is no longer referenced. Does nothing when the thread state is not exactly
+		/// Running, which includes every thread NamedThread starts itself: those are background threads, whose
+		/// state is Background.
+		/// </summary>
 		public void Abort()
 		{
 			if (Thread != null && Thread.ThreadState == System.Threading.ThreadState.Running)
 			{
-				Thread.Abort();
+				throw new PlatformNotSupportedException($"The thread ({Name}) is running and cannot be aborted: Thread.Abort is not supported on .NET.");
 			}
 		}
 

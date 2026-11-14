@@ -48,8 +48,8 @@ namespace Bam
 
         internal GeneratedAssemblyInfo(Assembly assembly)
         {
-            FileInfo assemblyFileInfo = assembly.GetFileInfo();
-            InfoFileName = assemblyFileInfo.Name;
+            // generated assemblies are usually loaded from bytes and have no file
+            InfoFileName = assembly.TryGetFileInfo(out FileInfo? assemblyFileInfo) ? assemblyFileInfo.Name : $"{assembly.GetName().Name}.dll";
             Assembly = assembly;
         }
 
