@@ -289,7 +289,7 @@ public class ProjectableServiceRegistry : ServiceRegistry
         List<string> conflicts = new List<string>();
         foreach (KeyValuePair<Type, Type> seam in _seams)
         {
-            foreach (string found in Unexpected(services, seam.Key, seam.Value, resolved))
+            foreach (string found in Unexpected(services, seam.Key, seam.Value, null, resolved))
             {
                 conflicts.Add($"{DisplayName(seam.Key)} is registered as {found}, and the registry declares {DisplayName(seam.Value)}. Declare it on the registry instead{place}: {Declaration(seam.Key, resolved)}.");
             }
@@ -297,7 +297,7 @@ public class ProjectableServiceRegistry : ServiceRegistry
         foreach (ServiceDescriptor composed in _composedProjections.Values)
         {
             string declared = composed.ImplementationType is not null ? DisplayName(composed.ImplementationType) : "a factory";
-            foreach (string found in Unexpected(services, composed.ServiceType, composed.ImplementationType, resolved))
+            foreach (string found in Unexpected(services, composed.ServiceType, composed.ImplementationType, composed.ImplementationFactory, resolved))
             {
                 conflicts.Add($"{DisplayName(composed.ServiceType)} is registered as {found}, and the registry composes it as {declared}. The registry projects it; don't register it in the collection.");
             }
@@ -444,13 +444,20 @@ public class ProjectableServiceRegistry : ServiceRegistry
         return kinds;
     }
 
-    private static IEnumerable<string> Unexpected(IServiceCollection services, Type serviceType, Type? declared, ProjectionOptions options)
+    private static IEnumerable<string> Unexpected(IServiceCollection services, Type serviceType, Type? declared, Func<IServiceProvider, object>? declaredFactory, ProjectionOptions options)
     {
         options.KnownDefaults.TryGetValue(serviceType, out Type? knownDefault);
         foreach (ServiceDescriptor existing in services.Where(descriptor => descriptor.ServiceType == serviceType && !descriptor.IsKeyedService))
         {
             Type? registered = existing.ImplementationType;
             if (registered is not null && ((declared is not null && registered == declared) || registered == knownDefault))
+            {
+                continue;
+            }
+            // The composed host factory itself, from an earlier projection of the same declaration: projecting again is
+            // idempotent, as it is for a type. Delegates are equal when they share a target and method, so a factory that
+            // captures nothing (a static lambda) matches across registries.
+            if (declaredFactory is not null && existing.ImplementationFactory is not null && existing.ImplementationFactory.Equals(declaredFactory))
             {
                 continue;
             }
