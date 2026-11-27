@@ -35,6 +35,7 @@ public class ProjectableServiceRegistry : ServiceRegistry
     private readonly List<Type> _composed = new List<Type>();
     private readonly Dictionary<Type, object> _composedRegistrations = new Dictionary<Type, object>();
     private readonly Dictionary<Type, ServiceDescriptor> _composedProjections = new Dictionary<Type, ServiceDescriptor>();
+    private readonly HashSet<Type> _recomposed = new HashSet<Type>();
 
     /// <summary>Single-implementation seams (service type to implementation type) declared so far, as a read-only copy.</summary>
     public IReadOnlyDictionary<Type, Type> Seams => new ReadOnlyDictionary<Type, Type>(new Dictionary<Type, Type>(_seams));
@@ -169,8 +170,8 @@ public class ProjectableServiceRegistry : ServiceRegistry
     /// <summary>
     /// Binds a service the host composes itself, constructed as <typeparamref name="TImplementation"/> both on the
     /// registry and in the collection (projected with <c>Replace</c> as a singleton). Rebinding or removing it on the
-    /// registry afterwards is a conflict, and so is declaring the same service as a seam, a catalog or an extension. A
-    /// service composed as itself (<c>Compose&lt;Foo, Foo&gt;()</c>) isn't compared on the registry, as with a seam:
+    /// registry afterwards is a conflict, and so is composing it a second time or declaring the same service as a seam, a
+    /// catalog or an extension. A service composed as itself (<c>Compose&lt;Foo, Foo&gt;()</c>) isn't compared on the registry, as with a seam:
     /// resolving it stores the instance under its own type.
     /// </summary>
     /// <typeparam name="TService">The service type.</typeparam>
@@ -188,7 +189,10 @@ public class ProjectableServiceRegistry : ServiceRegistry
     /// Binds a service the host composes itself with two factories: one for the registry and, optionally, one for the
     /// host's container (projected with <c>Replace</c> as a singleton). Without <paramref name="hostFactory"/>, nothing
     /// is projected for it and the host registers it itself. Rebinding or removing it on the registry afterwards is a
-    /// conflict, and so is declaring the same service as a seam, a catalog or an extension.
+    /// conflict, and so is composing it a second time or declaring the same service as a seam, a catalog or an extension.
+    /// Projecting the same declaration twice into one collection is idempotent only when <paramref name="hostFactory"/>
+    /// captures nothing (a static method or a non-capturing lambda), since the check compares delegates; a capturing
+    /// lambda or an instance method is refused on the second projection.
     /// </summary>
     /// <typeparam name="TService">The service type.</typeparam>
     /// <param name="registryFactory">Builds the service from this registry.</param>
@@ -274,7 +278,8 @@ public class ProjectableServiceRegistry : ServiceRegistry
     /// else: a declared seam, or a composed binding the registry projects, whose existing registration is neither the
     /// declared type nor a known default. A registration made with a factory or an instance has no type to compare, so
     /// it counts, and anything already registered for a service composed with a host factory counts too, unless it is
-    /// the known default. Keyed registrations are ignored. Lifetimes aren't compared: both are projected as singletons.
+    /// the known default or a registration whose factory equals the composed host factory (an earlier projection of the
+    /// same declaration, so projecting again is idempotent). Keyed registrations are ignored. Lifetimes aren't compared: both are projected as singletons.
     /// A composed binding with no host factory is the host's to register and isn't checked.
     /// </summary>
     /// <param name="services">The host's service collection.</param>
@@ -288,7 +293,7 @@ public class ProjectableServiceRegistry : ServiceRegistry
         List<string> conflicts = new List<string>();
         foreach (KeyValuePair<Type, Type> seam in _seams)
         {
-            foreach (string found in Unexpected(services, seam.Key, seam.Value, resolved))
+            foreach (string found in Unexpected(services, seam.Key, seam.Value, null, resolved))
             {
                 conflicts.Add($"{DisplayName(seam.Key)} is registered as {found}, and the registry declares {DisplayName(seam.Value)}. Declare it on the registry instead{place}: {Declaration(seam.Key, resolved)}.");
             }
@@ -296,7 +301,7 @@ public class ProjectableServiceRegistry : ServiceRegistry
         foreach (ServiceDescriptor composed in _composedProjections.Values)
         {
             string declared = composed.ImplementationType is not null ? DisplayName(composed.ImplementationType) : "a factory";
-            foreach (string found in Unexpected(services, composed.ServiceType, composed.ImplementationType, resolved))
+            foreach (string found in Unexpected(services, composed.ServiceType, composed.ImplementationType, composed.ImplementationFactory, resolved))
             {
                 conflicts.Add($"{DisplayName(composed.ServiceType)} is registered as {found}, and the registry composes it as {declared}. The registry projects it; don't register it in the collection.");
             }
@@ -310,7 +315,7 @@ public class ProjectableServiceRegistry : ServiceRegistry
     /// <item><description>a service declared as a seam or composed and also under another kind (seam, composed, catalog or extension);</description></item>
     /// <item><description>a declared seam whose registration is no longer the one <see cref="UseSeam{TService, TImplementation}"/> made (rebound with <c>For&lt;I&gt;().Use</c>, <c>Set</c>, <c>Include</c> or <c>CopyFrom</c>, or removed);</description></item>
     /// <item><description>a seam named in <see cref="ProjectionOptions.DeclarationHints"/> that is bound without a declaration;</description></item>
-    /// <item><description>a composed binding rebound or removed.</description></item>
+    /// <item><description>a composed binding rebound or removed, or composed a second time.</description></item>
     /// </list>
     /// Nothing is constructed to find out. A seam or composed service that is its own implementation isn't compared.
     /// </summary>
@@ -330,9 +335,14 @@ public class ProjectableServiceRegistry : ServiceRegistry
                 conflicts.Add($"{DisplayName(single)} is declared as {string.Join(" and as ", kinds)}, so the host and registry.Get would resolve different types. A seam or a composed service has one declaration; keep one.");
             }
         }
+        foreach (Type recomposed in _composed.Where(composed => _recomposed.Contains(composed) && !mixed.Contains(composed)))
+        {
+            string advice = resolved.ComposedAdvice.TryGetValue(recomposed, out string? text) ? " " + text : string.Empty;
+            conflicts.Add($"{DisplayName(recomposed)} was composed more than once on the registry, so a later Compose replaced the declaration without a conflict. A composed service has one declaration.{advice}");
+        }
         foreach (KeyValuePair<Type, object> composed in _composedRegistrations)
         {
-            if (mixed.Contains(composed.Key))
+            if (mixed.Contains(composed.Key) || _recomposed.Contains(composed.Key))
             {
                 continue;
             }
@@ -389,7 +399,13 @@ public class ProjectableServiceRegistry : ServiceRegistry
 
     private ProjectableServiceRegistry RecordComposed(Type serviceType, ServiceDescriptor? projection, bool compare)
     {
-        if (!_composed.Contains(serviceType))
+        if (_composed.Contains(serviceType))
+        {
+            // A composed service has one declaration: composing it again would otherwise become the recorded
+            // declaration, and nothing would report that the first one was replaced (bam.base#61).
+            _recomposed.Add(serviceType);
+        }
+        else
         {
             _composed.Add(serviceType);
         }
@@ -432,13 +448,20 @@ public class ProjectableServiceRegistry : ServiceRegistry
         return kinds;
     }
 
-    private static IEnumerable<string> Unexpected(IServiceCollection services, Type serviceType, Type? declared, ProjectionOptions options)
+    private static IEnumerable<string> Unexpected(IServiceCollection services, Type serviceType, Type? declared, Func<IServiceProvider, object>? declaredFactory, ProjectionOptions options)
     {
         options.KnownDefaults.TryGetValue(serviceType, out Type? knownDefault);
         foreach (ServiceDescriptor existing in services.Where(descriptor => descriptor.ServiceType == serviceType && !descriptor.IsKeyedService))
         {
             Type? registered = existing.ImplementationType;
             if (registered is not null && ((declared is not null && registered == declared) || registered == knownDefault))
+            {
+                continue;
+            }
+            // The composed host factory itself, from an earlier projection of the same declaration: projecting again is
+            // idempotent, as it is for a type. Delegates are equal when they share a target and method, so a factory that
+            // captures nothing (a static lambda) matches across registries.
+            if (declaredFactory is not null && existing.ImplementationFactory is not null && existing.ImplementationFactory.Equals(declaredFactory))
             {
                 continue;
             }

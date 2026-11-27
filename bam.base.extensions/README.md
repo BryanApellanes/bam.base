@@ -37,13 +37,14 @@ registry.ProjectInto(builder.Services, new ProjectionOptions
   - a service declared as a seam or composed and also under another kind;
   - a declared seam that was rebound or removed on the registry, including through `Include` or `CopyFrom`;
   - a seam named in `DeclarationHints` that is bound without a declaration;
-  - a composed binding that was rebound or removed.
+  - a composed binding that was rebound, removed, or composed a second time.
 - **`SeamConflicts(services, options)`** finds a seam, or a composed binding the registry projects, that the collection already holds as something else. A registration made with a factory or an instance counts, since it has no type to compare. These are not conflicts:
   - the declared type;
   - a `KnownDefaults` entry;
+  - for a service composed with a host factory, a registration whose factory equals that host factory, such as one from an earlier projection of the same declaration;
   - a keyed registration.
 
-A composed binding with no host factory is the host's to register and isn't checked against the collection. Nothing is constructed to find a conflict. A seam or composed service that is its own implementation (`UseSeam<Foo, Foo>()`) isn't compared. A registration added to the collection *after* `ProjectInto` isn't checked: `TryAdd` then does nothing, and `Add` wins. Project once: projecting twice into one collection adds each instance extension twice.
+A composed binding with no host factory is the host's to register and isn't checked against the collection. Nothing is constructed to find a conflict. A seam or composed service that is its own implementation (`UseSeam<Foo, Foo>()`) isn't compared. A registration added to the collection *after* `ProjectInto` isn't checked: `TryAdd` then does nothing, and `Add` wins. Project once: projecting twice into one collection adds each instance extension twice. A factory-composed service survives a second projection only when its host factory captures nothing (a static method or a non-capturing lambda); the check compares delegates, so a capturing lambda or an instance method is refused the second time.
 
 ## Options
 
@@ -54,7 +55,7 @@ A composed binding with no host factory is the host's to register and isn't chec
 | `DeclarationHints` | Service type to the call a host should make; such seams are checked even when undeclared. |
 | `DeclarationPlace` | Where seams are declared, added to the advice. |
 | `SeamConflictAdvice` | A sentence appended to the seam-conflict message. |
-| `ComposedAdvice` | Service type to the advice for a rebound composed binding. |
+| `ComposedAdvice` | Service type to the advice for a composed binding rebound, removed or composed again. |
 | `RegistryConflictHeader` | What the registry-conflict message says after "The {name} registry"; defaults to "holds a binding the service collection would not get." |
 | `DeclarationName` | What an undeclared seam lacks, as in "without a {DeclarationName}"; defaults to "declaration". |
 

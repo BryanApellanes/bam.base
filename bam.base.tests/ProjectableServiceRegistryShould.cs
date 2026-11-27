@@ -234,6 +234,43 @@ namespace Bam.Tests
         }
 
         [UnitTest]
+        public void RefuseAComposedServiceComposedAgain()
+        {
+            When.A<ProjectionOptions>("composes a pipeline once, and twice with each overload",
+                () => new ProjectionOptions { ComposedAdvice = new Dictionary<Type, string> { [typeof(IPipeline)] = "Add steps instead." } },
+                options =>
+                {
+                    ProjectableServiceRegistry once = new ProjectableServiceRegistry().Compose<IPipeline>(registry => new Pipeline(), provider => new Pipeline());
+                    ProjectableServiceRegistry byFactory = new ProjectableServiceRegistry().Compose<IPipeline>(registry => new Pipeline(), provider => new Pipeline());
+                    byFactory.Compose<IPipeline>(registry => new Pipeline());
+                    ProjectableServiceRegistry byType = new ProjectableServiceRegistry().Compose<IPipeline, Pipeline>();
+                    byType.Compose<IPipeline, Pipeline>();
+                    ServiceCollection twice = new ServiceCollection();
+                    new ProjectableServiceRegistry().Compose<IPipeline>(registry => new Pipeline(), HostPipeline).ProjectInto(twice, options);
+                    new ProjectableServiceRegistry().Compose<IPipeline>(registry => new Pipeline(), HostPipeline).ProjectInto(twice, options);
+                    ServiceCollection hostFactory = new ServiceCollection();
+                    hostFactory.AddSingleton<IPipeline>(provider => new Pipeline());
+                    return new RecomposedOutcome(
+                        twice.Count(descriptor => descriptor.ServiceType == typeof(IPipeline)),
+                        Refusal(() => new ProjectableServiceRegistry().Compose<IPipeline>(registry => new Pipeline(), HostPipeline).ProjectInto(hostFactory, options)),
+                        once.RegistryConflicts(options).Count,
+                        Refusal(() => byFactory.ProjectInto(new ServiceCollection(), options)),
+                        Refusal(() => byType.ProjectInto(new ServiceCollection(), options)));
+                })
+                .TheTest
+                .ShouldPass<RecomposedOutcome>((because, outcome) =>
+                {
+                    because.ItsTrue("composing once is fine", outcome.OnceConflicts == 0);
+                    because.ItsTrue($"projecting the same factory-composed declaration twice keeps one registration ({outcome.TwiceRegistrations})", outcome.TwiceRegistrations == 1);
+                    because.ItsTrue($"a host's own factory registered first is still refused ({outcome.HostFactory})", outcome.HostFactory.Contains("is registered as a factory", StringComparison.Ordinal));
+                    because.ItsTrue($"a second factory Compose is refused with the advice ({outcome.ByFactory})", outcome.ByFactory.Contains("was composed more than once", StringComparison.Ordinal) && outcome.ByFactory.Contains("Add steps instead.", StringComparison.Ordinal));
+                    because.ItsTrue($"a second type Compose is refused ({outcome.ByType})", outcome.ByType.Contains("was composed more than once", StringComparison.Ordinal));
+                })
+                .SoBeHappy()
+                .UnlessItFailed();
+        }
+
+        [UnitTest]
         public void WriteGenericTypeNamesAsCSharpDoes()
         {
             When.A<Type>("formats a closed and an open generic type",
@@ -438,6 +475,11 @@ namespace Bam.Tests
         private sealed record RegistryOutcome(string Rebound, string Removed, string Undeclared, int CleanCount);
 
         private sealed record ComposedOutcome(Type HostType, int FactoryRegistrations, string Rebound, string Removed);
+
+        private sealed record RecomposedOutcome(int TwiceRegistrations, string HostFactory, int OnceConflicts, string ByFactory, string ByType);
+
+        /// <summary>A host factory that captures nothing, so every registry composing with it shares one delegate.</summary>
+        private static IPipeline HostPipeline(IServiceProvider provider) => new Pipeline();
 
         private sealed record NameOutcome(string Closed, string Open);
 
