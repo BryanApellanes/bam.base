@@ -234,6 +234,34 @@ namespace Bam.Tests
         }
 
         [UnitTest]
+        public void RefuseAComposedServiceComposedAgain()
+        {
+            When.A<ProjectionOptions>("composes a pipeline once, and twice with each overload",
+                () => new ProjectionOptions { ComposedAdvice = new Dictionary<Type, string> { [typeof(IPipeline)] = "Add steps instead." } },
+                options =>
+                {
+                    ProjectableServiceRegistry once = new ProjectableServiceRegistry().Compose<IPipeline>(registry => new Pipeline(), provider => new Pipeline());
+                    ProjectableServiceRegistry byFactory = new ProjectableServiceRegistry().Compose<IPipeline>(registry => new Pipeline(), provider => new Pipeline());
+                    byFactory.Compose<IPipeline>(registry => new Pipeline());
+                    ProjectableServiceRegistry byType = new ProjectableServiceRegistry().Compose<IPipeline, Pipeline>();
+                    byType.Compose<IPipeline, Pipeline>();
+                    return new RecomposedOutcome(
+                        once.RegistryConflicts(options).Count,
+                        Refusal(() => byFactory.ProjectInto(new ServiceCollection(), options)),
+                        Refusal(() => byType.ProjectInto(new ServiceCollection(), options)));
+                })
+                .TheTest
+                .ShouldPass<RecomposedOutcome>((because, outcome) =>
+                {
+                    because.ItsTrue("composing once is fine", outcome.OnceConflicts == 0);
+                    because.ItsTrue($"a second factory Compose is refused with the advice ({outcome.ByFactory})", outcome.ByFactory.Contains("was composed more than once", StringComparison.Ordinal) && outcome.ByFactory.Contains("Add steps instead.", StringComparison.Ordinal));
+                    because.ItsTrue($"a second type Compose is refused ({outcome.ByType})", outcome.ByType.Contains("was composed more than once", StringComparison.Ordinal));
+                })
+                .SoBeHappy()
+                .UnlessItFailed();
+        }
+
+        [UnitTest]
         public void WriteGenericTypeNamesAsCSharpDoes()
         {
             When.A<Type>("formats a closed and an open generic type",
@@ -438,6 +466,8 @@ namespace Bam.Tests
         private sealed record RegistryOutcome(string Rebound, string Removed, string Undeclared, int CleanCount);
 
         private sealed record ComposedOutcome(Type HostType, int FactoryRegistrations, string Rebound, string Removed);
+
+        private sealed record RecomposedOutcome(int OnceConflicts, string ByFactory, string ByType);
 
         private sealed record NameOutcome(string Closed, string Open);
 

@@ -35,6 +35,7 @@ public class ProjectableServiceRegistry : ServiceRegistry
     private readonly List<Type> _composed = new List<Type>();
     private readonly Dictionary<Type, object> _composedRegistrations = new Dictionary<Type, object>();
     private readonly Dictionary<Type, ServiceDescriptor> _composedProjections = new Dictionary<Type, ServiceDescriptor>();
+    private readonly HashSet<Type> _recomposed = new HashSet<Type>();
 
     /// <summary>Single-implementation seams (service type to implementation type) declared so far, as a read-only copy.</summary>
     public IReadOnlyDictionary<Type, Type> Seams => new ReadOnlyDictionary<Type, Type>(new Dictionary<Type, Type>(_seams));
@@ -310,7 +311,7 @@ public class ProjectableServiceRegistry : ServiceRegistry
     /// <item><description>a service declared as a seam or composed and also under another kind (seam, composed, catalog or extension);</description></item>
     /// <item><description>a declared seam whose registration is no longer the one <see cref="UseSeam{TService, TImplementation}"/> made (rebound with <c>For&lt;I&gt;().Use</c>, <c>Set</c>, <c>Include</c> or <c>CopyFrom</c>, or removed);</description></item>
     /// <item><description>a seam named in <see cref="ProjectionOptions.DeclarationHints"/> that is bound without a declaration;</description></item>
-    /// <item><description>a composed binding rebound or removed.</description></item>
+    /// <item><description>a composed binding rebound or removed, or composed a second time.</description></item>
     /// </list>
     /// Nothing is constructed to find out. A seam or composed service that is its own implementation isn't compared.
     /// </summary>
@@ -330,9 +331,14 @@ public class ProjectableServiceRegistry : ServiceRegistry
                 conflicts.Add($"{DisplayName(single)} is declared as {string.Join(" and as ", kinds)}, so the host and registry.Get would resolve different types. A seam or a composed service has one declaration; keep one.");
             }
         }
+        foreach (Type recomposed in _composed.Where(composed => _recomposed.Contains(composed) && !mixed.Contains(composed)))
+        {
+            string advice = resolved.ComposedAdvice.TryGetValue(recomposed, out string? text) ? " " + text : string.Empty;
+            conflicts.Add($"{DisplayName(recomposed)} was composed more than once on the registry, so a later Compose replaced the declaration without a conflict. A composed service has one declaration.{advice}");
+        }
         foreach (KeyValuePair<Type, object> composed in _composedRegistrations)
         {
-            if (mixed.Contains(composed.Key))
+            if (mixed.Contains(composed.Key) || _recomposed.Contains(composed.Key))
             {
                 continue;
             }
@@ -389,7 +395,13 @@ public class ProjectableServiceRegistry : ServiceRegistry
 
     private ProjectableServiceRegistry RecordComposed(Type serviceType, ServiceDescriptor? projection, bool compare)
     {
-        if (!_composed.Contains(serviceType))
+        if (_composed.Contains(serviceType))
+        {
+            // A composed service has one declaration: composing it again would otherwise become the recorded
+            // declaration, and nothing would report that the first one was replaced (bam.base#61).
+            _recomposed.Add(serviceType);
+        }
+        else
         {
             _composed.Add(serviceType);
         }
