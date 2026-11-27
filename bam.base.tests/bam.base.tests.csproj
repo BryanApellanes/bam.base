@@ -15,6 +15,11 @@
     <ProjectReference Include="..\..\bam.shell\bam.shell\bam.shell.csproj" />
     <ProjectReference Include="..\..\bam.test\bam.test\bam.test.csproj" />
     <ProjectReference Include="..\bam.base\bam.base.csproj" />
+    <ProjectReference Include="..\bam.base.extensions\bam.base.extensions.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />
   </ItemGroup>
 
 </Project>
