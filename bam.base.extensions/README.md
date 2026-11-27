@@ -14,7 +14,9 @@ To detect conflicts, the projection has to know which bindings were *declared* a
 | Seam: one implementation, last declaration wins | `UseSeam<TService, TImplementation>()` | `Replace` (singleton) |
 | Catalog: ordered, de-duplicated by type | `AddToCatalog<TService, TImplementation>()`; read with `CatalogTypes<TService>()`, build with `BuildCatalog<TService>()` | `TryAddEnumerable` (singleton) |
 | Extension: one more registration of a collection service | `AddExtension(Type, Type)`, `AddExtension(Type, object)` (the same instance twice is one) | `TryAddEnumerable`, or `Add` for an instance |
-| Composed: built by the host, never rebound | `Compose<TService, TImplementation>()`, `Compose<TService>(registryFactory, hostFactory?)` | `TryAdd` (singleton); nothing without a host factory |
+| Composed: built by the host, never rebound | `Compose<TService, TImplementation>()`, `Compose<TService>(registryFactory, hostFactory?)` | `Replace` (singleton); nothing without a host factory |
+
+A seam or a composed service has **one declaration**. Declaring the same service type as a seam or composed *and* under any other kind (in either order) is a conflict, because the host and `registry.Get` would resolve different types. Catalogs and extensions are collections and may share a service type.
 
 ## Projecting
 ```csharp
@@ -31,16 +33,17 @@ registry.ProjectInto(builder.Services, new ProjectionOptions
 });
 ```
 `ProjectInto` registers nothing and throws one `InvalidOperationException` naming every conflict when either check finds one:
-- **`RegistryConflicts(options)`** finds three things:
-  - a declared seam that was rebound or removed on the registry;
+- **`RegistryConflicts(options)`** finds four things:
+  - a service declared as a seam or composed and also under another kind;
+  - a declared seam that was rebound or removed on the registry, including through `Include` or `CopyFrom`;
   - a seam named in `DeclarationHints` that is bound without a declaration;
   - a composed binding that was rebound or removed.
-- **`SeamConflicts(services, options)`** finds a seam the collection already holds as something else. A registration made with a factory or an instance counts, since it has no type to compare. These are not conflicts:
+- **`SeamConflicts(services, options)`** finds a seam, or a composed binding the registry projects, that the collection already holds as something else. A registration made with a factory or an instance counts, since it has no type to compare. These are not conflicts:
   - the declared type;
   - a `KnownDefaults` entry;
   - a keyed registration.
 
-Nothing is constructed to find a conflict. A seam or composed service that is its own implementation (`UseSeam<Foo, Foo>()`) isn't compared. A registration added to the collection *after* `ProjectInto` isn't checked: `TryAdd` then does nothing, and `Add` wins.
+A composed binding with no host factory is the host's to register and isn't checked against the collection. Nothing is constructed to find a conflict. A seam or composed service that is its own implementation (`UseSeam<Foo, Foo>()`) isn't compared. A registration added to the collection *after* `ProjectInto` isn't checked: `TryAdd` then does nothing, and `Add` wins. Project once: projecting twice into one collection adds each instance extension twice.
 
 ## Options
 
@@ -52,3 +55,7 @@ Nothing is constructed to find a conflict. A seam or composed service that is it
 | `DeclarationPlace` | Where seams are declared, added to the advice. |
 | `SeamConflictAdvice` | A sentence appended to the seam-conflict message. |
 | `ComposedAdvice` | Service type to the advice for a rebound composed binding. |
+| `RegistryConflictHeader` | What the registry-conflict message says after "The {name} registry"; defaults to "holds a binding the service collection would not get." |
+| `DeclarationName` | What an undeclared seam lacks, as in "without a {DeclarationName}"; defaults to "declaration". |
+
+A dictionary set to null reads as empty, and blank wording falls back to the default.

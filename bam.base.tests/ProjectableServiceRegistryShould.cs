@@ -249,6 +249,169 @@ namespace Bam.Tests
                 .UnlessItFailed();
         }
 
+        [UnitTest]
+        public void ProjectAServiceComposedAsItselfAfterItIsResolved()
+        {
+            When.A<ProjectableServiceRegistry>("composes Pipeline as itself, by type and by factory, resolves both and projects",
+                () => new ProjectableServiceRegistry().Compose<Pipeline, Pipeline>().Compose<StepA>(registry => new StepA(), provider => new StepA()),
+                registry =>
+                {
+                    registry.Get<Pipeline>();
+                    registry.Get<StepA>();
+                    ServiceCollection services = new ServiceCollection();
+                    string message = Refusal(() => registry.ProjectInto(services));
+                    using ServiceProvider provider = services.BuildServiceProvider();
+                    return new SelfComposedOutcome(message, provider.GetService<Pipeline>() is not null, provider.GetService<StepA>() is not null);
+                })
+                .TheTest
+                .ShouldPass<SelfComposedOutcome>((because, outcome) =>
+                {
+                    because.ItsTrue($"resolving a self-composed service is no conflict ({outcome.Message})", outcome.Message.Length == 0);
+                    because.ItsTrue("the type-composed service reaches the host", outcome.HostHasPipeline);
+                    because.ItsTrue("and so does the factory-composed one", outcome.HostHasStep);
+                })
+                .SoBeHappy()
+                .UnlessItFailed();
+        }
+
+        [UnitTest]
+        public void RefuseOneServiceDeclaredUnderTwoKindsInEitherOrder()
+        {
+            When.A<string>("declares one service as a seam and as composed, a catalog or an extension, in both orders",
+                () => "Declared as",
+                _ =>
+                {
+                    List<ProjectableServiceRegistry> registries = new List<ProjectableServiceRegistry>
+                    {
+                        new ProjectableServiceRegistry().UseSeam<IGreeter, PoliteGreeter>().Compose<IGreeter, CurtGreeter>(),
+                        new ProjectableServiceRegistry().UseSeam<IGreeter, PoliteGreeter>().Compose<IGreeter>(registry => new CurtGreeter(), provider => new CurtGreeter()),
+                        new ProjectableServiceRegistry().Compose<IGreeter, CurtGreeter>().UseSeam<IGreeter, PoliteGreeter>(),
+                        new ProjectableServiceRegistry().UseSeam<IStep, StepA>().AddToCatalog<IStep, StepB>(),
+                        new ProjectableServiceRegistry().AddToCatalog<IStep, StepB>().UseSeam<IStep, StepA>(),
+                        new ProjectableServiceRegistry().Compose<IStep, StepA>().AddExtension(typeof(IStep), typeof(StepB)),
+                    };
+                    List<string> messages = new List<string>();
+                    List<int> registered = new List<int>();
+                    foreach (ProjectableServiceRegistry registry in registries)
+                    {
+                        ServiceCollection services = new ServiceCollection();
+                        messages.Add(Refusal(() => registry.ProjectInto(services)));
+                        registered.Add(services.Count);
+                    }
+                    ProjectableServiceRegistry shared = new ProjectableServiceRegistry().AddToCatalog<IStep, StepA>().AddExtension(typeof(IStep), typeof(StepB));
+                    return new MixedOutcome(messages, registered, Refusal(() => shared.ProjectInto(new ServiceCollection())));
+                })
+                .TheTest
+                .ShouldPass<MixedOutcome>((because, outcome) =>
+                {
+                    because.ItsTrue("every mixed declaration is refused", outcome.Messages.All(message => message.Contains(" is declared as a ", StringComparison.Ordinal)));
+                    because.ItsTrue("seam then compose names both kinds", outcome.Messages[0].Contains($"a seam ({typeof(PoliteGreeter).FullName}) and as a composed service", StringComparison.Ordinal));
+                    because.ItsTrue("seam and catalog name both kinds", outcome.Messages[3].Contains("and as a catalog", StringComparison.Ordinal) && outcome.Messages[4].Contains("and as a catalog", StringComparison.Ordinal));
+                    because.ItsTrue("composed and extension name both kinds", outcome.Messages[5].Contains("a composed service and as an extension", StringComparison.Ordinal));
+                    because.ItsTrue("nothing was registered", outcome.Registered.All(count => count == 0));
+                    because.ItsTrue($"a catalog and an extension may share a service ({outcome.Shared})", outcome.Shared.Length == 0);
+                })
+                .SoBeHappy()
+                .UnlessItFailed();
+        }
+
+        [UnitTest]
+        public void CompareComposedBindingsWithTheCollection()
+        {
+            When.A<ProjectionOptions>("composes IGreeter as CurtGreeter onto collections holding another type, the known default and the declared type",
+                () => new ProjectionOptions { KnownDefaults = new Dictionary<Type, Type> { [typeof(IGreeter)] = typeof(DefaultGreeter) } },
+                options =>
+                {
+                    ServiceCollection other = new ServiceCollection();
+                    other.AddSingleton<IGreeter, PoliteGreeter>();
+                    string refused = Refusal(() => new ProjectableServiceRegistry().Compose<IGreeter, CurtGreeter>().ProjectInto(other, options));
+                    ServiceCollection factory = new ServiceCollection();
+                    factory.AddSingleton<IGreeter, PoliteGreeter>();
+                    string factoryRefused = Refusal(() => new ProjectableServiceRegistry().Compose<IGreeter>(registry => new CurtGreeter(), provider => new CurtGreeter()).ProjectInto(factory, options));
+                    ServiceCollection defaults = new ServiceCollection();
+                    defaults.AddSingleton<IGreeter, DefaultGreeter>();
+                    new ProjectableServiceRegistry().Compose<IGreeter, CurtGreeter>().ProjectInto(defaults, options);
+                    ServiceCollection same = new ServiceCollection();
+                    same.AddSingleton<IGreeter, CurtGreeter>();
+                    new ProjectableServiceRegistry().Compose<IGreeter, CurtGreeter>().ProjectInto(same, options);
+                    ServiceCollection hostOwned = new ServiceCollection();
+                    hostOwned.AddSingleton<IGreeter, PoliteGreeter>();
+                    string hostOwnedRefused = Refusal(() => new ProjectableServiceRegistry().Compose<IGreeter>(registry => new CurtGreeter()).ProjectInto(hostOwned, options));
+                    using ServiceProvider defaultsProvider = defaults.BuildServiceProvider();
+                    using ServiceProvider sameProvider = same.BuildServiceProvider();
+                    return new ComposedCollectionOutcome(refused, factoryRefused, defaultsProvider.GetRequiredService<IGreeter>().GetType(), same.Count, sameProvider.GetRequiredService<IGreeter>().GetType(), hostOwnedRefused);
+                })
+                .TheTest
+                .ShouldPass<ComposedCollectionOutcome>((because, outcome) =>
+                {
+                    because.ItsTrue("another type in the collection is refused", outcome.Refused.Contains($"is registered as {typeof(PoliteGreeter).FullName}, and the registry composes it as {typeof(CurtGreeter).FullName}", StringComparison.Ordinal));
+                    because.ItsTrue("and so it is for a host factory", outcome.FactoryRefused.Contains("the registry composes it as a factory", StringComparison.Ordinal));
+                    because.ItsTrue("the known default is replaced by the composed type", outcome.DefaultsHostType == typeof(CurtGreeter));
+                    because.ItsTrue("the declared type already there stays one registration", outcome.SameCount == 1 && outcome.SameHostType == typeof(CurtGreeter));
+                    because.ItsTrue("a composed binding the host registers itself isn't checked", outcome.HostOwnedRefused.Length == 0);
+                })
+                .SoBeHappy()
+                .UnlessItFailed();
+        }
+
+        [UnitTest]
+        public void UseTheHostsWordingAndReportARebindThroughInclude()
+        {
+            When.A<ProjectionOptions>("words conflicts the way a host asks and rebinds a seam through Include",
+                () => new ProjectionOptions
+                {
+                    RegistryName = "gateway",
+                    RegistryConflictHeader = "holds a seam bound other than through its Use methods, which the service collection would not get.",
+                    DeclarationName = "Use declaration",
+                    DeclarationHints = new Dictionary<Type, string> { [typeof(IStep)] = "registry.UseStep<T>()" },
+                },
+                options =>
+                {
+                    ProjectableServiceRegistry undeclared = new ProjectableServiceRegistry();
+                    undeclared.For<IStep>().Use<StepA>();
+                    ServiceRegistry other = new ServiceRegistry();
+                    other.For<IGreeter>().Use<CurtGreeter>();
+                    ProjectableServiceRegistry included = new ProjectableServiceRegistry().UseSeam<IGreeter, PoliteGreeter>();
+                    included.Include(other);
+                    return new WordingOutcome(
+                        Refusal(() => undeclared.ProjectInto(new ServiceCollection(), options)),
+                        Refusal(() => included.ProjectInto(new ServiceCollection(), options)));
+                })
+                .TheTest
+                .ShouldPass<WordingOutcome>((because, outcome) =>
+                {
+                    because.ItsTrue("the header is the host's", outcome.Undeclared.StartsWith("The gateway registry holds a seam bound other than through its Use methods, which the service collection would not get. ", StringComparison.Ordinal));
+                    because.ItsTrue("and so is the declaration's name", outcome.Undeclared.Contains("without a Use declaration", StringComparison.Ordinal));
+                    because.ItsTrue("a rebind through Include is refused", outcome.Included.Contains("then bound again as a factory (For<I>().Use..., Set with a factory, or Include/CopyFrom", StringComparison.Ordinal));
+                })
+                .SoBeHappy()
+                .UnlessItFailed();
+        }
+
+        [UnitTest]
+        public void ReadNullDictionariesAsEmptyAndNameArrays()
+        {
+            When.A<ProjectionOptions>("projects with every dictionary set to null and names an array of a generic type",
+                () => new ProjectionOptions { KnownDefaults = null!, DeclarationHints = null!, ComposedAdvice = null!, RegistryConflictHeader = null!, DeclarationName = " " },
+                options =>
+                {
+                    ServiceCollection services = new ServiceCollection();
+                    services.AddSingleton<IGreeter, CurtGreeter>();
+                    string message = Refusal(() => new ProjectableServiceRegistry().UseSeam<IGreeter, PoliteGreeter>().ProjectInto(services, options));
+                    return new NullOptionsOutcome(message, options.RegistryConflictHeader, options.DeclarationName, ProjectableServiceRegistry.DisplayName(typeof(List<int>[])), ProjectableServiceRegistry.DisplayName(typeof(int[,])));
+                })
+                .TheTest
+                .ShouldPass<NullOptionsOutcome>((because, outcome) =>
+                {
+                    because.ItsTrue($"a null dictionary reads as empty, so the conflict is still reported ({outcome.Message})", outcome.Message.Contains($"is registered as {typeof(CurtGreeter).FullName}", StringComparison.Ordinal));
+                    because.ItsTrue("blank wording falls back to the defaults", outcome.Header == ProjectionOptions.DefaultRegistryConflictHeader && outcome.DeclarationName == ProjectionOptions.DefaultDeclarationName);
+                    because.ItsTrue($"an array of a generic type is written as C# does ({outcome.GenericArray})", outcome.GenericArray == "System.Collections.Generic.List<System.Int32>[]");
+                    because.ItsTrue($"and a two-dimensional array too ({outcome.MultiArray})", outcome.MultiArray == "System.Int32[,]");
+                })
+                .SoBeHappy()
+                .UnlessItFailed();
+        }
+
         private static string Refusal(Action project)
         {
             try
@@ -277,6 +440,16 @@ namespace Bam.Tests
         private sealed record ComposedOutcome(Type HostType, int FactoryRegistrations, string Rebound, string Removed);
 
         private sealed record NameOutcome(string Closed, string Open);
+
+        private sealed record SelfComposedOutcome(string Message, bool HostHasPipeline, bool HostHasStep);
+
+        private sealed record MixedOutcome(List<string> Messages, List<int> Registered, string Shared);
+
+        private sealed record ComposedCollectionOutcome(string Refused, string FactoryRefused, Type DefaultsHostType, int SameCount, Type SameHostType, string HostOwnedRefused);
+
+        private sealed record WordingOutcome(string Undeclared, string Included);
+
+        private sealed record NullOptionsOutcome(string Message, string Header, string DeclarationName, string GenericArray, string MultiArray);
     }
 
     /// <summary>A sample seam.</summary>
