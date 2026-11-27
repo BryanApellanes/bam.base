@@ -170,8 +170,8 @@ public class ProjectableServiceRegistry : ServiceRegistry
     /// <summary>
     /// Binds a service the host composes itself, constructed as <typeparamref name="TImplementation"/> both on the
     /// registry and in the collection (projected with <c>Replace</c> as a singleton). Rebinding or removing it on the
-    /// registry afterwards is a conflict, and so is declaring the same service as a seam, a catalog or an extension. A
-    /// service composed as itself (<c>Compose&lt;Foo, Foo&gt;()</c>) isn't compared on the registry, as with a seam:
+    /// registry afterwards is a conflict, and so is composing it a second time or declaring the same service as a seam, a
+    /// catalog or an extension. A service composed as itself (<c>Compose&lt;Foo, Foo&gt;()</c>) isn't compared on the registry, as with a seam:
     /// resolving it stores the instance under its own type.
     /// </summary>
     /// <typeparam name="TService">The service type.</typeparam>
@@ -189,7 +189,10 @@ public class ProjectableServiceRegistry : ServiceRegistry
     /// Binds a service the host composes itself with two factories: one for the registry and, optionally, one for the
     /// host's container (projected with <c>Replace</c> as a singleton). Without <paramref name="hostFactory"/>, nothing
     /// is projected for it and the host registers it itself. Rebinding or removing it on the registry afterwards is a
-    /// conflict, and so is declaring the same service as a seam, a catalog or an extension.
+    /// conflict, and so is composing it a second time or declaring the same service as a seam, a catalog or an extension.
+    /// Projecting the same declaration twice into one collection is idempotent only when <paramref name="hostFactory"/>
+    /// captures nothing (a static method or a non-capturing lambda), since the check compares delegates; a capturing
+    /// lambda or an instance method is refused on the second projection.
     /// </summary>
     /// <typeparam name="TService">The service type.</typeparam>
     /// <param name="registryFactory">Builds the service from this registry.</param>
@@ -275,7 +278,8 @@ public class ProjectableServiceRegistry : ServiceRegistry
     /// else: a declared seam, or a composed binding the registry projects, whose existing registration is neither the
     /// declared type nor a known default. A registration made with a factory or an instance has no type to compare, so
     /// it counts, and anything already registered for a service composed with a host factory counts too, unless it is
-    /// the known default. Keyed registrations are ignored. Lifetimes aren't compared: both are projected as singletons.
+    /// the known default or a registration whose factory equals the composed host factory (an earlier projection of the
+    /// same declaration, so projecting again is idempotent). Keyed registrations are ignored. Lifetimes aren't compared: both are projected as singletons.
     /// A composed binding with no host factory is the host's to register and isn't checked.
     /// </summary>
     /// <param name="services">The host's service collection.</param>
